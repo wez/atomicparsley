@@ -1413,7 +1413,7 @@ void APar_FieldInit(ID3v2Frame* aFrame, uint8_t a_field, uint8_t frame_comp_list
 		
 		case ID3_BINARY_DATA_FIELD : {
 			if (aFrame->ID3v2_Frame_ID == ID3v2_EMBEDDED_PICTURE || aFrame->ID3v2_Frame_ID == ID3v2_EMBEDDED_OBJECT ) {
-				//this will be left NULL because it would would probably have to be realloced, so just do it later to the right size //byte_allocation = (uint32_t)findFileSize(frame_payload) + 1; //this should be limited to max_sync_safe_uint28_t
+				//this will be left NULL because it would would probably have to be realloced, so just do it later to the right size //byte_allocation = findFileSize(frame_payload) + 1; //this should be limited to max_sync_safe_uint28_t
 			} else {
 				byte_allocation = 2000;
 			}
@@ -1512,26 +1512,26 @@ uint32_t APar_TextFieldDataPut(ID3v2Fields* thisField, const char* this_payload,
 		
 	} else if (str_encoding == TE_LATIN1) {
 		int string_length = strlen(this_payload);
-		if ((uint32_t)string_length + thisField->field_length > thisField->alloc_length) {
+		if (string_length + thisField->field_length > thisField->alloc_length) {
 			APar_realloc_memcpy(thisField, (string_length > 2000 ? string_length : 2000) );
 		}
 		int converted_bytes = UTF8Toisolat1((unsigned char*)thisField->field_string + thisField->field_length, (int)thisField->alloc_length,
 		                                   (unsigned char*)this_payload, string_length);
 		if (converted_bytes > 0) {
-			thisField->field_length += (uint32_t)converted_bytes;
+			thisField->field_length += converted_bytes;
 			bytes_used = converted_bytes;
 			//fprintf(stdout, "string %s, %u=%u\n", thisField->field_string, thisField->field_length, bytes_used);
 		}
 		
 	} else if (str_encoding == TE_UTF16BE_NO_BOM) {
 		int string_length = (int)utf8_length(this_payload, strlen(this_payload)) + 1;
-		if (2 * (uint32_t)string_length + thisField->field_length > thisField->alloc_length) {
-			APar_realloc_memcpy(thisField, (2 * (uint32_t)string_length + thisField->field_length > 2000 ? 2 * (uint32_t)string_length + thisField->field_length : 2000) );
+		if (2 * string_length + thisField->field_length > thisField->alloc_length) {
+			APar_realloc_memcpy(thisField, (2 * string_length + thisField->field_length > 2000 ? 2 * string_length + thisField->field_length : 2000) );
 		}
 		int converted_bytes = UTF8ToUTF16BE((unsigned char*)thisField->field_string + thisField->field_length, (int)thisField->alloc_length,
 		                                   (unsigned char*)this_payload, string_length);
 		if (converted_bytes > 0) {
-			thisField->field_length += (uint32_t)converted_bytes;
+			thisField->field_length += converted_bytes;
 			bytes_used = converted_bytes;
 		}
 	
@@ -1539,8 +1539,8 @@ uint32_t APar_TextFieldDataPut(ID3v2Fields* thisField, const char* this_payload,
 		int string_length = (int)utf8_length(this_payload, strlen(this_payload)) + 1;
 		uint32_t bom_offset = 0;
 		
-		if (2 * (uint32_t)string_length + thisField->field_length > thisField->alloc_length) { //important: realloc before BOM testing!!!
-			APar_realloc_memcpy(thisField, (2 * (uint32_t)string_length + thisField->field_length > 2000 ? 2 * (uint32_t)string_length + thisField->field_length : 2000) );
+		if (2 * string_length + thisField->field_length > thisField->alloc_length) { //important: realloc before BOM testing!!!
+			APar_realloc_memcpy(thisField, (2 * string_length + thisField->field_length > 2000 ? 2 * string_length + thisField->field_length : 2000) );
 		}
 		if (thisField->field_length == 0 && multistringtext == false) {
 			memcpy(thisField->field_string, "\xFF\xFE", 2);
@@ -1553,7 +1553,7 @@ uint32_t APar_TextFieldDataPut(ID3v2Fields* thisField, const char* this_payload,
 		int converted_bytes = UTF8ToUTF16LE((unsigned char*)thisField->field_string + thisField->field_length + bom_offset, (int)thisField->alloc_length,
 		                                   (unsigned char*)this_payload, string_length);
 		if (converted_bytes > 0) {
-			thisField->field_length += (uint32_t)converted_bytes + bom_offset;
+			thisField->field_length += converted_bytes + bom_offset;
 			bytes_used = converted_bytes;
 		}
 	}
@@ -1576,7 +1576,7 @@ uint32_t APar_BinaryFieldPut(ID3v2Fields* thisField, uint32_t a_number, const ch
 		return 1;
 		
 	} else if (thisField->ID3v2_Field_Type == ID3_BINARY_DATA_FIELD && payload_len == 0) { //contents of a file
-		uint32_t file_length = (uint32_t)findFileSize(this_payload);
+		uint64_t file_length = findFileSize(this_payload);
 		thisField->field_string = (char*)calloc(1, sizeof(char*)*file_length+16);
 		
 		FILE* binfile = APar_OpenFile(this_payload, "rb");
@@ -1786,7 +1786,7 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 			}
 			
 			if (playcount < 268435455) {
-				convert_to_syncsafe32((uint32_t)playcount, play_count_syncsafe);
+				convert_to_syncsafe32(playcount, play_count_syncsafe);
 				thisFrame->ID3v2_Frame_Length = APar_BinaryFieldPut(thisFrame->ID3v2_Frame_Fields, 0, play_count_syncsafe, 4);
 			} else {
 				uint8_t conversion_len = convert_to_syncsafeXX(playcount, play_count_syncsafe);
@@ -1826,7 +1826,7 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 			}
 			if (popm_playcount > 0) {
 				if (popm_playcount < 268435455) {
-					convert_to_syncsafe32((uint32_t)popm_playcount, popm_play_count_syncsafe);
+					convert_to_syncsafe32(popm_playcount, popm_play_count_syncsafe);
 					thisFrame->ID3v2_Frame_Length = APar_BinaryFieldPut(thisFrame->ID3v2_Frame_Fields, 0, popm_play_count_syncsafe, 4); //syncsafe32 counter
 				} else {
 					uint8_t conversion_len = convert_to_syncsafeXX(popm_playcount, popm_play_count_syncsafe);

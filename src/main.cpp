@@ -1813,7 +1813,7 @@ int main( int argc, char *argv[]) {
 		//X bytes - binary data
 				
 				uint32_t extn_len = strlen(uuid_file_extn)+1; //+1 for the trailing 1 byte NULL terminator
-				uint32_t file_len = (uint32_t)findFileSize(uuid_file_path);
+				uint64_t file_len = findFileSize(uuid_file_path);
 				
 				APar_MetaData_atom_QuickInit(genericUUID->AtomicNumber, uuid_dataType, 20, extn_len + desc_len + file_len + 100);
 				genericUUID->AtomicClassification = EXTENDED_ATOM; //it gets reset in QuickInit Above; force its proper setting
@@ -2007,7 +2007,7 @@ int main( int argc, char *argv[]) {
 			
 			for (uint8_t i_asset = 1; i_asset <= asset_iterations; i_asset++) {
 				AtomicInfo* title_asset = APar_UserData_atom_Init("titl", optarg, userdata_area, asset_iterations == 1 ? selected_track : i_asset, packed_lang);
-				APar_Unified_atom_Put(title_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), (uint32_t)packed_lang, 16);
+				APar_Unified_atom_Put(title_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), packed_lang, 16);
 			}
 			break;
 		}
@@ -2035,7 +2035,7 @@ int main( int argc, char *argv[]) {
 			
 			for (uint8_t i_asset = 1; i_asset <= asset_iterations; i_asset++) {
 				AtomicInfo* author_asset = APar_UserData_atom_Init("auth", optarg, userdata_area, asset_iterations == 1 ? selected_track : i_asset, packed_lang);
-				APar_Unified_atom_Put(author_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), (uint32_t)packed_lang, 16);
+				APar_Unified_atom_Put(author_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), packed_lang, 16);
 			}
 			break;
 		}
@@ -2063,7 +2063,7 @@ int main( int argc, char *argv[]) {
 			
 			for (uint8_t i_asset = 1; i_asset <= asset_iterations; i_asset++) {
 				AtomicInfo* performer_asset = APar_UserData_atom_Init("perf", optarg, userdata_area, asset_iterations == 1 ? selected_track : i_asset, packed_lang);
-				APar_Unified_atom_Put(performer_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), (uint32_t)packed_lang, 16);
+				APar_Unified_atom_Put(performer_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), packed_lang, 16);
 			}
 			break;
 		}
@@ -2091,7 +2091,7 @@ int main( int argc, char *argv[]) {
 			
 			for (uint8_t i_asset = 1; i_asset <= asset_iterations; i_asset++) {
 				AtomicInfo* genre_asset = APar_UserData_atom_Init("gnre", optarg, userdata_area, asset_iterations == 1 ? selected_track : i_asset, packed_lang);
-				APar_Unified_atom_Put(genre_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), (uint32_t)packed_lang, 16);
+				APar_Unified_atom_Put(genre_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), packed_lang, 16);
 			}
 			break;
 		}
@@ -2119,7 +2119,7 @@ int main( int argc, char *argv[]) {
 			
 			for (uint8_t i_asset = 1; i_asset <= asset_iterations; i_asset++) {
 				AtomicInfo* description_asset = APar_UserData_atom_Init("dscp", optarg, userdata_area, asset_iterations == 1 ? selected_track : i_asset, packed_lang);
-				APar_Unified_atom_Put(description_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), (uint32_t)packed_lang, 16);
+				APar_Unified_atom_Put(description_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), packed_lang, 16);
 			}
 			break;
 		}
@@ -2152,7 +2152,7 @@ int main( int argc, char *argv[]) {
 			
 			for (uint8_t i_asset = 1; i_asset <= asset_iterations; i_asset++) {
 				AtomicInfo* copyright_notice = APar_UserData_atom_Init("cprt", optarg, userdata_area, asset_iterations == 1 ? selected_track : i_asset, packed_lang);
-				APar_Unified_atom_Put(copyright_notice, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), (uint32_t)packed_lang, 16);
+				APar_Unified_atom_Put(copyright_notice, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), packed_lang, 16);
 			}
 			break;
 		}
@@ -2193,9 +2193,9 @@ int main( int argc, char *argv[]) {
 			
 			for (uint8_t i_asset = 1; i_asset <= asset_iterations; i_asset++) {
 				AtomicInfo* album_asset = APar_UserData_atom_Init("albm", optarg, userdata_area, asset_iterations == 1 ? selected_track : i_asset, packed_lang);
-				APar_Unified_atom_Put(album_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), (uint32_t)packed_lang, 16);
+				APar_Unified_atom_Put(album_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), packed_lang, 16);
 				if (tracknum != 0) {
-					APar_Unified_atom_Put(album_asset, NULL, UTF8_3GP_Style, (uint32_t)tracknum, 8);
+					APar_Unified_atom_Put(album_asset, NULL, UTF8_3GP_Style, tracknum, 8);
 				}
 			}			
 			break;
@@ -2236,7 +2236,7 @@ int main( int argc, char *argv[]) {
 			
 			for (uint8_t i_asset = 1; i_asset <= asset_iterations; i_asset++) {
 				AtomicInfo* recordingyear_asset = APar_UserData_atom_Init("yrrc", optarg, userdata_area, asset_iterations == 1 ? selected_track : i_asset, 0);
-				APar_Unified_atom_Put(recordingyear_asset, NULL, UTF8_3GP_Style, (uint32_t)year_tag, 16);
+				APar_Unified_atom_Put(recordingyear_asset, NULL, UTF8_3GP_Style, year_tag, 16);
 			}
 			break;	
 		}
@@ -2285,7 +2285,7 @@ int main( int argc, char *argv[]) {
 			
 				APar_Unified_atom_Put(rating_asset, NULL, UTF8_3GP_Style, UInt32FromBigEndian(rating_entity), 32);
 				APar_Unified_atom_Put(rating_asset, NULL, UTF8_3GP_Style, UInt32FromBigEndian(rating_criteria), 32);
-				APar_Unified_atom_Put(rating_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), (uint32_t)packed_lang, 16);
+				APar_Unified_atom_Put(rating_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), packed_lang, 16);
 			}
 			break;	
 		}
@@ -2334,7 +2334,7 @@ int main( int argc, char *argv[]) {
 				
 				APar_Unified_atom_Put(classification_asset, NULL, UTF8_3GP_Style, UInt32FromBigEndian(classification_entity), 32);
 				APar_Unified_atom_Put(classification_asset, NULL, UTF8_3GP_Style, classification_index, 16);
-				APar_Unified_atom_Put(classification_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), (uint32_t)packed_lang, 16);
+				APar_Unified_atom_Put(classification_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), packed_lang, 16);
 			}
 			break;	
 		}
@@ -2391,7 +2391,7 @@ int main( int argc, char *argv[]) {
 				for (uint8_t i_asset = 1; i_asset <= asset_iterations; i_asset++) {
 					AtomicInfo* keyword_asset = APar_UserData_atom_Init("kywd", keyword_strlen ? "temporary" : "", userdata_area, asset_iterations == 1 ? selected_track : i_asset, packed_lang); //just a "temporary" valid string to satisfy a test there
 					if (keyword_strlen > 0) {
-						APar_Unified_atom_Put(keyword_asset, NULL, UTF8_3GP_Style, (uint32_t)packed_lang, 16);
+						APar_Unified_atom_Put(keyword_asset, NULL, UTF8_3GP_Style, packed_lang, 16);
 						APar_Unified_atom_Put(keyword_asset, NULL, UTF8_3GP_Style, keyword_count, 8);
 						APar_atom_Binary_Put(keyword_asset, formed_keyword_struct, keyword_struct_bytes, 3);
 					}
@@ -2493,8 +2493,8 @@ int main( int argc, char *argv[]) {
 				for (uint8_t i_asset = 1; i_asset <= asset_iterations; i_asset++) {
 					//short location_3GP_atom = APar_UserData_atom_Init("moov.udta.loci", optarg, packed_lang);
 					AtomicInfo* location_asset = APar_UserData_atom_Init("loci", optarg, userdata_area, asset_iterations == 1 ? selected_track : i_asset, packed_lang);
-					APar_Unified_atom_Put(location_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), (uint32_t)packed_lang, 16);
-					APar_Unified_atom_Put(location_asset, NULL, false, (uint32_t)role, 8);
+					APar_Unified_atom_Put(location_asset, optarg, (set_UTF16_text ? UTF16_3GP_Style : UTF8_3GP_Style), packed_lang, 16);
+					APar_Unified_atom_Put(location_asset, NULL, false, role, 8);
 					
 					APar_Unified_atom_Put(location_asset, NULL, false, float_to_16x16bit_fixed_point(longitude), 32);
 					APar_Unified_atom_Put(location_asset, NULL, false, float_to_16x16bit_fixed_point(latitude), 32);

@@ -118,7 +118,7 @@ secsTOtime
 ----------------------*/
 char* secsTOtime(double seconds) {
 	ap_time time_duration = {0};
-	uint32_t whole_secs = (uint32_t)(seconds / 1);
+	uint32_t whole_secs = seconds / 1;
 	
 	time_duration.rem_millisecs = seconds - (double)whole_secs;
 	time_duration.hours = whole_secs / 3600;
@@ -1184,7 +1184,7 @@ void APar_Print_TrackDetails(TrackInfo* track_info) {
 #if defined (_MSC_VER)
 		fprintf(stdout, "     %.2lf* kbp/s", ( (double)((__int64)track_info->sample_aggregate) /
 																						( (double)((__int64)track_info->duration) / (double)((__int64)movie_info.timescale)) ) / 1000.0 * 8);
-		fprintf(stdout, "  %.3f sec", (float)((uint32_t)track_info->duration) / (float)((uint32_t)movie_info.timescale));
+		fprintf(stdout, "  %.3f sec", (float)track_info->duration / (float)movie_info.timescale);
 #else
 		fprintf(stdout, "     %.2lf* kbp/s", ( (double)track_info->sample_aggregate /
 																						( (double)track_info->duration / (double)movie_info.timescale) ) / 1000.0 * 8);

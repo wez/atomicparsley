@@ -649,7 +649,7 @@ void ListGenresValues() {
 
 stiks* MatchStikString(const char* in_stik_string) {
 	stiks* matching_stik = NULL;
-	uint8_t total_known_stiks = (uint32_t)(sizeof(stikArray)/sizeof(*stikArray));
+	uint8_t total_known_stiks = (sizeof(stikArray)/sizeof(*stikArray));
 	uint8_t stik_str_length = strlen(in_stik_string) +1;
 	
 	for (uint8_t i = 0; i < total_known_stiks; i++) {
@@ -664,7 +664,7 @@ stiks* MatchStikString(const char* in_stik_string) {
 
 stiks* MatchStikNumber(uint8_t in_stik_num) {
 	stiks* matching_stik = NULL;
-	uint8_t total_known_stiks = (uint32_t)(sizeof(stikArray)/sizeof(*stikArray));
+	uint8_t total_known_stiks = (sizeof(stikArray)/sizeof(*stikArray));
 	
 	for (uint8_t i = 0; i < total_known_stiks; i++) {
 		if ( stikArray[i].stik_number == in_stik_num ) {
@@ -676,7 +676,7 @@ stiks* MatchStikNumber(uint8_t in_stik_num) {
 }
 
 void ListStikValues() {
-	uint8_t total_known_stiks = (uint32_t)(sizeof(stikArray)/sizeof(*stikArray));
+	uint8_t total_known_stiks = (sizeof(stikArray)/sizeof(*stikArray));
 	fprintf(stdout, "\tAvailable stik settings - case sensitive  (number in parens shows the stik value).\n");
 
 	for (uint8_t i = 0; i < total_known_stiks; i++) {
@@ -687,7 +687,7 @@ void ListStikValues() {
 
 sfIDs* MatchStoreFrontNumber(uint32_t storefrontnum) {
 	sfIDs* matching_sfID = NULL;
-	uint8_t total_known_sfs = (uint32_t)(sizeof(storefronts)/sizeof(*storefronts));
+	uint8_t total_known_sfs = (sizeof(storefronts)/sizeof(*storefronts));
 	
 	for (uint8_t i = 0; i < total_known_sfs; i++) {
 		if ( storefronts[i].storefront_number == storefrontnum ) {

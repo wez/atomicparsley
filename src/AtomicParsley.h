@@ -63,8 +63,8 @@ enum {
 
 struct AtomicInfo  {
 	short     AtomicNumber;
-	uint32_t  AtomicStart;
-	uint32_t  AtomicLength;
+	uint64_t  AtomicStart;
+	uint64_t  AtomicLength;
 	uint64_t  AtomicLengthExtended;
 	char*     AtomicName;
 	char*			ReverseDNSname;
@@ -257,7 +257,7 @@ extern bool moov_atom_was_mooved;
 extern int metadata_style;
 extern uint32_t brand;
 extern uint32_t mdatData;
-extern uint32_t file_size;
+extern uint64_t file_size;
 extern uint32_t gapless_void_padding;
 
 extern EmployedCodecs track_codecs;
