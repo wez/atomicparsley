@@ -1045,13 +1045,14 @@ void APar_IdentifyBrand(char* file_brand ) {
 		case 0x4D344220 : //'M4B '
 		case 0x4D345020 : //'M4P '
 		case 0x4D345620 : //'M4V '
+		case 0x4D345648 : //'MV4H'
+		case 0x4D345650 : //'M4VP'
 		case 0x6D703432 : //'mp42'
 		case 0x6D703431 : //'mp41'
 		case 0x69736F6D : //'isom'
 		case 0x69736F32 : //'iso2'
 		case 0x61766331 : //'avc1'
 		
-		case 0x4D345648 : //'MV4H'
 
 			metadata_style = ITUNES_STYLE;
 			break;
