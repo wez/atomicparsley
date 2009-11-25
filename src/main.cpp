@@ -1101,7 +1101,7 @@ int main( int argc, char *argv[]) {
 	int c = -1;
 	int option_index = 0; 
 	
-	c = getopt_long(argc, argv, "hTtEe:a:b:c:d:f:g:i:k:l:n:o:pq::u:w:y:z:A:B:C:D:F:G:H:I:J:K:L:MN:QR:S:U:WXV:ZP 0xAA: 0xAB: 0xAC: 0xAD: 0xAE: 0xAF: 0xB0: 0xB1: 0xB2: 0xB3: 0xB4: 0xB5: 0xB6:", long_options, &option_index);
+	c = getopt_long(argc, argv, "hTtEe:a:b:c:d:f:g:i:k:l:n:o:p:q::u:w:y:z:A:B:C:D:F:G:H:I:J:K:L:MN:QR:S:U:WXV:ZP 0xAA: 0xAB: 0xAC: 0xAD: 0xAE: 0xAF: 0xB0: 0xB1: 0xB2: 0xB3: 0xB4: 0xB5: 0xB6:", long_options, &option_index);
 	
 	if (c == -1) {
 		if (argc < 3 && argc > 2) {
