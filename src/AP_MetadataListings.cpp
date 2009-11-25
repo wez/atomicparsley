@@ -652,7 +652,7 @@ void APar_Print_iTunesData(const char *path, char* output_path, uint8_t suppleme
 		}
 		if (supplemental_info && 0x04) { //PRINT_PADDING_SPACE
 			if (!moov_atom_was_mooved) {
-				fprintf(stdout, "padding available: %u bytes\n", dynUpd.padding_bytes);
+				fprintf(stdout, "padding available: %llu bytes\n", dynUpd.padding_bytes);
 			} else {
 				fprintf(stdout, "padding available: 0 (reorg)\n");
 			}
@@ -1529,13 +1529,15 @@ void APar_PrintAtomicTree() {
 		mdatData, file_size - mdatData,
 		(double)(file_size - mdatData)/(double)file_size * 100.0 );
 
-	fprintf(stdout, "Total free atom space: %u bytes; %2.3lf%% waste.", freeSpace, (double)freeSpace/(double)file_size * 100.0 );
+	fprintf(stdout, "Total free atom space: %u bytes; %2.3lf%% waste.",
+		freeSpace, (double)freeSpace/(double)file_size * 100.0 );
+
 	if (freeSpace) {
 		dynUpd.updage_by_padding = false;
 		//APar_DetermineDynamicUpdate(true); //gets the size of the padding
 		APar_Optimize(true); //just to know if 'free' atoms can be considered padding, or (in the case of say a faac file) it's *just* 'free'
 		if (!moov_atom_was_mooved) {
-			fprintf(stdout, " Padding available: %u bytes.", dynUpd.padding_bytes);
+			fprintf(stdout, " Padding available: %llu bytes.", dynUpd.padding_bytes);
 		}
 	}
 	if (gapless_void_padding > 0) {

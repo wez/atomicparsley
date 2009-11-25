@@ -119,7 +119,7 @@ struct DynamicUpdateStat  {
 
 	uint32_t optimization_flags;
 	
-	uint32_t padding_bytes;
+	uint64_t padding_bytes;
 	short consolidated_padding_insertion;
 
 	AtomicInfo* last_trak_child_atom;
