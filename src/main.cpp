@@ -140,7 +140,7 @@ static void kill_signal (int sig) {
 }
 
 //less than 80 (max 78) char wide, giving a general (concise) overview
-static char* shortHelp_text =
+static const char* shortHelp_text =
 "\n"
 "AtomicParlsey sets metadata into MPEG-4 files & derivatives supporting 3 tag\n"
 " schemes: iTunes-style, 3GPP assets & ISO defined copyright notifications.\n"
@@ -210,7 +210,7 @@ static char* shortHelp_text =
 ;
 
 //an expansive, verbose, unconstrained (about 112 char wide) detailing of options
-static char* longHelp_text =
+static const char* longHelp_text =
 "AtomicParsley help page for setting iTunes-style metadata into MPEG-4 files. \n"
 "              (3gp help available with AtomicParsley --3gp-help)\n"
 "          (ISO copyright help available with AtomicParsley --ISO-help)\n"
@@ -323,7 +323,7 @@ static char* longHelp_text =
 #endif
 ;
 
-static char* fileLevelHelp_text =
+static const char* fileLevelHelp_text =
 "AtomicParsley help page for general & file level options.\n"
 #if defined (_MSC_VER)
 "  Note: you can change the input/output behavior to raw 8-bit utf8 if the program name\n"
@@ -446,7 +446,7 @@ static char* fileLevelHelp_text =
 ;
 
 //detailed options for 3gp branded files
-static char* _3gpHelp_text =
+static const char* _3gpHelp_text =
 "AtomicParsley 3gp help page for setting 3GPP-style metadata.\n"
 "----------------------------------------------------------------------------------------------------\n"
 "  3GPP text tags can be encoded in either UTF-8 (default input encoding) or UTF-16 (converted from UTF-8)\n"
@@ -524,7 +524,7 @@ static char* _3gpHelp_text =
 "\n"
 ;
 
-static char* ISOHelp_text =
+static const char* ISOHelp_text =
 "AtomicParsley help page for setting ISO copyright notices at movie & track level.\n"
 "----------------------------------------------------------------------------------------------------\n"
 "  The ISO specification allows for setting copyright in a number of places. This copyright atom is\n"
@@ -556,7 +556,7 @@ static char* ISOHelp_text =
 "Note: (foo) denotes required arguments; [foo] denotes optional parameters & may have defaults.\n"
 ;
 
-static char* uuidHelp_text =
+static const char* uuidHelp_text =
 "AtomicParsley help page for setting uuid user extension metadata tags.\n"
 "----------------------------------------------------------------------------------------------------\n"
 " Setting a user-defined 'uuid' private extention tags will appear in \"moov.udta.meta\"). These will\n"
@@ -628,7 +628,7 @@ static char* uuidHelp_text =
 "------------------------------------------------------------------------------------------------\n"
 ;
 
-static char* rDNSHelp_text =
+static const char* rDNSHelp_text =
 "AtomicParsley help page for setting reverse domain '----' metadata atoms.\n"
 "----------------------------------------------------------------------------------------------------\n"
 "          Please note that the reverse DNS format supported here is not feature complete.\n"
@@ -658,7 +658,7 @@ static char* rDNSHelp_text =
 "----------------------------------------------------------------------------------------------------\n"
 ;
 
-static char* ID3Help_text =
+static const char* ID3Help_text =
 "AtomicParsley help page for ID32 atoms with ID3 tags.\n"
 "----------------------------------------------------------------------------------------------------\n"
 "      **  Please note: ID3 tag support is not feature complete & is in an alpha state.  **\n"
@@ -824,7 +824,7 @@ void find_optional_args(char *argv[], int start_optindargs, uint16_t &packed_lan
 	return;
 }
 
-void scan_ID3_optargs(char *argv[], int start_optargs, char* &target_lang, uint16_t &packed_lang, uint8_t &char_encoding, char* meta_container, bool &multistring) {
+void scan_ID3_optargs(char *argv[], int start_optargs, const char* &target_lang, uint16_t &packed_lang, uint8_t &char_encoding, char* meta_container, bool &multistring) {
 	packed_lang = 5575; //default ID32 lang is 'eng'
 	uint16_t i = 0;
 	
@@ -864,8 +864,8 @@ void scan_ID3_optargs(char *argv[], int start_optargs, char* &target_lang, uint1
 	return;
 }
 
-char* find_ID3_optarg(char *argv[], int start_optargs, char* arg_string) {
-	char* ret_val = "";
+const char* find_ID3_optarg(char *argv[], int start_optargs, const char* arg_string) {
+	const char* ret_val = "";
 	uint16_t i = 0;
 	uint8_t arg_prefix_len = strlen(arg_string);
 	
@@ -2423,8 +2423,8 @@ int main( int argc, char *argv[]) {
 			double latitude = 40.77;
 			double altitude = 4.3;
 			uint8_t role = 0;
-			char* astronomical_body = "Earth";
-			char* additional_notes = "no notes";
+			const char* astronomical_body = "Earth";
+			const char* additional_notes = "no notes";
 			
 			find_optional_args(argv, optind, packed_lang, set_UTF16_text, userdata_area, selected_track, 10);
 			
@@ -2553,7 +2553,7 @@ int main( int argc, char *argv[]) {
 		}
 		
 		case Meta_rDNS_rating : {
-			char* media_rating = Expand_cli_mediastring(optarg);
+			const char* media_rating = Expand_cli_mediastring(optarg);
 			uint32_t rDNS_data_flags = AtomFlags_Data_Text;
 			
 			APar_ScanAtoms(ISObasemediafile);
@@ -2567,7 +2567,7 @@ int main( int argc, char *argv[]) {
 		}
 		
 		case Meta_ID3v2Tag : {
-			char* target_frame_ID = NULL;
+			const char* target_frame_ID = NULL;
 			uint16_t packed_lang = 0;
 			uint8_t char_encoding = TE_UTF8; //utf8 is the default encoding
 			char meta_container = 0-MOVIE_LEVEL_ATOM;
@@ -2631,7 +2631,7 @@ int main( int argc, char *argv[]) {
 					id3args->zlibCompressed = true;
 				}
 				
-				char* groupsymbol = find_ID3_optarg(argv, optind, "groupsymbol=");
+				const char* groupsymbol = find_ID3_optarg(argv, optind, "groupsymbol=");
 				if (groupsymbol[0] == '0' && groupsymbol[1] == 'x') {
 					sscanf(groupsymbol, "%hhX", &id3args->groupSymbol);
 					if (id3args->groupSymbol < 0x80 || id3args->groupSymbol > 0xF0) id3args->groupSymbol = 0;

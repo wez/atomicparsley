@@ -30,7 +30,7 @@ typedef struct {
 
 void APar_print_uuid(ap_uuid_t* uuid, bool new_line = true);
 void APar_sprintf_uuid(ap_uuid_t* uuid, char* destination);
-uint8_t APar_uuid_scanf(char* in_formed_uuid, char* raw_uuid);
+uint8_t APar_uuid_scanf(char* in_formed_uuid, const char* raw_uuid);
 
 void APar_endian_uuid_bin_str_conversion(char* raw_uuid);
 

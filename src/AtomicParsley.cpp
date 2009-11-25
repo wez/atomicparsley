@@ -568,7 +568,7 @@ APar_FindChildAtom
 
     Given an atom, search its children for child_name
 ----------------------*/
-AtomicInfo* APar_FindChildAtom(short parent_atom, char* child_name, uint8_t child_name_len = 4, uint16_t desired_index = 1) {
+AtomicInfo* APar_FindChildAtom(short parent_atom, const char* child_name, uint8_t child_name_len = 4, uint16_t desired_index = 1) {
 	AtomicInfo* found_child = NULL;
 	short test_child_idx = parsedAtoms[parent_atom].NextAtomNumber;
 	uint16_t current_count = 0;
@@ -1923,7 +1923,7 @@ APar_InterjectNewAtom
 
     Creates a single new atom (carrying NULLed data) inserted after preceding_atom
 ----------------------*/
-short APar_InterjectNewAtom(char* atom_name, uint8_t cntr_state, uint8_t atom_class, uint32_t atom_length, 
+short APar_InterjectNewAtom(const char* atom_name, uint8_t cntr_state, uint8_t atom_class, uint32_t atom_length, 
 														uint32_t atom_verflags, uint16_t packed_lang, uint8_t atom_level,
 														short preceding_atom) {
 														
@@ -2351,7 +2351,7 @@ APar_sprintf_atompath
 
     Fill a destinaiton path with the fully expressed atom path taking track indexes into consideration
 ----------------------*/
-void APar_sprintf_atompath(char* dest_path, char* target_atom_name, uint8_t track_index, uint8_t udta_container, uint16_t dest_len) {
+void APar_sprintf_atompath(char* dest_path, const char* target_atom_name, uint8_t track_index, uint8_t udta_container, uint16_t dest_len) {
 	memset(dest_path, 0, dest_len);
 	if (udta_container == MOVIE_LEVEL_ATOM) {
 		memcpy(dest_path, "moov.udta.", 10);
@@ -2425,7 +2425,7 @@ APar_uuid_atom_Init
 		
 		//4bytes atom length, 4 bytes 'uuid', 16bytes uuidv5, 4bytes name of uuid in AP namespace, 4bytes versioning, 4bytes NULL, Xbytes data
 ----------------------*/
-AtomicInfo* APar_uuid_atom_Init(const char* atom_path, char* uuidName, const uint32_t dataType, const char* uuidValue, bool shellAtom) {
+AtomicInfo* APar_uuid_atom_Init(const char* atom_path, const char* uuidName, const uint32_t dataType, const char* uuidValue, bool shellAtom) {
 	AtomicInfo* desiredAtom = NULL;
 	char uuid_path[256];
 	char uuid_binary_str[20];
@@ -2582,7 +2582,7 @@ APar_UserData_atom_Init
 			
 			TODO NOTE: the track modification date should change if set at track level because of this
 ----------------------*/
-AtomicInfo* APar_UserData_atom_Init(char* userdata_atom_name, const char* atom_payload, uint8_t udta_container, uint8_t track_idx, uint16_t userdata_lang) {
+AtomicInfo* APar_UserData_atom_Init(const char* userdata_atom_name, const char* atom_payload, uint8_t udta_container, uint8_t track_idx, uint16_t userdata_lang) {
 	uint8_t atom_type = PACKED_LANG_ATOM;
 	uint8_t total_tracks = 0;
 	uint8_t a_track = 0;//unused
@@ -2709,7 +2709,7 @@ AtomicInfo* APar_reverseDNS_atom_Init(const char* rDNS_atom_name, const char* rD
 	return desiredAtom;
 }
 
-AtomicInfo* APar_ID32_atom_Init(char* frameID_str, char meta_area, char* lang_str, uint16_t id32_lang) {
+AtomicInfo* APar_ID32_atom_Init(const char* frameID_str, char meta_area, const char* lang_str, uint16_t id32_lang) {
 	uint8_t total_tracks = 0;
 	uint8_t a_track = 0;//unused
 	AtomicInfo* meta_atom = NULL;
@@ -4217,8 +4217,8 @@ void APar_ValidateAtoms() {
 	return;
 }
 
-void APar_DeriveNewPath(const char *filePath, char* temp_path, int output_type, const char* file_kind, char* forced_suffix, bool random_filename = true) {
-	char* suffix = NULL;
+void APar_DeriveNewPath(const char *filePath, char* temp_path, int output_type, const char* file_kind, const char* forced_suffix, bool random_filename = true) {
+	const char* suffix = NULL;
 	char* file_name = NULL;
 	size_t file_name_len = 0;
 	bool relative_path = false;
@@ -4313,7 +4313,7 @@ void APar_UpdateModTime(AtomicInfo* container_header_atom) {
 	APar_readX(container_header_atom->AtomicData, source_file, container_header_atom->AtomicStart+12, container_header_atom->AtomicLength-12);
 
 	uint32_t current_time = APar_get_mpeg4_time();
-	if (container_header_atom->AtomicVerFlags & 0xFFFFFF == 1) {
+	if ((container_header_atom->AtomicVerFlags & 0xFFFFFF) == 1) {
 		UInt64_TO_String8((uint64_t)current_time, container_header_atom->AtomicData+8);
 	} else {
 		UInt32_TO_String4(current_time, container_header_atom->AtomicData+4);

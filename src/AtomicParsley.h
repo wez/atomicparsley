@@ -83,7 +83,7 @@ struct AtomicInfo  {
 };
 
 //currently this is only used on Mac OS X to set type/creator for generic '.mp4' file extension files. The Finder 4 character code TYPE is what determines whether a file appears as a video or an audio file in a broad sense.
-typedef struct EmployedCodecs {
+struct EmployedCodecs {
 	bool has_avc1;
 	bool has_mp4v;
 	bool has_drmi;
@@ -146,8 +146,8 @@ struct padding_preferences {
 
 // Structure that defines the known atoms used by mpeg-4 family of specifications.
 typedef struct {
-  char*         known_atom_name;
-  char*					known_parent_atoms[5]; //max known to be tested
+  const char*         known_atom_name;
+  const char*					known_parent_atoms[5]; //max known to be tested
   uint32_t			container_state;
   int						presence_requirements;
   uint32_t			box_type;
@@ -198,24 +198,24 @@ enum {
 };
 
 typedef struct {
-  char*         stik_string;
+  const char*         stik_string;
   uint8_t       stik_number;
 } stiks;
 
 typedef struct {
-  char*         storefront_string;
+  const char*         storefront_string;
   uint32_t      storefront_number;
 } sfIDs;
 
 typedef struct {
-	char* iso639_2_code;
-	char* iso639_1_code;
-	char* language_in_english;
+	const char* iso639_2_code;
+	const char* iso639_1_code;
+	const char* language_in_english;
 } iso639_lang;
 
 typedef struct {
-  char* media_rating;
-  char* media_rating_cli_str;
+  const char* media_rating;
+  const char* media_rating_cli_str;
 } m_ratings;
 
 enum {
@@ -321,17 +321,17 @@ AtomicInfo* APar_MetaData_atom_Init(const char* atom_path, const char* MD_Payloa
 AtomicInfo* APar_reverseDNS_atom_Init(const char* rDNS_atom_name, const char* rDNS_payload, const uint32_t* atomFlags, const char* rDNS_domain);
 
 /* uuid user extension metadata; made to look much like iTunes-style metadata with a 4byte NULL */
-AtomicInfo* APar_uuid_atom_Init(const char* atom_path, char* uuidName, const uint32_t dataType, const char* uuidValue, bool shellAtom);
+AtomicInfo* APar_uuid_atom_Init(const char* atom_path, const char* uuidName, const uint32_t dataType, const char* uuidValue, bool shellAtom);
 
 uint16_t APar_TestVideoDescription(AtomicInfo* video_desc_atom, FILE* ISObmff_file); //test whether the ipod uuid can be added for a video track
 void APar_Generate_iPod_uuid(char* atom_path);
 
 /* 3GP-style metadata */
 uint32_t APar_3GP_Keyword_atom_Format(char* keywords_globbed, uint8_t keyword_count, bool set_UTF16_text, char* &formed_keyword_struct);
-AtomicInfo* APar_UserData_atom_Init(char* userdata_atom_name, const char* atom_payload, uint8_t udta_container, uint8_t track_idx, uint16_t userdata_lang);
+AtomicInfo* APar_UserData_atom_Init(const char* userdata_atom_name, const char* atom_payload, uint8_t udta_container, uint8_t track_idx, uint16_t userdata_lang);
 
 /* ID3v2 (2.4) style metadata, non-external form */
-AtomicInfo* APar_ID32_atom_Init(char* frameID_str, char meta_area, char* lang_str, uint16_t id32_lang);
+AtomicInfo* APar_ID32_atom_Init(const char* frameID_str, char meta_area, const char* lang_str, uint16_t id32_lang);
 
 void APar_RemoveAtom(const char* atom_path, uint8_t atom_type, uint16_t UD_lang, const char* rDNS_domain = NULL);
 void APar_freefree(int purge_level);

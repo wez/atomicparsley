@@ -20,7 +20,7 @@
 //==================================================================//
 
 void printBOM();
-void APar_fprintf_UTF8_data(char* utf8_encoded_data);
+void APar_fprintf_UTF8_data(const char* utf8_encoded_data);
 #if defined (_MSC_VER)
 void APar_unicode_win32Printout(wchar_t* unicode_out, char* utf8_out);
 #endif
@@ -31,7 +31,7 @@ void APar_Print_APuuid_atoms(const char *path, char* output_path, uint8_t target
 void APar_Print_iTunesData(const char *path, char* output_path, uint8_t supplemental_info, uint8_t target_information, AtomicInfo* ilstAtom = NULL);
 void APar_PrintUserDataAssests(bool quantum_listing = false);
 
-void APar_Extract_ID3v2_file(AtomicInfo* id32_atom, char* frame_str, char* originfile, char* destination_folder, AdjunctArgs* id3args);
+void APar_Extract_ID3v2_file(AtomicInfo* id32_atom, const char* frame_str, const char* originfile, const char* destination_folder, AdjunctArgs* id3args);
 void APar_Print_ID3v2_tags(AtomicInfo* id32_atom);
 
 void APar_Print_ISO_UserData_per_track();

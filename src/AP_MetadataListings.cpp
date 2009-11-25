@@ -37,7 +37,7 @@
 
 bool BOM_printed = false;
 
-uint32_t APar_ProvideTallyForAtom(char* atom_name) {
+uint32_t APar_ProvideTallyForAtom(const char* atom_name) {
 	uint32_t tally_for_atom = 0;
 	short iter = parsedAtoms[0].NextAtomNumber;
 	while (true) {
@@ -93,7 +93,7 @@ void APar_unicode_win32Printout(wchar_t* unicode_out, char* utf8_out) { //based 
 }
 #endif
 
-void APar_fprintf_UTF8_data(char* utf8_encoded_data) {
+void APar_fprintf_UTF8_data(const char* utf8_encoded_data) {
 #if defined (_MSC_VER)
 	if (GetVersion() & 0x80000000 || UnicodeOutputStatus == UNIVERSAL_UTF8) {
 		fprintf(stdout, "%s", utf8_encoded_data); //just printout the raw utf8 bytes (not characters) under pre-NT windows
@@ -257,9 +257,9 @@ void APar_ExtractAAC_Artwork(short this_atom_num, char* pic_output_path, short a
 	memset(suffix, 0, sizeof(char)*5);
 	
 	if (memcmp(art_payload, "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A", 8) == 0) {
-				suffix = ".png";
+				strcpy(suffix, ".png");
 	}	else if (memcmp(art_payload, "\xFF\xD8\xFF\xE0", 4) == 0 || memcmp(art_payload, "\xFF\xD8\xFF\xE1", 4) == 0) {
-				suffix = ".jpg";
+				strcpy(suffix, ".jpg");
 	}
 	
 	strcat(base_outpath, suffix);
@@ -326,7 +326,7 @@ APar_Extract_ID3v2_file
 		image format/extension definitions). In combination with the file extension, use the image description and image type to create the name of the output file.
 		The image (which if was compressed on disc was expanded when read in) and simply write out its data (stored in the 5th member of the frame's field strings.
 ----------------------*/
-void APar_Extract_ID3v2_file(AtomicInfo* id32_atom, char* frame_str, char* originfile, char* destination_folder, AdjunctArgs* id3args) {
+void APar_Extract_ID3v2_file(AtomicInfo* id32_atom, const char* frame_str, const char* originfile, const char* destination_folder, AdjunctArgs* id3args) {
 	uint16_t iter = 0;
 	ID3v2Frame* eval_frame = NULL;
 	uint32_t basepath_len = 0;
@@ -1053,8 +1053,8 @@ void APar_Print_ID3TextField(ID3v2Frame* textframe, ID3v2Fields* textfield, bool
 	return;
 }
 
-char* APar_GetTextEncoding(ID3v2Frame* aframe, ID3v2Fields* textfield) {
-	char* text_encoding = NULL;
+const char* APar_GetTextEncoding(ID3v2Frame* aframe, ID3v2Fields* textfield) {
+	const char* text_encoding = NULL;
 	if (aframe->ID3v2_Frame_Fields->field_string[0] == TE_LATIN1) text_encoding = "latin1";
 	if (aframe->ID3v2_Frame_Fields->field_string[0] == TE_UTF16BE_NO_BOM) {
 		if (memcmp(textfield->field_string, "\xFF\xFE", 2) == 0) {

@@ -189,26 +189,26 @@ enum text_encodings {
 
 // Structure that defines the (subset) known ID3 frames defined by id3 informal specification.
 typedef struct {
-  char*         ID3V2p2_FrameID;
-  char*					ID3V2p3_FrameID;
-  char*					ID3V2p4_FrameID;
-	char*					ID3V2_FrameDescription;
-	char*         CLI_frameIDpreset;
+  const char*         ID3V2p2_FrameID;
+  const char*					ID3V2p3_FrameID;
+  const char*					ID3V2p4_FrameID;
+	const char*					ID3V2_FrameDescription;
+	const char*         CLI_frameIDpreset;
   int						ID3v2_InternalFrameID;
   int						ID3v2_FrameType;
 } ID3FrameDefinition;
 
 typedef struct {
-  char*         image_mimetype;
-	char*         image_fileextn;
+  const char*         image_mimetype;
+	const char*         image_fileextn;
   uint8_t				image_testbytes;
-  char*					image_binaryheader;
+  const char*					image_binaryheader;
 } ImageFileFormatDefinition;
 
 typedef struct {
 	uint8_t       hexcode;
-	char*         hexstring;
-	char*         imagetype_str;
+	const char*         hexstring;
+	const char*         imagetype_str;
 } ID3ImageType;
 
 // Structure that defines how any ID3v2FrameType is constructed, listing an array of its constituent ID3_FieldTypes

@@ -267,8 +267,8 @@ uint16_t PackLanguage(const char* language_code, uint8_t lang_offset) { //?? is 
 	}
 	
 	packed_language = (((language_code[0+lang_offset] - 0x60) & 0x1F) << 10 ) | 
-	                   ((language_code[1+lang_offset] - 0x60) & 0x1F) << 5  | 
-										  (language_code[2+lang_offset] - 0x60) & 0x1F;
+	                   (((language_code[1+lang_offset] - 0x60) & 0x1F) << 5)  | 
+										  ((language_code[2+lang_offset] - 0x60) & 0x1F);
 	return packed_language;
 }
 
@@ -593,7 +593,7 @@ uint16_t UInt16FromBigEndian(const char *string) {
 	memcpy(&test,string,2);
 	return test;
 #else
-	return ((string[0] & 0xff) << 8 | string[1] & 0xff) << 0;
+	return (((string[0] & 0xff) << 8) | (string[1] & 0xff) << 0);
 #endif
 }
 
@@ -603,7 +603,7 @@ uint32_t UInt32FromBigEndian(const char *string) {
 	memcpy(&test,string,4);
 	return test;
 #else
-	return ((string[0] & 0xff) << 24 | (string[1] & 0xff) << 16 | (string[2] & 0xff) << 8 | string[3] & 0xff) << 0;
+	return (((string[0] & 0xff) << 24) | ((string[1] & 0xff) << 16) | ((string[2] & 0xff) << 8) | (string[3] & 0xff) << 0);
 #endif
 }
 
@@ -684,7 +684,7 @@ uint32_t widechar_len(char* instring, uint32_t _bytes_) {
 	return wstring_len;
 }
 
-bool APar_assert(bool expression, int error_msg, char* supplemental_info) {
+bool APar_assert(bool expression, int error_msg, const char* supplemental_info) {
 	bool force_break = true;
 	if (!expression) {
 		force_break = false;

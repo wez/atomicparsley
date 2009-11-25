@@ -1,0 +1,10 @@
+syntax: glob
+obj_dir
+AtomicParsley
+Makefile
+autom4te.cache
+config.log
+config.status
+configure
+src/Makefile
+src/config.h

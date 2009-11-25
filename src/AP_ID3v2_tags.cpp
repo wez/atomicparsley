@@ -172,7 +172,7 @@ uint8_t convert_to_syncsafeXX(uint64_t in_uint, char* buffer) {
 }
 
 uint32_t UInt24FromBigEndian(const char *string) { //v2.2 frame lengths
-	return (0 << 24 | (string[0] & 0xff) << 16 | (string[1] & 0xff) << 8 | string[2] & 0xff) << 0;
+	return ((0 << 24) | ((string[0] & 0xff) << 16) | ((string[1] & 0xff) << 8) | (string[2] & 0xff) << 0);
 }
 
 uint32_t ID3v2_desynchronize(char* buffer, uint32_t bufferlen) {
@@ -304,7 +304,7 @@ void WriteZlibData(char* buffer, uint32_t buff_len) {
 //                               cli functions                                       //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-char* ReturnFrameTypeStr(int frametype) {
+static const char* ReturnFrameTypeStr(int frametype) {
 	if (frametype == ID3_TEXT_FRAME) {
 		return "text frame             ";
 	} else if (frametype == ID3_TEXT_FRAME_USERDEF) {
@@ -338,8 +338,8 @@ char* ReturnFrameTypeStr(int frametype) {
 } 
 
 void ListID3FrameIDstrings() {
-	char* frametypestr = NULL;
-	char* presetpadding = NULL;
+	const char* frametypestr = NULL;
+	const char* presetpadding = NULL;
 	uint16_t total_known_frames = (uint16_t)(sizeof(KnownFrames)/sizeof(*KnownFrames));
 	fprintf(stdout, "ID3v2.4 Implemented Frames:\nframeID    type                   alias       Description\n--------------------------------------------------------------------------\n");
 	for (uint16_t i = 1; i < total_known_frames; i++) {
@@ -431,8 +431,8 @@ void List_imagtype_strings() {
 	return;
 }
 
-char* ConvertCLIFrameStr_TO_frameID(char* frame_str) {
-	char* discovered_frameID = NULL;
+const char* ConvertCLIFrameStr_TO_frameID(const char* frame_str) {
+	const char* discovered_frameID = NULL;
 	uint16_t total_known_frames = (uint16_t)(sizeof(KnownFrames)/sizeof(*KnownFrames));
 	uint8_t frame_str_len = strlen(frame_str) + 1;
 	
@@ -497,7 +497,7 @@ int MatchID3FrameIDstr(const char* foundFrameID, uint8_t tagVersion) {
 	uint8_t frameLen = (tagVersion >= 3 ? 4 : 3) +1;
 	
 	for (int i = 0; i < total_known_frames; i++) {
-		char* testFrameID = NULL;
+		const char* testFrameID = NULL;
 		if (tagVersion == 2) testFrameID = KnownFrames[i].ID3V2p2_FrameID;
 		if (tagVersion == 3) testFrameID = KnownFrames[i].ID3V2p3_FrameID;
 		if (tagVersion == 4) testFrameID = KnownFrames[i].ID3V2p4_FrameID;
@@ -522,8 +522,8 @@ uint8_t GetFrameCompositionDescription(int ID3v2_FrameTypeID) {
 	return matchingFrameDescription;
 }
 
-int FrameStr_TO_FrameType(char* frame_str) {
-	char* eval_framestr = NULL;
+int FrameStr_TO_FrameType(const char* frame_str) {
+	const char* eval_framestr = NULL;
 	int frame_type = 0;
 	uint16_t total_known_frames = (uint16_t)(sizeof(KnownFrames)/sizeof(*KnownFrames));
 	uint8_t frame_str_len = strlen(frame_str) + 1;
@@ -1118,7 +1118,7 @@ void APar_FrameFilter(AtomicInfo* id32_atom) {
 uint32_t APar_GetTagSize(AtomicInfo* id32_atom) { // a rough approximation of how much to malloc; this will be larger than will be ultimately required
 	uint32_t tag_len = 0;
 	uint16_t surviving_frame_count = 0;
-	if (id32_atom->ID32_TagInfo->modified_tag = false) return tag_len;
+	if (id32_atom->ID32_TagInfo->modified_tag == false) return tag_len;
 	if (id32_atom->ID32_TagInfo->ID3v2_FrameCount == 0) return tag_len; //but a frame isn't removed by AP; its just marked for elimination
 	if (id32_atom->ID32_TagInfo->ID3v2_FrameList == NULL) return tag_len; //something went wrong somewhere if this wasn't an entry to a linked list of frames
 	if (id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion != 4) return tag_len; //only id3 version 2.4 tags are written
@@ -1371,7 +1371,7 @@ uint32_t APar_Render_ID32_Tag(AtomicInfo* id32_atom, uint32_t max_alloc) {
 //                       id3 initializing functions                                  //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-void APar_FieldInit(ID3v2Frame* aFrame, uint8_t a_field, uint8_t frame_comp_list, char* frame_payload) {
+void APar_FieldInit(ID3v2Frame* aFrame, uint8_t a_field, uint8_t frame_comp_list, const char* frame_payload) {
 	uint32_t byte_allocation = 0;
 	ID3v2Fields* this_field = NULL;
 	int field_type = FrameTypeConstructionList[frame_comp_list].ID3_FieldComponents[a_field];
@@ -1440,7 +1440,7 @@ void APar_FieldInit(ID3v2Frame* aFrame, uint8_t a_field, uint8_t frame_comp_list
 	return;
 }
 
-void APar_FrameInit(ID3v2Frame* aFrame, char* frame_str, int frameID, uint8_t frame_comp_list, char* frame_payload) {
+void APar_FrameInit(ID3v2Frame* aFrame, const char* frame_str, int frameID, uint8_t frame_comp_list, const char* frame_payload) {
 	aFrame->ID3v2_FieldCount = FrameTypeConstructionList[frame_comp_list].ID3_FieldCount;
 	if (aFrame->ID3v2_FieldCount > 0) {
 		aFrame->ID3v2_Frame_Fields = (ID3v2Fields*)calloc(1, sizeof(ID3v2Fields)*aFrame->ID3v2_FieldCount);
@@ -1495,7 +1495,7 @@ void APar_realloc_memcpy(ID3v2Fields* thisField, uint32_t new_size) {
 //                    id3 frame setting/finding functions                            //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-uint32_t APar_TextFieldDataPut(ID3v2Fields* thisField, char* this_payload, uint8_t str_encoding, bool multistringtext = false) {
+uint32_t APar_TextFieldDataPut(ID3v2Fields* thisField, const char* this_payload, uint8_t str_encoding, bool multistringtext = false) {
 	uint32_t bytes_used = 0;
 
 	if (multistringtext == false) {
@@ -1568,7 +1568,7 @@ uint32_t APar_TextFieldDataPut(ID3v2Fields* thisField, char* this_payload, uint8
 	return bytes_used;
 }
 
-uint32_t APar_BinaryFieldPut(ID3v2Fields* thisField, uint32_t a_number, char* this_payload, uint32_t payload_len) {
+uint32_t APar_BinaryFieldPut(ID3v2Fields* thisField, uint32_t a_number, const char* this_payload, uint32_t payload_len) {
 	if (thisField->ID3v2_Field_Type == ID3_TEXT_ENCODING_FIELD || thisField->ID3v2_Field_Type == ID3_PIC_TYPE_FIELD || thisField->ID3v2_Field_Type == ID3_GROUPSYMBOL_FIELD) {
 		thisField->field_string[0] = (unsigned char)a_number;
 		thisField->field_length = 1;
@@ -1601,7 +1601,7 @@ uint32_t APar_BinaryFieldPut(ID3v2Fields* thisField, uint32_t a_number, char* th
 	return 0;
 }
 
-void APar_FrameDataPut(ID3v2Frame* thisFrame, char* frame_payload, AdjunctArgs* adjunct_payload, uint8_t str_encoding) {
+void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, AdjunctArgs* adjunct_payload, uint8_t str_encoding) {
 	if (adjunct_payload->multistringtext == false && !APar_EvalFrame_for_Field(thisFrame->ID3v2_FrameType, ID3_COUNTER_FIELD) ) thisFrame->ID3v2_Frame_Length = 0;
 	switch(thisFrame->ID3v2_FrameType) {
 		case ID3_TEXT_FRAME : {
@@ -1711,7 +1711,7 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, char* frame_payload, AdjunctArgs* 
 			thisFrame->ID3v2_Frame_Length += APar_BinaryFieldPut(thisFrame->ID3v2_Frame_Fields, str_encoding, NULL, 1); //encoding
 			thisFrame->ID3v2_Frame_Length += APar_TextFieldDataPut(thisFrame->ID3v2_Frame_Fields+1, adjunct_payload->mimeArg, TE_LATIN1); //mimetype
 			if (memcmp(adjunct_payload->filenameArg, "FILENAMESTAMP", 13) == 0) {
-				char* derived_filename = NULL;
+				const char* derived_filename = NULL;
 #if defined (WIN32)
 				derived_filename = strrchr(frame_payload, '\\');
 #else
@@ -1842,13 +1842,13 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, char* frame_payload, AdjunctArgs* 
 	return;
 }
 
-void APar_EmbeddedFileTests(char* filepath, int frameType, AdjunctArgs* adjunct_payloads) {
+void APar_EmbeddedFileTests(const char* filepath, int frameType, AdjunctArgs* adjunct_payloads) {
 	if (frameType == ID3_ATTACHED_PICTURE_FRAME) {
 		
 		//get cli imagetype
 		uint8_t total_image_types = (uint8_t)(sizeof(ImageTypeList)/sizeof(*ImageTypeList));
 		uint8_t img_typlen = strlen(adjunct_payloads->pictypeArg) + 1;
-		char* img_comparison_str = NULL;
+		const char* img_comparison_str = NULL;
 		
 		for (uint8_t itest = 0; itest < total_image_types; itest++) {
 			if (img_typlen == 5) {
@@ -1959,7 +1959,7 @@ APar_FindFrame
 
     this provides 2 functions: actually searching while looping through the frames & creation of a frame at the end of the frame list.
 ----------------------*/
-ID3v2Frame* APar_FindFrame(ID3v2Tag* id3v2tag, char* frame_str, int frameID, int frametype, AdjunctArgs* adjunct_payloads, bool createframe) {
+ID3v2Frame* APar_FindFrame(ID3v2Tag* id3v2tag, const char* frame_str, int frameID, int frametype, AdjunctArgs* adjunct_payloads, bool createframe) {
 	ID3v2Frame* returnframe = NULL;
 	ID3v2Frame* evalframe = id3v2tag->ID3v2_FirstFrame;
 	uint8_t supplemental_matching = 0;
@@ -2025,7 +2025,7 @@ APar_ID3FrameAmmend
 		If all is well after the tests, and the frame does not exists, create it via APar_FindFrame(... true) & initialize the frame to hold data. Send the frame, payload &
 		adjunct payloads onto APar_FrameDataPut to actually place the data onto the frame
 ----------------------*/
-void APar_ID3FrameAmmend(AtomicInfo* id32_atom, char* frame_str, char* frame_payload, AdjunctArgs* adjunct_payloads, uint8_t str_encoding) {
+void APar_ID3FrameAmmend(AtomicInfo* id32_atom, const char* frame_str, const char* frame_payload, AdjunctArgs* adjunct_payloads, uint8_t str_encoding) {
 	ID3v2Frame* targetFrame = NULL;
 	ID3v2Frame* eval_frame = NULL;
 	

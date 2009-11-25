@@ -139,6 +139,6 @@ double fixed_point_16x16bit_to_double(uint32_t fixed_point);
 
 uint32_t widechar_len(char* instring, uint32_t _bytes_);
 
-bool APar_assert(bool expression, int error_msg, char* supplemental_info);
+bool APar_assert(bool expression, int error_msg, const char* supplemental_info);
 
 unsigned long xor4096i();

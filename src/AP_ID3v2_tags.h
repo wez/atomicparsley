@@ -20,13 +20,13 @@
 //==================================================================//
 
 struct AdjunctArgs  {
-	char*     targetLang;
-	char*     descripArg;
-	char*     mimeArg;
-	char*     pictypeArg;
-	char*     filenameArg;
-	char*     ratingArg;
-	char*     dataArg; //multipurposed: PRIV's binary data, GRID's group data, UFID's binary data, POPM's counter field
+	const char*     targetLang;
+	const char*     descripArg;
+	const char*     mimeArg;
+	const char*     pictypeArg;
+	const char*     filenameArg;
+	const char*     ratingArg;
+	const char*     dataArg; //multipurposed: PRIV's binary data, GRID's group data, UFID's binary data, POPM's counter field
 	uint8_t   pictype_uint8;
 	uint8_t   groupSymbol;
 	bool      zlibCompressed;
@@ -42,12 +42,12 @@ uint8_t ImageListMembers();
 
 void ListID3FrameIDstrings();
 void List_imagtype_strings();
-char* ConvertCLIFrameStr_TO_frameID(char* frame_str);
+const char* ConvertCLIFrameStr_TO_frameID(const char* frame_str);
 bool TestCLI_for_FrameParams(int frametype, uint8_t testparam);
 
 int MatchID3FrameIDstr(const char* foundFrameID, uint8_t tagVersion);
 uint8_t GetFrameCompositionDescription(int ID3v2_FrameTypeID);
-int FrameStr_TO_FrameType(char* frame_str);
+int FrameStr_TO_FrameType(const char* frame_str);
 
 void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom);
 
@@ -57,6 +57,6 @@ uint32_t APar_Render_ID32_Tag(AtomicInfo* id32_atom, uint32_t max_alloc);
 char* APar_ConvertField_to_UTF8(ID3v2Frame* targetframe, int fieldtype);
 
 void APar_ID3Tag_Init(AtomicInfo* id32_atom);
-void APar_ID3FrameAmmend(AtomicInfo* id32_atom, char* frame_str, char* frame_payload, AdjunctArgs* adjunct_payloads, uint8_t str_encoding);
+void APar_ID3FrameAmmend(AtomicInfo* id32_atom, const char* frame_str, const char* frame_payload, AdjunctArgs* adjunct_payloads, uint8_t str_encoding);
 
 void APar_FreeID32Memory(ID3v2Tag* id32tag);
