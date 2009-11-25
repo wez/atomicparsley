@@ -724,11 +724,11 @@ uint64_t calcuate_sample_size(char* uint32_buffer, FILE* isofile, short stsz_ato
 	sample_count = APar_read32(uint32_buffer, isofile, parsedAtoms[stsz_atom].AtomicStart + 16);
 	
 	if (sample_size == 0) {
-		for (uint32_t atom_offset = 20; atom_offset < parsedAtoms[stsz_atom].AtomicLength; atom_offset +=4) {
-			total_size += (uint64_t)APar_read32(uint32_buffer, isofile, parsedAtoms[stsz_atom].AtomicStart + atom_offset);
+		for (uint64_t atom_offset = 20; atom_offset < parsedAtoms[stsz_atom].AtomicLength; atom_offset +=4) {
+			total_size += APar_read32(uint32_buffer, isofile, parsedAtoms[stsz_atom].AtomicStart + atom_offset);
 		}
 	} else {
-		total_size = (uint64_t)sample_size * (uint64_t)sample_count;
+		total_size = sample_size * sample_count;
 	}
 	return total_size;
 }
@@ -801,7 +801,7 @@ APar_Extract_iods_Info
 		all other video types it is ignored.
 ----------------------*/
 void APar_Extract_iods_Info(FILE* isofile, AtomicInfo* iods_atom) {
-	uint32_t iods_offset = iods_atom->AtomicStart+8;
+	uint64_t iods_offset = iods_atom->AtomicStart+8;
 	if (iods_atom->AtomicVerFlags == 0 && APar_read8(isofile, iods_offset+4) == 0x10) {
 		iods_offset+=5;
 		iods_offset += APar_skip_filler(isofile, iods_offset);
@@ -846,7 +846,7 @@ APar_Extract_d263_Info
     'd263' only holds 4 things; the 3 of interest are gathered here. Its possible that a 'bitr' atom follows 'd263', which would hold bitrates, but isn't parsed here
 ----------------------*/
 void APar_Extract_d263_Info(char* uint32_buffer, FILE* isofile, short track_level_atom, TrackInfo* track_info) {
-	uint32_t offset_into_d263 = 8;
+	uint64_t offset_into_d263 = 8;
 	APar_readX(track_info->encoder_name, isofile, parsedAtoms[track_level_atom].AtomicStart + offset_into_d263, 4);
 	track_info->level = APar_read8(isofile, parsedAtoms[track_level_atom].AtomicStart + offset_into_d263 + 4+1);
 	track_info->profile = APar_read8(isofile, parsedAtoms[track_level_atom].AtomicStart + offset_into_d263 + 4+2);
@@ -863,7 +863,7 @@ APar_Extract_devc_Info
     'devc' only holds 3 things: encoder vendor, decoder version & frames per sample; only encoder vendor is gathered
 ----------------------*/
 void APar_Extract_devc_Info(FILE* isofile, short track_level_atom, TrackInfo* track_info) {
-	uint32_t offset_into_devc = 8;
+	uint64_t offset_into_devc = 8;
 	APar_readX(track_info->encoder_name, isofile, parsedAtoms[track_level_atom].AtomicStart + offset_into_devc, 4);
 	return;
 }
@@ -881,16 +881,16 @@ APar_Extract_esds_Info
 		amount of filler (see APar_skip_filler), then the length of the section to the end of the atom or the end of another section.
 ----------------------*/
 void APar_Extract_esds_Info(char* uint32_buffer, FILE* isofile, short track_level_atom, TrackInfo* track_info) {
-	uint32_t offset_into_stsd = 0;
+	uint64_t offset_into_stsd = 0;
 	
 	while (offset_into_stsd < parsedAtoms[track_level_atom].AtomicLength) {
 		offset_into_stsd ++;
 		if ( APar_read32(uint32_buffer, isofile, parsedAtoms[track_level_atom].AtomicStart + offset_into_stsd) == 0x65736473 ) {
 			track_info->contains_esds = true;
 		
-			uint32_t esds_start = parsedAtoms[track_level_atom].AtomicStart + offset_into_stsd - 4;
-			uint32_t esds_length = APar_read32(uint32_buffer, isofile, esds_start);
-			uint32_t offset_into_esds = 12; //4bytes length + 4 bytes name + 4bytes null
+			uint64_t esds_start = parsedAtoms[track_level_atom].AtomicStart + offset_into_stsd - 4;
+			uint64_t esds_length = APar_read32(uint32_buffer, isofile, esds_start);
+			uint64_t offset_into_esds = 12; //4bytes length + 4 bytes name + 4bytes null
 						
 			if ( APar_read8(isofile, esds_start + offset_into_esds) == 0x03 ) {
 				offset_into_esds++;
@@ -989,16 +989,16 @@ APar_ExtractTrackDetails
 		on its own.
 ----------------------*/
 void APar_ExtractTrackDetails(char* uint32_buffer, FILE* isofile, Trackage* track, TrackInfo* track_info) {
-	uint32_t _offset = 0;
+	uint64_t _offset = 0;
 
 	APar_TrackLevelInfo(track, "tkhd");
 	if ( APar_read8(isofile, parsedAtoms[track->track_atom].AtomicStart + 8) == 0) {
 		if (APar_read8(isofile, parsedAtoms[track->track_atom].AtomicStart + 11) & 1) {
 			track_info->track_enabled = true;
 		}
-		track_info->creation_time = (uint64_t)APar_read32(uint32_buffer, isofile, parsedAtoms[track->track_atom].AtomicStart + 12);
-		track_info->modified_time = (uint64_t)APar_read32(uint32_buffer, isofile, parsedAtoms[track->track_atom].AtomicStart + 16);
-		track_info->duration = (uint64_t)APar_read32(uint32_buffer, isofile, parsedAtoms[track->track_atom].AtomicStart + 28);
+		track_info->creation_time = APar_read32(uint32_buffer, isofile, parsedAtoms[track->track_atom].AtomicStart + 12);
+		track_info->modified_time = APar_read32(uint32_buffer, isofile, parsedAtoms[track->track_atom].AtomicStart + 16);
+		track_info->duration = APar_read32(uint32_buffer, isofile, parsedAtoms[track->track_atom].AtomicStart + 28);
 	} else {
 		track_info->creation_time = APar_read64(uint32_buffer, isofile, parsedAtoms[track->track_atom].AtomicStart + 12);
 		track_info->modified_time = APar_read64(uint32_buffer, isofile, parsedAtoms[track->track_atom].AtomicStart + 20);
@@ -1346,7 +1346,7 @@ void APar_ExtractBrands(char* filepath) {
 		fprintf(stdout, "  -  version %u\n", minor_version);
 		
 		fprintf(stdout, " Compatible Brands:");
-		for (uint32_t i = 16+file_type_offset; i < atom_length; i+=4) {
+		for (uint64_t i = 16+file_type_offset; i < atom_length; i+=4) {
 			APar_readX(buffer, a_file, i, 4);
 			compatible_brand = UInt32FromBigEndian(buffer);
 			if (compatible_brand != 0) {

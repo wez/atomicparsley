@@ -97,13 +97,13 @@ int fseeko(FILE *stream, uint64_t pos, int whence);
 #endif
 bool IsUnicodeWinOS();
 
-uint8_t APar_read8(FILE* ISObasemediafile, uint32_t pos);
-uint16_t APar_read16(char* buffer, FILE* ISObasemediafile, uint32_t pos);
-uint32_t APar_read32(char* buffer, FILE* ISObasemediafile, uint32_t pos);
-uint64_t APar_read64(char* buffer, FILE* ISObasemediafile, uint32_t pos);
-void APar_readX(char* buffer, FILE* ISObasemediafile, uint32_t pos, uint32_t length);
+uint8_t APar_read8(FILE* ISObasemediafile, uint64_t pos);
+uint16_t APar_read16(char* buffer, FILE* ISObasemediafile, uint64_t pos);
+uint32_t APar_read32(char* buffer, FILE* ISObasemediafile, uint64_t pos);
+uint64_t APar_read64(char* buffer, FILE* ISObasemediafile, uint64_t pos);
+void APar_readX(char* buffer, FILE* ISObasemediafile, uint64_t pos, uint32_t length);
 uint32_t APar_ReadFile(char* destination_buffer, FILE* a_file, uint32_t bytes_to_read);
-uint32_t APar_FindValueInAtom(char* uint32_buffer, FILE* ISObasemediafile, short an_atom, uint32_t start_position, uint32_t eval_number);
+uint32_t APar_FindValueInAtom(char* uint32_buffer, FILE* ISObasemediafile, short an_atom, uint64_t start_position, uint32_t eval_number);
 
 void APar_UnpackLanguage(unsigned char lang_code[], uint16_t packed_language);
 uint16_t PackLanguage(const char* language_code, uint8_t lang_offset);

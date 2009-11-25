@@ -98,14 +98,12 @@ uint64_t mdat_supplemental_offset = 0;
 uint64_t removed_bytes_tally = 0;
 uint64_t new_file_size = 0; //used for the progressbar
 uint32_t brand = 0;
-uint32_t mdatData = 0; //now global, used in bitrate calcs
+uint64_t mdatData = 0; //now global, used in bitrate calcs
 
-uint32_t gapless_void_padding = 0; //possibly used in the context of gapless playback support by Apple
+uint64_t gapless_void_padding = 0; //possibly used in the context of gapless playback support by Apple
 
 struct DynamicUpdateStat dynUpd;
 struct padding_preferences pad_prefs;
-
-bool contains_unsupported_64_bit_atom = false; //reminder that there are some 64-bit files that aren't yet supported (and where that limit is set)
 
 #if defined (WIN32) || defined (__CYGWIN__)
 short max_display_width = 45;
@@ -899,13 +897,20 @@ AtomicInfo* APar_FindAtom(const char* atom_name, bool createMissing, uint8_t ato
 //                      File scanning & atom parsing                                 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-void APar_AtomizeFileInfo(uint32_t Astart, uint32_t Alength,
+void APar_AtomizeFileInfo(uint64_t Astart, uint64_t Alength,
 	uint64_t Aextendedlength, char* Astring, uint8_t Alevel,
 	uint8_t Acon_state, uint8_t Aclass, uint32_t Averflags,
 	uint16_t Alang, uuid_vitals* uuid_info)
 {
 	static bool passed_mdat = false;
-	AtomicInfo* thisAtom = &parsedAtoms[atom_number];
+	AtomicInfo* thisAtom;
+
+	if (atom_number < 0 || atom_number >= MAX_ATOMS) {
+		fprintf(stderr, "too many atoms\n");
+		abort();
+	}
+
+	thisAtom = &parsedAtoms[atom_number];
 	
 	thisAtom->AtomicStart = Astart;
 	thisAtom->AtomicLength = Alength;
@@ -958,7 +963,7 @@ void APar_AtomizeFileInfo(uint32_t Astart, uint32_t Alength,
 	return;
 }
 
-uint8_t APar_GetCurrentAtomDepth(uint32_t atom_start, uint32_t atom_length) {
+uint8_t APar_GetCurrentAtomDepth(uint64_t atom_start, uint64_t atom_length) {
 	short level = 1;
 	for (int i = 0; i < atom_number; i++) {
 		AtomicInfo* thisAtom = &parsedAtoms[i];
@@ -1072,7 +1077,7 @@ void APar_IdentifyBrand(char* file_brand ) {
 	return;
 }
 
-void APar_TestCompatibleBrand(FILE* file, uint32_t atom_start, uint32_t atom_length) {
+void APar_TestCompatibleBrand(FILE* file, uint64_t atom_start, uint64_t atom_length) {
 	if (atom_length <= 16) return;
 	uint32_t compatible_brand = 0;
 
@@ -1085,7 +1090,7 @@ void APar_TestCompatibleBrand(FILE* file, uint32_t atom_start, uint32_t atom_len
 	return;
 }
 
-void APar_Extract_stsd_codec(FILE* file, uint32_t midJump) {
+void APar_Extract_stsd_codec(FILE* file, uint64_t midJump) {
 	memset(twenty_byte_buffer, 0, 12);
 	fseeko(file, midJump, SEEK_SET);
 	fread(twenty_byte_buffer, 1, 12, file);
@@ -1114,7 +1119,7 @@ void APar_LocateDataReference(short chunk_offset_idx, FILE* file) {
 	dinf_atom = APar_FindChildAtom(minf_atom_idx, "dinf");
 	dref_atom = APar_FindChildAtom(dinf_atom->AtomicNumber, "dref");
 	
-	target_reference_atom = APar_FindChildAtom(dref_atom->AtomicNumber, "any", 4, (uint16_t)data_ref_idx);
+	target_reference_atom = APar_FindChildAtom(dref_atom->AtomicNumber, "any", 4, data_ref_idx);
 	
 	if (target_reference_atom != NULL) {
 		parsedAtoms[chunk_offset_idx].ancillary_data = target_reference_atom->AtomicVerFlags;
@@ -1145,7 +1150,7 @@ void APar_SampleTableIterator(FILE *file) {
 	return;
 }
 
-uint64_t APar_64bitAtomRead(FILE *file, uint32_t jump_point) {
+uint64_t APar_64bitAtomRead(FILE *file, uint64_t jump_point) {
 	uint64_t extended_dataSize = APar_read64(twenty_byte_buffer, file, jump_point+8);
 	
 	// here's the problem: there can be some HUGE MPEG-4 files. They get
@@ -1161,12 +1166,13 @@ uint64_t APar_64bitAtomRead(FILE *file, uint32_t jump_point) {
 	// (essentially a pseudo 32-bit traditional mdat) can be supported as long
 	// as its less than UINT32_T_MAX (minus our big fat moov allowance).
 
+#if 0
 	if ( extended_dataSize > 4294967295UL - 30000000) {
-		contains_unsupported_64_bit_atom = true;
 		fprintf(stdout, "You must be off your block thinking I'm going to tag a file that is at LEAST %llu bytes long.\n", extended_dataSize);
-		fprintf(stdout, "AtomicParsley doesn't have full 64-bit support");
-		exit (2);
+		fprintf(stdout, "AtomicParsley doesn't have full 64-bit support\n");
+		exit(2);
 	}
+#endif
 	return extended_dataSize;
 }
 
@@ -1277,7 +1283,7 @@ APar_Manually_Determine_Parent
 		(where it ends), needs to be greater than or equal to where this new atom ends, and finally, that the eval containing atom be some form of parent as
 		defined in KnownAtoms
 ----------------------*/
-void APar_Manually_Determine_Parent(uint32_t atom_start, uint32_t atom_length, char* container) {
+void APar_Manually_Determine_Parent(uint64_t atom_start, uint64_t atom_length, char* container) {
 	short preceding_atom = atom_number-1;
 	while (parsedAtoms[preceding_atom].AtomicNumber != 0) {
 
@@ -1303,20 +1309,32 @@ APar_ScanAtoms
   path - the complete path to the originating file to be tested
   deepscan_REQ - controls whether we go into 'stsd' or just a superficial scan
 
-    if the file has not yet been scanned (this gets called by nearly every cli option), then open the file and start scanning. Read in the first 12 bytes
-		and see if bytes 4-8 are 'ftyp' as any modern MPEG-4 file will have 'ftyp' first. Accommodations are also in place for the jpeg2000 signature, but the sig.
-		must be followed by 'ftyp' and have an 'mjp2' or 'mj2s' brand. If it does, start scanning the rest of the file. An MPEG-4 file is logically organized
-		into discrete hierarchies called "atoms" or "boxes". Each atom is at minimum 8 bytes long. Bytes 1-4 make an unsigned 32-bit integer that denotes how
-		long this atom is (ie: 8 would mean this atom is 8 bytes long). The next 4 bytes (bytes 5-8) make the atom name. If the atom presents longer than 8 bytes,
-		then that supplemental data would be what the atom carries. Atoms are broadly separated into 2 categories: parents & children (or container & leaf).
-		Typically, a parent can hold other atoms, but not data; a child can hold data but not other atoms. This 'rule' is broken sometimes (the atoms listed
-		as DUAL_STATE_ATOM), but largely holds.
+if the file has not yet been scanned (this gets called by nearly every cli
+option), then open the file and start scanning. Read in the first 12 bytes and
+see if bytes 4-8 are 'ftyp' as any modern MPEG-4 file will have 'ftyp' first.
+Accommodations are also in place for the jpeg2000 signature, but the sig.  must
+be followed by 'ftyp' and have an 'mjp2' or 'mj2s' brand. If it does, start
+scanning the rest of the file. An MPEG-4 file is logically organized into
+discrete hierarchies called "atoms" or "boxes". Each atom is at minimum 8 bytes
+long. Bytes 1-4 make an unsigned 32-bit integer that denotes how long this atom
+is (ie: 8 would mean this atom is 8 bytes long).  The next 4 bytes (bytes 5-8)
+make the atom name. If the atom presents longer than 8 bytes, then that
+supplemental data would be what the atom carries. Atoms are broadly separated
+into 2 categories: parents & children (or container & leaf).  Typically, a
+parent can hold other atoms, but not data; a child can hold data but not other
+atoms. This 'rule' is broken sometimes (the atoms listed as DUAL_STATE_ATOM),
+but largely holds.
 		
-		Each atom is read in as 12 bytes (to accommodate flags & versioning). The atom name is extracted, and using the last known container (either FILE_LEVEL
-		or an actual atom name), the new atom's hierarchy is found based on its length & position. Using its containing atom, the KnownAtoms table is searched to
-		locate the properties of that atom (parent/child, versioned/simple), and jumping around in the file is based off that known atom's type. Atoms that
-		fall into a hybrid category (DUAL_STATE_ATOMs) are explicitly handled. If an atom is listed has having a language attribute, it is read to support
-		multiple langauges (as most 3GP assets do).
+Each atom is read in as 12 bytes (to accommodate flags & versioning). The atom
+name is extracted, and using the last known container (either FILE_LEVEL or an
+actual atom name), the new atom's hierarchy is found based on its length &
+position. Using its containing atom, the KnownAtoms table is searched to locate
+the properties of that atom (parent/child, versioned/simple), and jumping
+around in the file is based off that known atom's type. Atoms that fall into a
+hybrid category (DUAL_STATE_ATOMs) are explicitly handled. If an atom is listed
+has having a language attribute, it is read to support multiple langauges (as
+most 3GP assets do).
+
 ----------------------*/
 void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 	if (!parsedfile) {
@@ -1335,8 +1353,8 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 			uuid_info.uuid_AP_atom_name=(char*)malloc(sizeof(char)*5); //this will hold any atom name that is written after the uuid written by AP
 			
 			if (data == NULL) return;
-			uint32_t dataSize = 0;
-			uint32_t jump = 0;
+			uint64_t dataSize = 0;
+			uint64_t jump = 0;
 			
 			fread(data, 1, 12, file);
 			char *atom = data+4;
@@ -1937,12 +1955,19 @@ APar_InterjectNewAtom
 
     Creates a single new atom (carrying NULLed data) inserted after preceding_atom
 ----------------------*/
-short APar_InterjectNewAtom(const char* atom_name, uint8_t cntr_state, uint8_t atom_class, uint32_t atom_length, 
-														uint32_t atom_verflags, uint16_t packed_lang, uint8_t atom_level,
-														short preceding_atom) {
+short APar_InterjectNewAtom(const char* atom_name, uint8_t cntr_state,
+	uint8_t atom_class, uint64_t atom_length, 
+	uint32_t atom_verflags, uint16_t packed_lang, uint8_t atom_level,
+	short preceding_atom)
+{
 														
 	if (deep_atom_scan && !modified_atoms) {
 		return 0;
+	}
+
+	if (atom_number >= MAX_ATOMS) {
+		fprintf(stderr, "too many atoms\n");
+		abort();
 	}
 
 	AtomicInfo* new_atom = &parsedAtoms[atom_number];
@@ -1980,6 +2005,11 @@ APar_CreateSparseAtom
     Create a single new atom (not carrying any data) copied from a template to follow preceding_atom 
 ----------------------*/
 AtomicInfo* APar_CreateSparseAtom(AtomicInfo* surrogate_atom, AtomicInfo* parent_atom, short preceding_atom) {
+
+	if (atom_number >= MAX_ATOMS) {
+		fprintf(stderr, "too many atoms\n");
+		abort();
+	}
 	AtomicInfo* new_atom = &parsedAtoms[atom_number];
 	new_atom->AtomicNumber = atom_number;
 	new_atom->AtomicStart = 0;
@@ -2037,8 +2067,10 @@ APar_Unified_atom_Put
 		works on iTunes-style & 3GP asset style but NOT binary safe (use APar_atom_Binary_Put)
 		TODO: work past the max malloced amount onto a new larger array
 ----------------------*/
-void APar_Unified_atom_Put(AtomicInfo* target_atom, const char* unicode_data, uint8_t text_tag_style, uint32_t ancillary_data, uint8_t anc_bit_width) {
-	uint32_t atom_data_pos = 0;
+void APar_Unified_atom_Put(AtomicInfo* target_atom, const char* unicode_data,
+	uint8_t text_tag_style, uint64_t ancillary_data, uint8_t anc_bit_width)
+{
+	uint64_t atom_data_pos = 0;
 	if (target_atom == NULL) {
 		return;
 	}
@@ -2167,7 +2199,9 @@ APar_atom_Binary_Put
     Simple placement of binary data (perhaps containing NULLs) onto AtomicData.
 		TODO: if over MAXDATA_PAYLOAD malloc a new char string
 ----------------------*/
-void APar_atom_Binary_Put(AtomicInfo* target_atom, const char* binary_data, uint32_t bytecount, uint32_t atomic_data_offset) {
+void APar_atom_Binary_Put(AtomicInfo* target_atom, const char* binary_data,
+	uint32_t bytecount, uint64_t atomic_data_offset)
+{
 	if (target_atom == NULL) return;
 	
 	if (atomic_data_offset + bytecount + target_atom->AtomicLength <= MAXDATA_PAYLOAD) {
@@ -2388,8 +2422,8 @@ APar_3GP_Keyword_atom_Format
 		And each keyword needs to be NULL terminated. Technically it would be possible to even have mixed encodings (not supported here).
 ----------------------*/
 uint32_t APar_3GP_Keyword_atom_Format(char* keywords_globbed, uint8_t keyword_count, bool set_UTF16_text, char* &formed_keyword_struct) {
-	uint32_t formed_string_offset = 0;
-	uint32_t string_len = 0;
+	uint64_t formed_string_offset = 0;
+	uint64_t string_len = 0;
 	
 	char* a_keyword = strsep(&keywords_globbed,",");
 	
@@ -2971,7 +3005,7 @@ uint16_t APar_TestVideoDescription(AtomicInfo* video_desc_atom, FILE* ISObmff_fi
 	
 	avcC_atom = APar_FindChildAtom(video_desc_atom->AtomicNumber, "avcC");
 	if (avcC_atom != NULL) {
-		uint32_t avcC_offset = avcC_atom->AtomicStart - video_desc_atom->AtomicStart;
+		uint64_t avcC_offset = avcC_atom->AtomicStart - video_desc_atom->AtomicStart;
 		video_profile = *(avc1_contents+avcC_offset+9);
 		video_level = *(avc1_contents+avcC_offset+11);
 	}
@@ -3044,8 +3078,8 @@ void APar_Generate_iPod_uuid(char* atom_path) {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 //determine if our mdat atom has moved at all...
-uint32_t APar_DetermineMediaData_AtomPosition() {
-	uint32_t mdat_position = 0;
+uint64_t APar_DetermineMediaData_AtomPosition() {
+	uint64_t mdat_position = 0;
 	short thisAtomNumber = 0;
 	
 	//loop through each atom in the struct array (which holds the offset info/data)
@@ -3084,7 +3118,7 @@ uint32_t APar_SimpleSumAtoms(short stop_atom) {
 	byte_sum += 8; //the 'tfhd' points to the byte in mdat where the fragment data is - NOT the atom itself (should always be +8bytes with a fragment)
 	while (true) {
 		if (parsedAtoms[stop_atom].AtomicLevel == 1) {
-			byte_sum+= (parsedAtoms[stop_atom].AtomicLength == 1 ? (uint32_t )parsedAtoms[stop_atom].AtomicLengthExtended : parsedAtoms[stop_atom].AtomicLength);
+			byte_sum+= (parsedAtoms[stop_atom].AtomicLength == 1 ? parsedAtoms[stop_atom].AtomicLengthExtended : parsedAtoms[stop_atom].AtomicLength);
 			//fprintf(stdout, "%i %s (%u)\n", stop_atom, parsedAtoms[stop_atom].AtomicName, parsedAtoms[stop_atom].AtomicLength);
 		}
 		if (stop_atom == 0) {
@@ -3102,8 +3136,8 @@ APar_QuickSumAtomicLengths
 
     fill
 ----------------------*/
-uint32_t APar_QuickSumAtomicLengths(AtomicInfo* target_atom) {
-	uint32_t atom_pos = 0;
+uint64_t APar_QuickSumAtomicLengths(AtomicInfo* target_atom) {
+	uint64_t atom_pos = 0;
 	short atom_idx = 0;
 	short current_level = 0;
 	if (target_atom == NULL) return atom_pos;
@@ -3137,7 +3171,7 @@ APar_Constituent_mdat_data
 
     fill
 ----------------------*/
-AtomicInfo* APar_Constituent_mdat_data(uint32_t desired_data_pos, uint32_t desired_data_len) {
+AtomicInfo* APar_Constituent_mdat_data(uint64_t desired_data_pos, uint64_t desired_data_len) {
 	AtomicInfo* target_mdat = NULL;
 	short eval_atom = 0;
 	
@@ -3179,7 +3213,7 @@ bool APar_Readjust_iloc_atom(short iloc_number) {
 	uint8_t length_size = *parsedAtoms[iloc_number].AtomicData & 0x0F;
 	uint8_t base_offset_size = ( *(parsedAtoms[iloc_number].AtomicData+1) >> 4) & 0x0F;
 	uint16_t item_count = UInt16FromBigEndian(parsedAtoms[iloc_number].AtomicData+2);
-	uint32_t aggregate_offset = 4;
+	uint64_t aggregate_offset = 4;
 	char* base_offset_ptr = NULL;
 	
 #if defined(DEBUG_V)
@@ -3189,9 +3223,9 @@ bool APar_Readjust_iloc_atom(short iloc_number) {
 	for (uint16_t an_item=1; an_item <= item_count; an_item++) {
 		uint16_t an_item_ID = UInt16FromBigEndian(parsedAtoms[iloc_number].AtomicData+aggregate_offset);
 		uint16_t a_data_ref_idx = UInt16FromBigEndian(parsedAtoms[iloc_number].AtomicData+aggregate_offset+2);
-		uint32_t base_offset = 0;
-		uint32_t curr_container_pos = 0;
-		uint32_t extent_len_sum = 0;
+		uint64_t base_offset = 0;
+		uint64_t curr_container_pos = 0;
+		uint64_t extent_len_sum = 0;
 		
 		aggregate_offset +=4;
 		
@@ -3215,8 +3249,8 @@ bool APar_Readjust_iloc_atom(short iloc_number) {
 			aggregate_offset +=2;
 			
 			for (uint16_t an_extent=1; an_extent <= this_item_extent_count; an_extent++) {
-				uint32_t this_extent_offset = 0;
-				uint32_t this_extent_length = 0;
+				uint64_t this_extent_offset = 0;
+				uint64_t this_extent_length = 0;
 				
 				if (offset_size == 4 || offset_size == 8) {
 					if (offset_size == 4) {
@@ -3246,8 +3280,8 @@ bool APar_Readjust_iloc_atom(short iloc_number) {
 			
 			if (container_atom != NULL) {
 				curr_container_pos = APar_QuickSumAtomicLengths(container_atom);
-				uint32_t exisiting_offset_into_atom = base_offset - container_atom->AtomicStart;
-				uint32_t new_item_offset = curr_container_pos + exisiting_offset_into_atom;
+				uint64_t exisiting_offset_into_atom = base_offset - container_atom->AtomicStart;
+				uint64_t new_item_offset = curr_container_pos + exisiting_offset_into_atom;
 				
 #if defined(DEBUG_V)
 				fprintf(stdout, "debug: AP_Readjust_iloc_atom  item is contained on mdat started @ %u (now at %u)\n", container_atom->AtomicStart, curr_container_pos);
@@ -3256,7 +3290,7 @@ bool APar_Readjust_iloc_atom(short iloc_number) {
 				if (base_offset_size == 4) {
 					UInt32_TO_String4(new_item_offset, base_offset_ptr);
 				} else {
-					UInt64_TO_String8((uint64_t)new_item_offset, base_offset_ptr);
+					UInt64_TO_String8(new_item_offset, base_offset_ptr);
 				}
 				iloc_changed = true;
 			}
@@ -3266,7 +3300,7 @@ bool APar_Readjust_iloc_atom(short iloc_number) {
 	return iloc_changed;
 }
 
-bool APar_Readjust_CO64_atom(uint32_t mdat_position, short co64_number) {
+bool APar_Readjust_CO64_atom(uint64_t mdat_position, short co64_number) {
 	bool co64_changed = false;
 	
 	if (parsedAtoms[co64_number].ancillary_data != 1) { 
@@ -3337,7 +3371,7 @@ bool APar_Readjust_CO64_atom(uint32_t mdat_position, short co64_number) {
 	return co64_changed;
 }
 
-bool APar_Readjust_TFHD_fragment_atom(uint32_t mdat_position, short tfhd_number) {
+bool APar_Readjust_TFHD_fragment_atom(uint64_t mdat_position, short tfhd_number) {
 	static bool tfhd_changed = false;
 	static bool determined_offset = false;
 	static uint64_t base_offset = 0;
@@ -3370,7 +3404,7 @@ bool APar_Readjust_TFHD_fragment_atom(uint32_t mdat_position, short tfhd_number)
 	return tfhd_changed;
 }
 
-bool APar_Readjust_STCO_atom(uint32_t mdat_position, short stco_number) {
+bool APar_Readjust_STCO_atom(uint64_t mdat_position, short stco_number) {
 	bool stco_changed = false;
 	
 	if (parsedAtoms[stco_number].ancillary_data != 1) { 
@@ -3442,7 +3476,7 @@ APar_CreatePadding
 
     Create a 'free' atom at a pre-determined area of a given length & set that atom as the global padding store atom
 ----------------------*/
-void APar_CreatePadding(uint32_t padding_length) {
+void APar_CreatePadding(uint64_t padding_length) {
 	AtomicInfo* next_atom = &parsedAtoms[ parsedAtoms[dynUpd.consolidated_padding_insertion].NextAtomNumber ];
 	if (padding_length > 2000 && next_atom->AtomicLevel > 1) {
 		short padding_atom = APar_InterjectNewAtom("free", CHILD_ATOM, SIMPLE_ATOM, 2000, 0, 0,
@@ -3468,8 +3502,8 @@ APar_AdjustPadding
 
     Adjust the consolidated padding store atom to the new size - creating&splitting if necessary.
 ----------------------*/
-void APar_AdjustPadding(uint32_t new_padding_length) {
-	uint32_t avail_padding = 0;
+void APar_AdjustPadding(uint64_t new_padding_length) {
+	uint64_t avail_padding = 0;
 	
 	if ( (psp_brand || force_existing_hierarchy) && (dynUpd.optimization_flags & MEDIADATA__PRECEDES__MOOV) ) return;
 	
@@ -3527,8 +3561,8 @@ APar_PaddingAmount
 		found to fall outside those values. When a file will be updated by dynamic updating, the consolidated padding will be initially set to the amount that was present
 		before any modifications to tags. This amount of padding will in all likelyhood change when the final determination of whether a dynamic update can occur.
 ----------------------*/
-uint32_t APar_PaddingAmount(uint32_t target_amount, bool limit_by_prefs) {
-	uint32_t padding_allowance = 0;
+uint64_t APar_PaddingAmount(uint64_t target_amount, bool limit_by_prefs) {
+	uint64_t padding_allowance = 0;
 	if (limit_by_prefs) {
 		if (pad_prefs.maximum_present_padding_size == 0) {
 			return 0;
@@ -3559,12 +3593,12 @@ void APar_DetermineDynamicUpdate() {
 		dynUpd.prevent_dynamic_update = true;
 		return;
 	}
-	uint32_t mdat_pos = 0;
-	uint32_t moov_udta_pos = APar_QuickSumAtomicLengths(dynUpd.moov_udta_atom);
-	uint32_t moov_last_trak_pos = APar_QuickSumAtomicLengths(dynUpd.last_trak_child_atom);
-	uint32_t moov_meta_pos = APar_QuickSumAtomicLengths(dynUpd.moov_meta_atom);
-	uint32_t moov_pos = APar_QuickSumAtomicLengths(dynUpd.moov_atom);
-	uint32_t root_meta_pos = APar_QuickSumAtomicLengths(dynUpd.file_meta_atom);
+	uint64_t mdat_pos = 0;
+	uint64_t moov_udta_pos = APar_QuickSumAtomicLengths(dynUpd.moov_udta_atom);
+	uint64_t moov_last_trak_pos = APar_QuickSumAtomicLengths(dynUpd.last_trak_child_atom);
+	uint64_t moov_meta_pos = APar_QuickSumAtomicLengths(dynUpd.moov_meta_atom);
+	uint64_t moov_pos = APar_QuickSumAtomicLengths(dynUpd.moov_atom);
+	uint64_t root_meta_pos = APar_QuickSumAtomicLengths(dynUpd.file_meta_atom);
 	
 	if (root_meta_pos > 0 && root_meta_pos != dynUpd.file_meta_atom->AtomicStart) {
 	
@@ -3582,7 +3616,7 @@ void APar_DetermineDynamicUpdate() {
 	} else if (dynUpd.first_mdat_atom != NULL) {
 		mdat_pos = APar_QuickSumAtomicLengths(dynUpd.first_mdat_atom);
 		if (mdat_pos >= dynUpd.first_mdat_atom->AtomicStart) {
-			uint32_t offset_increase = mdat_pos - dynUpd.first_mdat_atom->AtomicStart;
+			uint64_t offset_increase = mdat_pos - dynUpd.first_mdat_atom->AtomicStart;
 			if (offset_increase > dynUpd.padding_bytes) {
 				if ( (psp_brand || force_existing_hierarchy) && (dynUpd.optimization_flags & MEDIADATA__PRECEDES__MOOV) ) {
 					dynUpd.updage_by_padding = true;
@@ -3590,8 +3624,8 @@ void APar_DetermineDynamicUpdate() {
 					dynUpd.prevent_dynamic_update = true;
 				}
 			} else {
-				uint32_t padding_remaining = dynUpd.padding_bytes - offset_increase;
-				uint32_t padding_allowed = APar_PaddingAmount(padding_remaining, true);
+				uint64_t padding_remaining = dynUpd.padding_bytes - offset_increase;
+				uint64_t padding_allowed = APar_PaddingAmount(padding_remaining, true);
 				
 				if (padding_remaining == padding_allowed) {
 					if (alter_original) {
@@ -3605,8 +3639,8 @@ void APar_DetermineDynamicUpdate() {
 			}
 			
 		} else {
-			uint32_t padding_replenishment = dynUpd.first_mdat_atom->AtomicStart - mdat_pos;
-			uint32_t padding_allowed = APar_PaddingAmount(padding_replenishment, true);
+			uint64_t padding_replenishment = dynUpd.first_mdat_atom->AtomicStart - mdat_pos;
+			uint64_t padding_allowed = APar_PaddingAmount(padding_replenishment, true);
 			
 			if (padding_replenishment == padding_allowed) {
 				if (alter_original) {
@@ -3635,7 +3669,7 @@ APar_ConsolidatePadding
 		When doing a dynamic update in situ, the length of this consolidated padding atom will change (later) if metadata is altered.
 ----------------------*/
 void APar_ConsolidatePadding() {
-	uint32_t bytes_o_padding = 0;
+	uint64_t bytes_o_padding = 0;
 	if (dynUpd.consolidated_padding_insertion == 0) return;
 	FreeAtomListing* padding_entry = dynUpd.first_padding_atom;
 	
@@ -3973,7 +4007,7 @@ void APar_DetermineAtomLengths() {
 	
 	while (true) {
 		short next_atom = 0;
-		uint32_t atom_size = 0;
+		uint64_t atom_size = 0;
 		short previous_atom = 0; //only gets used in testing for atom under stsd
 
 		//fprintf(stdout, "current atom is named %s, num:%i\n", parsedAtoms[rev_atom_loop].AtomicName, parsedAtoms[rev_atom_loop].AtomicNumber);
@@ -4328,7 +4362,7 @@ void APar_UpdateModTime(AtomicInfo* container_header_atom) {
 
 	uint32_t current_time = APar_get_mpeg4_time();
 	if ((container_header_atom->AtomicVerFlags & 0xFFFFFF) == 1) {
-		UInt64_TO_String8((uint64_t)current_time, container_header_atom->AtomicData+8);
+		UInt64_TO_String8(current_time, container_header_atom->AtomicData+8);
 	} else {
 		UInt32_TO_String4(current_time, container_header_atom->AtomicData+4);
 	}

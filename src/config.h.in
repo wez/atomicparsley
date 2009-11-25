@@ -154,9 +154,6 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
-/* turn on 64-bit offset */
-#undef _FILE_OFFSET_BITS
-
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
 

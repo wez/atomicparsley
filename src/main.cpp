@@ -1112,9 +1112,6 @@ int main( int argc, char *argv[]) {
 	}
 	
 	signal(SIGTERM, kill_signal);
-#ifndef WIN32
-	signal(SIGKILL, kill_signal);
-#endif
 	signal(SIGINT,  kill_signal);
 	
 	switch(c) {

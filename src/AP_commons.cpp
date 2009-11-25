@@ -174,32 +174,32 @@ bool IsUnicodeWinOS() {
 //                             File reading routines                                 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-uint8_t APar_read8(FILE* ISObasemediafile, uint32_t pos) {
+uint8_t APar_read8(FILE* ISObasemediafile, uint64_t pos) {
 	uint8_t a_byte = 0;
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	fread(&a_byte, 1, 1, ISObasemediafile);
 	return a_byte;
 }
 
-uint16_t APar_read16(char* buffer, FILE* ISObasemediafile, uint32_t pos) {
+uint16_t APar_read16(char* buffer, FILE* ISObasemediafile, uint64_t pos) {
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	fread(buffer, 1, 2, ISObasemediafile);
 	return UInt16FromBigEndian(buffer);
 }
 
-uint32_t APar_read32(char* buffer, FILE* ISObasemediafile, uint32_t pos) {
+uint32_t APar_read32(char* buffer, FILE* ISObasemediafile, uint64_t pos) {
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	fread(buffer, 1, 4, ISObasemediafile);
 	return UInt32FromBigEndian(buffer);
 }
 
-uint64_t APar_read64(char* buffer, FILE* ISObasemediafile, uint32_t pos) {
+uint64_t APar_read64(char* buffer, FILE* ISObasemediafile, uint64_t pos) {
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	fread(buffer, 1, 8, ISObasemediafile);
 	return UInt64FromBigEndian(buffer);
 }
 
-void APar_readX(char* buffer, FILE* ISObasemediafile, uint32_t pos, uint32_t length) {
+void APar_readX(char* buffer, FILE* ISObasemediafile, uint64_t pos, uint32_t length) {
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	fread(buffer, 1, length, ISObasemediafile);
 	return;
@@ -215,8 +215,9 @@ uint32_t APar_ReadFile(char* destination_buffer, FILE* a_file, uint32_t bytes_to
 	return bytes_read;
 }
 
-uint32_t APar_FindValueInAtom(char* uint32_buffer, FILE* ISObasemediafile, short an_atom, uint32_t start_position, uint32_t eval_number) {
-	uint32_t current_pos = start_position;
+uint32_t APar_FindValueInAtom(char* uint32_buffer, FILE* ISObasemediafile, short an_atom, uint64_t start_position, uint32_t eval_number)
+{
+	uint64_t current_pos = start_position;
 	memset(uint32_buffer, 0, 5);
 	while (current_pos <= parsedAtoms[an_atom].AtomicLength) {
 		current_pos ++;
