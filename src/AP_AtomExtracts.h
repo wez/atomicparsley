@@ -44,15 +44,15 @@ typedef struct {
 	
 	bool contains_esds;
 	
-	uint32_t section3_length;
-	uint32_t section4_length;
+	uint64_t section3_length;
+	uint64_t section4_length;
 	uint8_t ObjectTypeIndication;
 	uint32_t max_bitrate;
 	uint32_t avg_bitrate;
-	uint32_t section5_length;
+	uint64_t section5_length;
 	uint8_t descriptor_object_typeID;
 	uint16_t channels;
-	uint32_t section6_length; //unused
+	uint64_t section6_length; //unused
 
 	//specifics
 	uint8_t m4v_profile;

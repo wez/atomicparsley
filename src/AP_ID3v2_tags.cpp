@@ -665,7 +665,7 @@ uint32_t APar_ExtractField(char* buffer, uint32_t maxFieldLen, ID3v2Frame* thisF
 }
 
 void APar_ScanID3Frame(ID3v2Frame* targetframe, char* frame_ptr, uint32_t frameLen) {
-	uint32_t offset_into_frame = 0;
+	uint64_t offset_into_frame = 0;
 	
 	switch(targetframe->ID3v2_FrameType) {
 		case ID3_UNKNOWN_FRAME : {
@@ -1261,9 +1261,9 @@ uint32_t APar_Render_ID32_Tag(AtomicInfo* id32_atom, uint32_t max_alloc) {
 	APar_FrameFilter(id32_atom);
 	
 	UInt16_TO_String2(id32_atom->AtomicLanguage, id32_atom->AtomicData); //parsedAtoms[atom_idx].AtomicLanguage
-	uint32_t tag_offset = 2; //those first 2 bytes will hold the language
+	uint64_t tag_offset = 2; //those first 2 bytes will hold the language
 	uint32_t frame_length, frame_header_len; //the length in bytes this frame consumes in AtomicData as rendered
-	uint32_t frame_length_pos, frame_compressed_length_pos;
+	uint64_t frame_length_pos, frame_compressed_length_pos;
 	
 	memcpy(id32_atom->AtomicData + tag_offset, "ID3", 3);
 	tag_offset+=3;
@@ -1334,7 +1334,9 @@ uint32_t APar_Render_ID32_Tag(AtomicInfo* id32_atom, uint32_t max_alloc) {
 		}
 		
 		frame_length = 0;
-		APar_RenderFields(id32_atom->AtomicData + tag_offset+frame_header_len, max_alloc-tag_offset, id32_atom->ID32_TagInfo, thisframe, &frame_header_len, &frame_length);
+		APar_RenderFields(id32_atom->AtomicData + tag_offset+frame_header_len,
+			max_alloc-tag_offset, id32_atom->ID32_TagInfo, thisframe,
+			&frame_header_len, &frame_length);
 		
 #if defined HAVE_ZLIB_H
 		//and now that we have rendered the frame, its time to turn to compression, if set
@@ -1537,7 +1539,7 @@ uint32_t APar_TextFieldDataPut(ID3v2Fields* thisField, const char* this_payload,
 	
 	} else if (str_encoding == TE_UTF16LE_WITH_BOM) {
 		int string_length = (int)utf8_length(this_payload, strlen(this_payload)) + 1;
-		uint32_t bom_offset = 0;
+		uint64_t bom_offset = 0;
 		
 		if (2 * string_length + thisField->field_length > thisField->alloc_length) { //important: realloc before BOM testing!!!
 			APar_realloc_memcpy(thisField, (2 * string_length + thisField->field_length > 2000 ? 2 * string_length + thisField->field_length : 2000) );

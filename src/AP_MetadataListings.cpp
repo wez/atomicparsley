@@ -186,7 +186,7 @@ APar_Extract_uuid_binary_file
 ----------------------*/
 void APar_Extract_uuid_binary_file(AtomicInfo* uuid_atom, const char* originating_file, char* output_path) {
 	uint32_t path_len = 0;
-	uint32_t atom_offsets = 0;
+	uint64_t atom_offsets = 0;
 	char* uuid_outfile = (char*)calloc(1, sizeof(char)*MAXPATHLEN+1); //malloc a new string because it may be a cli arg for a specific output path	
 	if (output_path == NULL) {
 		char* orig_suffix = strrchr(originating_file, '.');
@@ -217,9 +217,9 @@ void APar_Extract_uuid_binary_file(AtomicInfo* uuid_atom, const char* originatin
 	atom_offsets+=1+suffix_len;
 	
 	uint8_t mime_len = (uint8_t)uuid_payload[atom_offsets];
-	uint32_t mimetype_string = atom_offsets+1;
+	uint64_t mimetype_string = atom_offsets+1;
 	atom_offsets+=1+mime_len;
-	uint32_t bin_len = UInt32FromBigEndian(uuid_payload+atom_offsets);
+	uint64_t bin_len = UInt32FromBigEndian(uuid_payload+atom_offsets);
 	atom_offsets+=4;
 
 	sprintf(uuid_outfile+path_len, "-%s-uuid%s", uuid_atom->uuid_ap_atomname, file_suffix);
@@ -521,8 +521,8 @@ void APar_ExtractDataAtom(int this_atom_number) {
 					} else if (thisAtom->AtomicClassification == EXTENDED_ATOM &&
 											thisAtom->AtomicVerFlags == AtomFlags_Data_uuid_binary &&
 											thisAtom->uuid_style == UUID_AP_SHA1_NAMESPACE) {
-						uint32_t offset_into_uuiddata = 0;
-						uint32_t descrip_len = UInt32FromBigEndian(data_payload);
+						uint64_t offset_into_uuiddata = 0;
+						uint64_t descrip_len = UInt32FromBigEndian(data_payload);
 						offset_into_uuiddata+=4;
 						
 						char* uuid_description = (char*)calloc(1, sizeof(char) * descrip_len+16 ); //char uuid_description[descrip_len+1];
@@ -861,7 +861,7 @@ void APar_Print_single_userdata_atomcontents(uint8_t track_num, short userdata_a
 		{
 			APar_Mark_UserData_area(track_num, userdata_atom, quantum_listing);
 			
-			uint32_t box_offset = 12;
+			uint64_t box_offset = 12;
 			
 			uint16_t packed_lang = APar_read16(bitpacked_lang, source_file, parsedAtoms[userdata_atom].AtomicStart + box_offset);
 			box_offset+=2;
@@ -895,7 +895,7 @@ void APar_Print_single_userdata_atomcontents(uint8_t track_num, short userdata_a
 		{
 			APar_Mark_UserData_area(track_num, userdata_atom, quantum_listing);
 			
-			uint32_t box_offset = 12;
+			uint64_t box_offset = 12;
 			uint16_t packed_lang = APar_read16(bitpacked_lang, source_file, parsedAtoms[userdata_atom].AtomicStart + box_offset);
 			box_offset+=2;
 			
@@ -1525,7 +1525,7 @@ void APar_PrintAtomicTree() {
 	fprintf(stdout, "Total size: %llu bytes; ", (uint64_t)file_size);
 	fprintf(stdout, "%i atoms total. ", atom_number-1);
 	ShowVersionInfo();
-	fprintf(stdout, "Media data: %u bytes; %llu bytes all other atoms (%2.3lf%% atom overhead).\n", 
+	fprintf(stdout, "Media data: %llu bytes; %llu bytes all other atoms (%2.3lf%% atom overhead).\n", 
 		mdatData, file_size - mdatData,
 		(double)(file_size - mdatData)/(double)file_size * 100.0 );
 
@@ -1539,7 +1539,7 @@ void APar_PrintAtomicTree() {
 		}
 	}
 	if (gapless_void_padding > 0) {
-		fprintf(stdout, "\nGapless playback null space at end of file: %u bytes.", gapless_void_padding);
+		fprintf(stdout, "\nGapless playback null space at end of file: %llu bytes.", gapless_void_padding);
 	}
 	fprintf(stdout, "\n------------------------------------------------------\n");
 	

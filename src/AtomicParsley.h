@@ -256,9 +256,9 @@ extern bool moov_atom_was_mooved;
 
 extern int metadata_style;
 extern uint32_t brand;
-extern uint32_t mdatData;
+extern uint64_t mdatData;
 extern uint64_t file_size;
-extern uint32_t gapless_void_padding;
+extern uint64_t gapless_void_padding;
 
 extern EmployedCodecs track_codecs;
 
@@ -309,8 +309,8 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ = false);
 void APar_IdentifyBrand(char* file_brand);
 
 AtomicInfo* APar_CreateSparseAtom(AtomicInfo* surrogate_atom, AtomicInfo* parent_atom, short preceding_atom);
-void APar_Unified_atom_Put(AtomicInfo* target_atom, const char* unicode_data, uint8_t text_tag_style, uint32_t ancillary_data, uint8_t anc_bit_width);
-void APar_atom_Binary_Put(AtomicInfo* target_atom, const char* binary_data, uint32_t bytecount, uint32_t atomic_data_offset);
+void APar_Unified_atom_Put(AtomicInfo* target_atom, const char* unicode_data, uint8_t text_tag_style, uint64_t ancillary_data, uint8_t anc_bit_width);
+void APar_atom_Binary_Put(AtomicInfo* target_atom, const char* binary_data, uint32_t bytecount, uint64_t atomic_data_offset);
 
 /* iTunes-style metadata */
 void APar_MetaData_atomArtwork_Set(const char* artworkPath, char* env_PicOptions);
