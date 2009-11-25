@@ -1,0 +1,31 @@
+To compile AtomicParsley on Windows using Microsoft Visual C++ 6.0:
+
+¥ admit that you are colluding with the evil empire by purchasing their products. Flog thyself often & repeatedly.
+
+¥ install zlib
+  zlib compression is optionally used in id3 tags on mpeg-4 files. Download the win32 zlib compiled dll (the last of the 4 listed) at http://www.zlib.net. Place the zlib123-dll folder inside the AtomicParsley/src/extras folder. Copy the zlib1.dll to your system32 directory.
+
+¥ configure MSVC to use a local zlib
+  From the Tools menu choose "Options" and select the "Directories" tab in the Options window.
+  On the right it will say "Show directories for" and have "Include files" selected.
+  On the lower portion, click on a new entry and locate the zlib include folder. It will be something like AtomicParsley/src/extras/zlib123-dll/includeÊ
+  Switch from "Include files" to "Library Files" and create a new entry. The folder to add will be the lib folder - something like this: AtomicParsley/src/extras/zlib123-dll/libÊ
+  Hit the ok button to close the options window.
+
+¥ create a msvc project
+  in MSVC choose File->New... & select "Win32 Console Application". Use the "Empty Project" setting. Name it something like AtomicParsley or "whatever".
+  Select the tab on the left side 2/3 of the way down called "File View". Right click on the "Source Fies" section in the FileView tab. Add the *.cpp source files in AtomicParsley/src to the project. Also, add the *.c files in AtomicParsley/src/extras (the getopt sources).
+  Right click on the "Header Files" section in the FileView tab. Add all the header files (*.h) in the AtomicParsley/src to the project. Also add the getopt.h header file in AtomicParsley/src/extras.
+
+¥ enable zlib compression in AtomicParsley
+  In the FileView tab, select the top level workspace (1 project).
+  From the Project menu choose Settings. In the Link tab of that window, there is a spot labeled "C/C++". In the space labeled "Preprocessor definitions, add a comma, "HAVE_ZLIB_H" (without the quotes). It should look like this:Ê
+WIN32,NDEBUG,_CONSOLE,_MBCS,HAVE_ZLIB_H
+  Switch to the tab labeled "Object/Library modules". At the very end of this, add a space and "zdll.lib" (without the quotes). Hit the okay button.
+
+¥ build AtomicParsley.exe
+  From the Build menu, choose "Build whatever.exe".
+  There will be dozens of warnings - those can be ignored.
+
+------------------
+If something went wrong, please realize this was written on a Mac by a Mac user.
