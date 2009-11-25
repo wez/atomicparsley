@@ -105,11 +105,7 @@ uint64_t gapless_void_padding = 0; //possibly used in the context of gapless pla
 struct DynamicUpdateStat dynUpd;
 struct padding_preferences pad_prefs;
 
-#if defined (WIN32) || defined (__CYGWIN__)
-short max_display_width = 45;
-#else
-short max_display_width = 75; //ah, figured out grub - vga=773 makes a whole new world open up
-#endif
+short max_display_width = 55;
 char* file_progress_buffer=(char*)calloc(1, sizeof(char)* (max_display_width+50) ); //+50 for any overflow in "%100", or "|"
 
 #if defined (DARWIN_PLATFORM)
@@ -2938,7 +2934,7 @@ void APar_RenderAllID32Atoms() {
  	while (true) {
 		if (memcmp(parsedAtoms[atom_idx].AtomicName, "ID32", 4) == 0) {
 			if (parsedAtoms[atom_idx].ID32_TagInfo != NULL) {
-				uint32_t id32tag_max_length = APar_GetTagSize(&parsedAtoms[atom_idx]);
+				uint64_t id32tag_max_length = APar_GetTagSize(&parsedAtoms[atom_idx]);
 				if (id32tag_max_length > 0) {
 					parsedAtoms[atom_idx].AtomicData = (char*)calloc(1, sizeof(char)* id32tag_max_length + (16*parsedAtoms[atom_idx].ID32_TagInfo->ID3v2_FrameCount) );
 					APar_Unified_atom_Put(&parsedAtoms[atom_idx], NULL, 0, parsedAtoms[atom_idx].AtomicLanguage, 16);
@@ -3996,10 +3992,15 @@ void APar_DetermineNewFileLength() {
 /*----------------------
 APar_DetermineAtomLengths
 
-    Working backwards from the last atom in the tree, for each parent atom, add the lengths of all the children atoms. All atom lengths for all parent atoms are
-		recalculated from the lenghts of children atoms directly under the parent. Even atoms in hieararchies that were not touched are recalculated. Accommodations
-		are made for certain dual-state atoms that are parents & contain data/versioning - the other dual-state atoms do not need to be listed because they exist
-		within the stsd hierarchy which is only parsed when viewing the tree (for setting tags, it remains monolithic). 
+Working backwards from the last atom in the tree, for each parent atom, add the
+lengths of all the children atoms. All atom lengths for all parent atoms are
+recalculated from the lenghts of children atoms directly under the parent. Even
+atoms in hieararchies that were not touched are recalculated. Accommodations
+are made for certain dual-state atoms that are parents & contain
+data/versioning - the other dual-state atoms do not need to be listed because
+they exist within the stsd hierarchy which is only parsed when viewing the tree
+(for setting tags, it remains monolithic). 
+
 ----------------------*/
 void APar_DetermineAtomLengths() {	
 	short rev_atom_loop = APar_FindLastAtom();
@@ -4183,7 +4184,7 @@ void APar_ValidateAtoms() {
 #if defined (_MSC_VER) /* apparently, long long is forbidden there*/
 				fprintf(stderr, "atom %s is %u bytes long which is greater than the filesize of %llu\n", parsedAtoms[iter].AtomicName, parsedAtoms[iter].AtomicLength, (long unsigned int)file_size);
 #else
-				fprintf(stderr, "atom %s is %llu bytes long which is greater than the filesize of %llu\n", parsedAtoms[iter].AtomicName, parsedAtoms[iter].AtomicLength, (long long unsigned int)file_size);
+				fprintf(stderr, "atom %s is %llu bytes long which is greater than the filesize of %llu\n", parsedAtoms[iter].AtomicName, parsedAtoms[iter].AtomicLength, file_size);
 #endif
 				exit(1); //its conceivable to repair such an off length by the surrounding atoms constrained by file_size - just not anytime soon; probly would catch a foobar2000 0.9 tagged file
 			}
@@ -4191,7 +4192,7 @@ void APar_ValidateAtoms() {
 		
 		if (parsedAtoms[iter].AtomicLevel == 1) {
 			if (parsedAtoms[iter].AtomicLength == 0 && strncmp(parsedAtoms[iter].AtomicName, "mdat", 4) == 0) {
-				simple_tally = (uint64_t)file_size - parsedAtoms[iter].AtomicStart;
+				simple_tally = file_size - parsedAtoms[iter].AtomicStart;
 			} else {
 				simple_tally += parsedAtoms[iter].AtomicLength == 1 ? parsedAtoms[iter].AtomicLengthExtended : parsedAtoms[iter].AtomicLength;
 			}
@@ -4369,16 +4370,17 @@ void APar_UpdateModTime(AtomicInfo* container_header_atom) {
 	return;
 }
 
-void APar_ShellProgressBar(uint32_t bytes_written) {
+void APar_ShellProgressBar(uint64_t bytes_written) {
 	if (dynUpd.updage_by_padding) {
 		return;
 	}
 	strcpy(file_progress_buffer, " Progress: ");
 	
-	double dispprog = (double)bytes_written/(double)new_file_size * 100.0 *( (double)max_display_width/100.0);
-	int display_progress = (int)lroundf((float)dispprog);
-	double percomp = 100.0 * (double)((double)bytes_written/ (double)new_file_size);
-	int percentage_complete = (int)lroundf((float)percomp);
+	double dispprog = (double)bytes_written / (double)new_file_size
+						* max_display_width;
+	int display_progress = (int)lroundf(dispprog);
+	double percomp = 100.0 * (double)bytes_written / (double)new_file_size;
+	int percentage_complete = (int)lroundf(percomp);
 		
 	for (int i = 0; i <= max_display_width; i++) {
 		if (i < display_progress ) {
@@ -4403,12 +4405,12 @@ void APar_ShellProgressBar(uint32_t bytes_written) {
 	return;
 }
 
-void APar_MergeTempFile(FILE* dest_file, FILE *src_file, uint32_t src_file_size, uint32_t dest_position, char* &buffer) {
-	uint32_t file_pos = 0;
+void APar_MergeTempFile(FILE* dest_file, FILE *src_file, uint64_t src_file_size, uint64_t dest_position, char* &buffer) {
+	uint64_t file_pos = 0;
 	while (file_pos <= src_file_size) {
 		if (file_pos + max_buffer <= src_file_size ) {
 			fseeko(src_file, file_pos, SEEK_SET);
-			fread(buffer, 1, (size_t)max_buffer, src_file);
+			fread(buffer, 1, max_buffer, src_file);
 			
 			//fseek(dest_file, dest_position + file_pos, SEEK_SET);
 #if defined(_MSC_VER)
@@ -4420,12 +4422,12 @@ void APar_MergeTempFile(FILE* dest_file, FILE *src_file, uint32_t src_file_size,
 			off_t file_offset = dest_position + file_pos;
 #endif
 			fsetpos(dest_file, &file_offset);
-			fwrite(buffer, (size_t)max_buffer, 1, dest_file);
+			fwrite(buffer, max_buffer, 1, dest_file);
 			file_pos += max_buffer;
 			
 		} else {
 			fseeko(src_file, file_pos, SEEK_SET);
-			fread(buffer, 1, (size_t)(src_file_size - file_pos), src_file);
+			fread(buffer, 1, src_file_size - file_pos, src_file);
 			//fprintf(stdout, "buff starts with %s\n", buffer+4);
 #if defined(_MSC_VER)
 			fpos_t file_offset = dest_position + file_pos;
@@ -4436,7 +4438,7 @@ void APar_MergeTempFile(FILE* dest_file, FILE *src_file, uint32_t src_file_size,
 			off_t file_offset = dest_position + file_pos;
 #endif
 			fsetpos(dest_file, &file_offset );
-			fwrite(buffer, (size_t)(src_file_size - file_pos), 1, dest_file);
+			fwrite(buffer, src_file_size - file_pos, 1, dest_file);
 			file_pos += src_file_size - file_pos;
 			break;
 		}		
@@ -4452,8 +4454,11 @@ void APar_MergeTempFile(FILE* dest_file, FILE *src_file, uint32_t src_file_size,
 	return;
 }
 
-uint32_t APar_WriteAtomically(FILE* source_file, FILE* temp_file, bool from_file, char* &buffer, uint32_t bytes_written_tally, short this_atom) {
-	uint32_t bytes_written = 0;
+uint64_t APar_WriteAtomically(FILE* source_file, FILE* temp_file,
+	bool from_file, char* &buffer, uint64_t bytes_written_tally,
+	short this_atom)
+{
+	uint64_t bytes_written = 0;
 	
 	if (parsedAtoms[this_atom].AtomicLength > 1 && parsedAtoms[this_atom].AtomicLength < 8) { //prevents any spurious atoms from appearing
 		return bytes_written;
@@ -4533,11 +4538,14 @@ uint32_t APar_WriteAtomically(FILE* source_file, FILE* temp_file, bool from_file
 				//fprintf(stdout, "Writing atom %s from file looping into buffer\n", parsedAtoms[this_atom].AtomicName);
 //fprintf(stdout, "Writing atom %s from file looping into buffer %u - %u | %u\n", parsedAtoms[this_atom].AtomicName, parsedAtoms[this_atom].AtomicLength, bytes_written_tally, bytes_written);
 				//read&write occurs from & including atom name through end of atom
-				fseeko(source_file, (bytes_written + parsedAtoms[this_atom].AtomicStart), SEEK_SET);
-				fread(buffer, 1, (size_t)max_buffer, source_file);
+				fseeko(source_file,
+					bytes_written + parsedAtoms[this_atom].AtomicStart,
+					SEEK_SET);
+				fread(buffer, 1, max_buffer, source_file);
 				
-				fseeko(temp_file, (bytes_written_tally + bytes_written), SEEK_SET);
-				fwrite(buffer, (size_t)max_buffer, 1, temp_file);
+				fseeko(temp_file, bytes_written_tally + bytes_written,
+					SEEK_SET);
+				fwrite(buffer, max_buffer, 1, temp_file);
 				bytes_written += max_buffer;
 				
 				APar_ShellProgressBar(bytes_written_tally + bytes_written);
@@ -4545,10 +4553,10 @@ uint32_t APar_WriteAtomically(FILE* source_file, FILE* temp_file, bool from_file
 			} else { //we either came up on a short atom (most are), or the last bit of a really long atom
 				//fprintf(stdout, "Writing atom %s from file directly into buffer\n", parsedAtoms[this_atom].AtomicName);
 				fseeko(source_file, (bytes_written + parsedAtoms[this_atom].AtomicStart), SEEK_SET);
-				fread(buffer, 1, (size_t)(parsedAtoms[this_atom].AtomicLength - bytes_written), source_file);
+				fread(buffer, 1, parsedAtoms[this_atom].AtomicLength - bytes_written, source_file);
 				
-				fseeko(temp_file, (bytes_written_tally + bytes_written), SEEK_SET);
-				fwrite(buffer, (size_t)(parsedAtoms[this_atom].AtomicLength - bytes_written), 1, temp_file);
+				fseeko(temp_file, bytes_written_tally + bytes_written, SEEK_SET);
+				fwrite(buffer, parsedAtoms[this_atom].AtomicLength - bytes_written, 1, temp_file);
 				bytes_written += parsedAtoms[this_atom].AtomicLength - bytes_written;
 				
 				APar_ShellProgressBar(bytes_written_tally + bytes_written);
@@ -4558,10 +4566,10 @@ uint32_t APar_WriteAtomically(FILE* source_file, FILE* temp_file, bool from_file
 		}
 		
 	} else { // we are going to be writing not from the file, but directly from the tree (in memory).
-		uint32_t atom_name_len = 4;
+		uint64_t atom_name_len = 4;
 
 		//fprintf(stdout, "Writing atom %s from memory %u\n", parsedAtoms[this_atom].AtomicName, parsedAtoms[this_atom].AtomicClassification);
-		fseeko(temp_file, (bytes_written_tally + bytes_written), SEEK_SET);
+		fseeko(temp_file, bytes_written_tally + bytes_written, SEEK_SET);
 		
 		if (parsedAtoms[this_atom].AtomicClassification == EXTENDED_ATOM) {
 			fwrite("uuid", 4, 1, temp_file);
@@ -4578,7 +4586,7 @@ uint32_t APar_WriteAtomically(FILE* source_file, FILE* temp_file, bool from_file
 			bytes_written += 4;
 		}
 		
-		uint32_t atom_data_size = 0;
+		uint64_t atom_data_size = 0;
 		switch (parsedAtoms[this_atom].AtomicContainerState) {
 			case PARENT_ATOM :
 			case SIMPLE_PARENT_ATOM : {
@@ -4659,33 +4667,33 @@ APar_copy_gapless_padding
 		structure.
 		
 ----------------------*/
-void APar_copy_gapless_padding(FILE* mp4file, uint32_t last_atom_pos, char* buffer) {
-	uint32_t gapless_padding_bytes_written = 0;
+void APar_copy_gapless_padding(FILE* mp4file, uint64_t last_atom_pos, char* buffer) {
+	uint64_t gapless_padding_bytes_written = 0;
 	while (gapless_padding_bytes_written < gapless_void_padding) {
 		if (gapless_padding_bytes_written + max_buffer <= gapless_void_padding ) {
 			memset(buffer, 0, max_buffer);
 			
-			fseeko(mp4file, (last_atom_pos + gapless_padding_bytes_written), SEEK_SET);
-			fwrite(buffer, (size_t)max_buffer, 1, mp4file);
+			fseeko(mp4file, last_atom_pos + gapless_padding_bytes_written,
+				SEEK_SET);
+			fwrite(buffer, max_buffer, 1, mp4file);
 			gapless_padding_bytes_written += max_buffer;
 			
 		} else { //less then 512k of gapless padding (here's hoping we get here always)
-			memset(buffer, 0, (gapless_void_padding - gapless_padding_bytes_written) );
+			memset(buffer, 0, gapless_void_padding - gapless_padding_bytes_written);
 			
-			fseeko(mp4file, (last_atom_pos + gapless_padding_bytes_written), SEEK_SET);
-			fwrite(buffer, (size_t)(gapless_void_padding - gapless_padding_bytes_written), 1, mp4file);
-			gapless_padding_bytes_written+= (gapless_void_padding - gapless_padding_bytes_written);
+			fseeko(mp4file, last_atom_pos + gapless_padding_bytes_written, SEEK_SET);
+			fwrite(buffer, gapless_void_padding - gapless_padding_bytes_written, 1, mp4file);
+			gapless_padding_bytes_written += gapless_void_padding - gapless_padding_bytes_written;
 			break;
 		}
 	}
-	return;
 }
 
 void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewrite_original) {
 	char* temp_file_name=(char*)calloc(1, sizeof(char)* 3500 );
 	char* file_buffer=(char*)calloc(1, sizeof(char)* max_buffer + 1 );
 	FILE* temp_file;
-	uint32_t temp_file_bytes_written = 0;
+	uint64_t temp_file_bytes_written = 0;
 	short thisAtomNumber = 0;
 	char* originating_file = NULL;
 	bool free_modified_name = false;
@@ -4713,7 +4721,7 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 	APar_ValidateAtoms();
 	
 	//whatever atoms/space comes before mdat has to be added/removed before this point, or chunk offsets (in stco, co64, tfhd) won't be properly determined
-	uint32_t mdat_position = APar_DetermineMediaData_AtomPosition(); 
+	uint64_t mdat_position = APar_DetermineMediaData_AtomPosition(); 
 	
 	if (dynUpd.updage_by_padding) {
 		APar_DeriveNewPath(ISObasemediafile, temp_file_name, 0, "-data-", NULL); //APar_DeriveNewPath(ISObasemediafile, temp_file_name, -1, "-data-", NULL);
