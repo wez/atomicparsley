@@ -1,0 +1,164 @@
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# This Makefile.in is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+
+SHELL = @SHELL@
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+datadir = @datadir@
+exec_prefix = @exec_prefix@
+includedir = @includedir@
+infodir = @infodir@
+libdir = @libdir@
+libexecdir = @libexecdir@
+localstatedir = @localstatedir@
+mandir = @mandir@
+oldincludedir = @oldincludedir@
+sbindir = @sbindir@
+sharedstatedir = @sharedstatedir@
+sysconfdir = @sysconfdir@
+
+CXX = @CXX@
+CXXFLAGS = @CXXFLAGS@
+DEFS = @DEFS@
+LIBS = @LIBS@
+LDFLAGS = @LDFLAGS@
+INSTALL = @INSTALL@
+
+DEBUG = @debug@
+HAVE_LIBZ = @HAVE_LIBZ@
+OS_NAME = @os_name@
+HAVE_DARWIN_PLATFORM = @HAVE_DARWIN_PLATFORM@
+DARWIN_BUILD_UNIVERSAL = @universal@
+DARWIN_NATIVE_ARCH = @AP_NATIVE_ARCH@
+DARWIN_CROSS_ARCH = @AP_CROSS_ARCH@
+DARWIN_UNIVERSAL_SDK_ROOT = @DARWIN_U_SYSROOT@
+HAVE_GETOPT = @HAVE_GETOPT_H@
+
+CXXFLAGS+= -Wall -Wno-unused
+CPPFLAGS+=-DHAVE_CONFIG_H
+
+EXTRA_LIBS = -lz
+
+LINK = link
+
+STRIP = 
+
+ALL_OBJ = $(AP_OBJ_DIR)/*.o
+AP_OBJ_DIR = $(top_srcdir)/obj_dir
+COMMON_SOURCE_FILES = AP_commons.cpp AP_arrays.cpp AP_iconv.cpp \
+AtomicParsley.cpp AP_AtomExtracts.cpp APar_sha1.cpp APar_uuid.cpp \
+AP_ID3v2_tags.cpp AP_MetadataListings.cpp AP_CDTOC.cpp main.cpp
+COMMON_OBJ = makeworkdir $(AP_OBJ_DIR)/AP_commons.o \
+		$(AP_OBJ_DIR)/AP_arrays.o \
+		$(AP_OBJ_DIR)/AP_iconv.o \
+		$(AP_OBJ_DIR)/AtomicParsley.o \
+		$(AP_OBJ_DIR)/AP_AtomExtracts.o \
+		$(AP_OBJ_DIR)/APar_sha1.o \
+		$(AP_OBJ_DIR)/APar_uuid.o \
+		$(AP_OBJ_DIR)/AP_ID3v2_tags.o \
+		$(AP_OBJ_DIR)/AP_MetadataListings.o \
+		$(AP_OBJ_DIR)/AP_CDTOC.o \
+		$(AP_OBJ_DIR)/main.o
+
+
+ifneq ($(HAVE_GETOPT), 1)
+COMMON_SOURCE_FILES+= extras/getopt.c extras/getopt1.c
+COMMON_OBJ+= $(AP_OBJ_DIR)/getopt.o $(AP_OBJ_DIR)/getopt1.o
+endif
+
+ifeq ($(DEBUG), yes)
+CPPFLAGS+=-DDEBUG_V
+STRIP = strip $(top_srcdir)/AtomicParsley
+endif
+
+ifeq ("$(OS_NAME)", "Darwin")
+COMMON_SOURCE_FILES+= AP_NSFile_utils.mm AP_NSImage.mm
+COMMON_OBJ+= $(AP_OBJ_DIR)/AP_NSFile_utils.o $(AP_OBJ_DIR)/AP_NSImage.o
+CPPFLAGS+=-DDARWIN_PLATFORM
+LDFLAGS+=-framework Cocoa -framework Foundation -framework IOKit
+endif
+
+ifeq ($(HAVE_LIBZ), 1)
+COMMON_OBJ+=$(AP_OBJ_DIR)/APar_zlib.o
+endif
+
+ifeq ("$(DARWIN_BUILD_UNIVERSAL)", "yes")
+STRIP = strip $(top_srcdir)/AtomicParsley_$(DARWIN_NATIVE_ARCH); \
+	strip $(top_srcdir)/AtomicParsley_$(DARWIN_CROSS_ARCH)
+LINK = link-uiniversal
+#COMMON_OBJ = $(patsubst %_$(DARWIN_NATIVE_ARCH).o,%.o,$(wildcard *.o))
+endif
+
+#-------------------------------------------------------------------------
+all:	$(COMMON_OBJ) $(LINK)
+
+.SUFFIXES: .cpp .c .mm .o 
+
+makeworkdir:
+	mkdir -p $(AP_OBJ_DIR)
+
+$(AP_OBJ_DIR)/%.o: %.c
+	@echo "$< ..."
+	$(CXX) $(CXXFLAGS) -I../src $(CPPFLAGS) $(EXTRACPPFLAGS) -MT $(AP_OBJ_DIR)/$*.o -MD -MP -MF $(AP_OBJ_DIR)/$*.Tpo -c -o $(AP_OBJ_DIR)/$*.o $*.c
+
+$(AP_OBJ_DIR)/%.o: %.cpp
+ifeq ("$(DARWIN_BUILD_UNIVERSAL)", "yes")
+	@echo "$< ..."
+	$(CXX) -arch $(DARWIN_NATIVE_ARCH) $(CXXFLAGS) -I../src $(CPPFLAGS) $(EXTRACPPFLAGS) -MT $(AP_OBJ_DIR)/$*.o -MD -MP -MF $(AP_OBJ_DIR)/$*.Tpo -c -o $(AP_OBJ_DIR)/$*_$(DARWIN_NATIVE_ARCH).o $*.cpp
+	$(CXX) -arch $(DARWIN_CROSS_ARCH) $(CXXFLAGS) -I../src $(CPPFLAGS) $(EXTRACPPFLAGS) -MT $(AP_OBJ_DIR)/$*.o -MD -MP -MF $(AP_OBJ_DIR)/$*.Tpo -c -o $(AP_OBJ_DIR)/$*_$(DARWIN_CROSS_ARCH).o $*.cpp
+else
+	$(CXX) $(CXXFLAGS) -I../src $(CPPFLAGS) $(EXTRACPPFLAGS) -MT $(AP_OBJ_DIR)/$*.o -MD -MP -MF $(AP_OBJ_DIR)/$*.Tpo -c -o $(AP_OBJ_DIR)/$*.o $*.cpp
+endif
+
+$(AP_OBJ_DIR)/%.o: %.mm
+ifeq ("$(DARWIN_BUILD_UNIVERSAL)", "yes")
+	@echo "$< ..."
+	$(CXX) -arch $(DARWIN_NATIVE_ARCH) $(CXXFLAGS) -I../src $(CPPFLAGS) $(EXTRACPPFLAGS) -MT $(AP_OBJ_DIR)/$*.o -MD -MP -MF $(AP_OBJ_DIR)/$*.Tpo -c -o $(AP_OBJ_DIR)/$*_$(DARWIN_NATIVE_ARCH).o $*.mm
+	$(CXX) -arch $(DARWIN_CROSS_ARCH) $(CXXFLAGS) -I../src $(CPPFLAGS) $(EXTRACPPFLAGS) -MT $(AP_OBJ_DIR)/$*.o -MD -MP -MF $(AP_OBJ_DIR)/$*.Tpo -c -o $(AP_OBJ_DIR)/$*_$(DARWIN_CROSS_ARCH).o $*.mm
+else
+	$(CXX) $(CXXFLAGS) -I../src $(CPPFLAGS) $(EXTRACPPFLAGS) -MT $(AP_OBJ_DIR)/$*.o -MD -MP -MF $(AP_OBJ_DIR)/$*.Tpo -c -o $(AP_OBJ_DIR)/$*.o $*.mm
+endif
+
+link:
+	@echo "Linking ..."
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(top_srcdir)/AtomicParsley $(ALL_OBJ) $(EXTRA_LIBS)
+	$(STRIP)
+
+link-uiniversal:
+	@echo "Linking & lipo joining ..."
+	$(CXX) -arch $(DARWIN_NATIVE_ARCH) $(CXXFLAGS) $(LDFLAGS) -o $(top_srcdir)/AtomicParsley_$(DARWIN_NATIVE_ARCH) $(AP_OBJ_DIR)/*_$(DARWIN_NATIVE_ARCH).o $(EXTRA_LIBS)
+	$(CXX) -arch $(DARWIN_CROSS_ARCH) $(CXXFLAGS) $(LDFLAGS) -isysroot $(DARWIN_UNIVERSAL_SDK_ROOT) -o $(top_srcdir)/AtomicParsley_$(DARWIN_CROSS_ARCH) $(AP_OBJ_DIR)/*_$(DARWIN_CROSS_ARCH).o $(EXTRA_LIBS)
+	$(STRIP)
+	lipo -arch $(DARWIN_NATIVE_ARCH) $(top_srcdir)/AtomicParsley_$(DARWIN_NATIVE_ARCH) -arch $(DARWIN_CROSS_ARCH) $(top_srcdir)/AtomicParsley_$(DARWIN_CROSS_ARCH) -create -output $(top_srcdir)/AtomicParsley
+
+
+clean:
+	rm -rf $(AP_OBJ_DIR)
+
+install:
+
+uninstall:
+
+maint-clean:
+
+dist-clean:
+
+.PHONY: all clean install dist-clean maint-clean
+
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:
