@@ -146,7 +146,7 @@ uint32_t APar_zlib_deflate(char* in_buffer, uint32_t in_buf_len, char* out_buffe
 	zlib.total_out = 0;
 	deflateInit(&zlib, Z_DEFAULT_COMPRESSION);
 	if (Z_STREAM_END == deflate(&zlib, Z_FINISH) ) {
-		compressed_bytes = (uint32_t)zlib.total_out;
+		compressed_bytes = zlib.total_out;
 		deflateEnd(&zlib);
 	}
 #endif

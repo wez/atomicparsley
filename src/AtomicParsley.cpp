@@ -72,7 +72,7 @@ bool svn_build = true; //controls which type of versioning - svn build-time stam
 //bool svn_build = false; //controls which type of versioning - release number
 
 FILE* source_file = NULL;
-uint32_t file_size;
+uint64_t file_size;
 
 struct AtomicInfo parsedAtoms[MAX_ATOMS];
 short atom_number = 0;
@@ -92,11 +92,11 @@ bool deep_atom_scan = false;
 
 uint32_t max_buffer = 4096*125; // increased to 512KB
 
-uint32_t bytes_before_mdat=0;
-uint32_t bytes_into_mdat = 0;
+uint64_t bytes_before_mdat=0;
+uint64_t bytes_into_mdat = 0;
 uint64_t mdat_supplemental_offset = 0;
-uint32_t removed_bytes_tally = 0;
-uint32_t new_file_size = 0; //used for the progressbar
+uint64_t removed_bytes_tally = 0;
+uint64_t new_file_size = 0; //used for the progressbar
 uint32_t brand = 0;
 uint32_t mdatData = 0; //now global, used in bitrate calcs
 
@@ -215,7 +215,7 @@ void APar_AtomicWriteTest(short AtomicNumber, bool binary) {
 			fwrite(data, 4, 1, single_atom_file);
 			fwrite(anAtom.AtomicName, 4, 1, single_atom_file);
 		
-			UInt32_TO_String4((uint32_t)anAtom.AtomicVerFlags, data);
+			UInt32_TO_String4(anAtom.AtomicVerFlags, data);
 			fwrite(data, 4, 1, single_atom_file);
 
 			fwrite(anAtom.AtomicData, strlen(anAtom.AtomicData)+1, 1, single_atom_file);
@@ -899,8 +899,11 @@ AtomicInfo* APar_FindAtom(const char* atom_name, bool createMissing, uint8_t ato
 //                      File scanning & atom parsing                                 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-void APar_AtomizeFileInfo(uint32_t Astart, uint32_t Alength, uint64_t Aextendedlength, char* Astring,
-													uint8_t Alevel, uint8_t Acon_state, uint8_t Aclass, uint32_t Averflags, uint16_t Alang, uuid_vitals* uuid_info ) {
+void APar_AtomizeFileInfo(uint32_t Astart, uint32_t Alength,
+	uint64_t Aextendedlength, char* Astring, uint8_t Alevel,
+	uint8_t Acon_state, uint8_t Aclass, uint32_t Averflags,
+	uint16_t Alang, uuid_vitals* uuid_info)
+{
 	static bool passed_mdat = false;
 	AtomicInfo* thisAtom = &parsedAtoms[atom_number];
 	
@@ -1179,7 +1182,7 @@ APar_MatchToKnownAtom
 		Iterate through the known parents, and test it against atom_container. If they match, return the properties of the known atom
 ----------------------*/
 int APar_MatchToKnownAtom(const char* atom_name, const char* atom_container, bool fromFile, const char* find_atom_path) {
-	uint32_t total_known_atoms = (uint32_t)(sizeof(KnownAtoms)/sizeof(*KnownAtoms));
+	uint32_t total_known_atoms = (sizeof(KnownAtoms)/sizeof(*KnownAtoms));
 	uint32_t return_known_atom = 0;
 	
 	//if this atom is contained by 'ilst', then it is *highly* likely an iTunes-style metadata parent atom
@@ -1356,7 +1359,7 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 				
 				fseek(file, jump, SEEK_SET);
 				
-				while (jump < (uint32_t)file_size) {
+				while (jump < file_size) {
 					
 					uuid_info.uuid_form = UUID_DEPRECATED_FORM; //start with the assumption that any found atom is in the depracted uuid form
 					
@@ -1373,8 +1376,8 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 						jpeg2000signature = false;
 					}
 					
-					if ( dataSize > (uint64_t)file_size) {
-						dataSize = (uint32_t)(file_size - jump);
+					if ( dataSize > file_size) {
+						dataSize = file_size - jump;
 					}
 					
 					if (dataSize == 0 && (atom[0] == 0 && atom[1] == 0 && atom[2] == 0 && atom[3] == 0) ) {
@@ -1409,7 +1412,7 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 						if (UInt32FromBigEndian(uuid_info.binary_uuid+8) == 0) { //the deperacted uuid form
 							atom = data+8;
 							atom_verflags = APar_read32(uuid_info.binary_uuid, file, jump+12);
-							if (atom_verflags > (uint32_t)AtomFlags_Data_UInt) {
+							if (atom_verflags > AtomFlags_Data_UInt) {
 								atom_verflags = 0;
 							}
 						} else {
@@ -1617,7 +1620,7 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 					
 					generalAtomicLevel = APar_GetCurrentAtomDepth(jump, dataSize);
 					
-					if ( (jump > 8 ? jump : 8) >= (uint32_t)file_size) { //prevents jumping past EOF for the smallest of atoms
+					if ( (jump > 8 ? jump : 8) >= file_size) { //prevents jumping past EOF for the smallest of atoms
 						break;
 					}
 					
@@ -2251,7 +2254,7 @@ void APar_MetaData_atomGenre_Set(const char* atomPayload) {
 				genreAtom = APar_FindAtom(std_genre_data_atom, true, VERSIONED_ATOM, 0);
 				APar_MetaData_atom_QuickInit(genreAtom->AtomicNumber, AtomFlags_Data_Binary, 0);
 				APar_Unified_atom_Put(genreAtom, NULL, UTF8_iTunesStyle_256glyphLimited, 0, 8);
-				APar_Unified_atom_Put(genreAtom, NULL, UTF8_iTunesStyle_256glyphLimited, (uint32_t)genre_number, 8);
+				APar_Unified_atom_Put(genreAtom, NULL, UTF8_iTunesStyle_256glyphLimited, genre_number, 8);
 
 			} else {
 				
@@ -2288,9 +2291,9 @@ void APar_MetaData_atomArtwork_Init(short atom_num, const char* artworkPath) {
 	off_t picture_size = findFileSize(artworkPath);
 	
 	if (picture_size > 0) {
-		APar_MetaData_atom_QuickInit(atom_num, APar_TestArtworkBinaryData(artworkPath), 0, (uint32_t)picture_size );
+		APar_MetaData_atom_QuickInit(atom_num, APar_TestArtworkBinaryData(artworkPath), 0, picture_size );
 		FILE* artfile = APar_OpenFile(artworkPath, "rb");
-		uint32_t bytes_read = APar_ReadFile(parsedAtoms[atom_num].AtomicData + 4, artfile, (uint32_t)picture_size); //+4 for the 4 null bytes
+		uint32_t bytes_read = APar_ReadFile(parsedAtoms[atom_num].AtomicData + 4, artfile, picture_size); //+4 for the 4 null bytes
 		if (bytes_read > 0) parsedAtoms[atom_num].AtomicLength += bytes_read;
 		fclose(artfile);
 	}	
@@ -3112,10 +3115,10 @@ uint32_t APar_QuickSumAtomicLengths(AtomicInfo* target_atom) {
 	while (true) {
 		if (parsedAtoms[atom_idx].AtomicLevel <= target_atom->AtomicLevel) {
 			if (parsedAtoms[atom_idx].AtomicContainerState >= DUAL_STATE_ATOM || parsedAtoms[atom_idx].AtomicLevel == 2) {
-				atom_pos += (parsedAtoms[atom_idx].AtomicLength == 1 ? (uint32_t)parsedAtoms[atom_idx].AtomicLengthExtended : parsedAtoms[atom_idx].AtomicLength);
+				atom_pos += (parsedAtoms[atom_idx].AtomicLength == 1 ? parsedAtoms[atom_idx].AtomicLengthExtended : parsedAtoms[atom_idx].AtomicLength);
 			} else if (parsedAtoms[atom_idx].AtomicContainerState <= SIMPLE_PARENT_ATOM) {
 				if (target_atom->AtomicLevel == 1) {
-					atom_pos += (parsedAtoms[atom_idx].AtomicLength == 1 ? (uint32_t)parsedAtoms[atom_idx].AtomicLengthExtended : parsedAtoms[atom_idx].AtomicLength);
+					atom_pos += (parsedAtoms[atom_idx].AtomicLength == 1 ? parsedAtoms[atom_idx].AtomicLengthExtended : parsedAtoms[atom_idx].AtomicLength);
 				} else {
 					atom_pos += 8;
 				}
@@ -3142,7 +3145,7 @@ AtomicInfo* APar_Constituent_mdat_data(uint32_t desired_data_pos, uint32_t desir
 		
 		if ( memcmp(parsedAtoms[eval_atom].AtomicName, "mdat", 4) == 0 && parsedAtoms[eval_atom].AtomicLevel == 1 ) {
 			if (parsedAtoms[eval_atom].AtomicLength == 1) {
-				if ( (parsedAtoms[eval_atom].AtomicStart + (uint32_t)parsedAtoms[eval_atom].AtomicLengthExtended >= desired_data_pos + desired_data_len) && 
+				if ( (parsedAtoms[eval_atom].AtomicStart + parsedAtoms[eval_atom].AtomicLengthExtended >= desired_data_pos + desired_data_len) && 
 				      parsedAtoms[eval_atom].AtomicStart < desired_data_pos) {
 					target_mdat = &parsedAtoms[eval_atom];
 					break;
@@ -3202,7 +3205,7 @@ bool APar_Readjust_iloc_atom(short iloc_number) {
 				base_offset = UInt32FromBigEndian(parsedAtoms[iloc_number].AtomicData+aggregate_offset);
 				aggregate_offset +=4;
 			} else {
-				base_offset = (uint32_t)UInt32FromBigEndian(parsedAtoms[iloc_number].AtomicData+aggregate_offset);
+				base_offset = UInt32FromBigEndian(parsedAtoms[iloc_number].AtomicData+aggregate_offset);
 				aggregate_offset +=8;
 			}
 		}
@@ -3220,7 +3223,7 @@ bool APar_Readjust_iloc_atom(short iloc_number) {
 						this_extent_offset = UInt32FromBigEndian(parsedAtoms[iloc_number].AtomicData+aggregate_offset);
 						aggregate_offset +=4;
 					} else {
-						this_extent_offset = (uint32_t)UInt32FromBigEndian(parsedAtoms[iloc_number].AtomicData+aggregate_offset);
+						this_extent_offset = UInt32FromBigEndian(parsedAtoms[iloc_number].AtomicData+aggregate_offset);
 						aggregate_offset +=8;
 					}
 				}
@@ -3229,7 +3232,7 @@ bool APar_Readjust_iloc_atom(short iloc_number) {
 						this_extent_length = UInt32FromBigEndian(parsedAtoms[iloc_number].AtomicData+aggregate_offset);
 						aggregate_offset +=4;
 					} else {
-						this_extent_length = (uint32_t)UInt32FromBigEndian(parsedAtoms[iloc_number].AtomicData+aggregate_offset);
+						this_extent_length = UInt32FromBigEndian(parsedAtoms[iloc_number].AtomicData+aggregate_offset);
 						aggregate_offset +=8;
 					}
 					extent_len_sum+= this_extent_length;
@@ -3694,7 +3697,7 @@ void APar_FindPadding(bool listing_purposes_only) {
 				}
 				dynUpd.last_padding_atom = free_listing;
 			}
-			dynUpd.padding_bytes += (parsedAtoms[eval_atom].AtomicLength == 1 ? (uint32_t)parsedAtoms[eval_atom].AtomicLengthExtended : parsedAtoms[eval_atom].AtomicLength);
+			dynUpd.padding_bytes += (parsedAtoms[eval_atom].AtomicLength == 1 ? parsedAtoms[eval_atom].AtomicLengthExtended : parsedAtoms[eval_atom].AtomicLength);
 		}
 		eval_atom = parsedAtoms[eval_atom].NextAtomNumber;
 		if (eval_atom == 0) break;
@@ -3945,7 +3948,7 @@ void APar_DetermineNewFileLength() {
 				new_file_size += parsedAtoms[thisAtomNumber].AtomicLengthExtended; //used in progressbar
 			}
 			if (parsedAtoms[thisAtomNumber].AtomicLength == 0) {				
-				new_file_size += (uint32_t)file_size - parsedAtoms[thisAtomNumber].AtomicStart; //used in progressbar; mdat.length = 1
+				new_file_size += file_size - parsedAtoms[thisAtomNumber].AtomicStart; //used in progressbar; mdat.length = 1
 			}
 		}
 		if (parsedAtoms[thisAtomNumber].NextAtomNumber == 0) {
@@ -4140,13 +4143,13 @@ void APar_ValidateAtoms() {
 		
 		//test3
 		//test for atoms that are going to be greater than out current file size; problem is we could be adding a 1MB pix to a 200k 3gp file; only fail for a file > 300k file; otherwise there would have to be more checks (like artwork present, but a zealous tagger could make moov.lengt > filzesize)
-		if (parsedAtoms[iter].AtomicLength > (uint32_t)file_size && file_size > 300000) {
+		if (parsedAtoms[iter].AtomicLength > file_size && file_size > 300000) {
 			if (parsedAtoms[iter].AtomicData == NULL) {
 				fprintf(stderr, "AtomicParsley error: an atom was detected that presents as larger than filesize. Aborting. %c\n", '\a');
 #if defined (_MSC_VER) /* apparently, long long is forbidden there*/
 				fprintf(stderr, "atom %s is %u bytes long which is greater than the filesize of %llu\n", parsedAtoms[iter].AtomicName, parsedAtoms[iter].AtomicLength, (long unsigned int)file_size);
 #else
-				fprintf(stderr, "atom %s is %u bytes long which is greater than the filesize of %llu\n", parsedAtoms[iter].AtomicName, parsedAtoms[iter].AtomicLength, (long long unsigned int)file_size);
+				fprintf(stderr, "atom %s is %llu bytes long which is greater than the filesize of %llu\n", parsedAtoms[iter].AtomicName, parsedAtoms[iter].AtomicLength, (long long unsigned int)file_size);
 #endif
 				exit(1); //its conceivable to repair such an off length by the surrounding atoms constrained by file_size - just not anytime soon; probly would catch a foobar2000 0.9 tagged file
 			}
@@ -4202,8 +4205,8 @@ void APar_ValidateAtoms() {
 	}
 	
 	//test7
-	double perdiff = (float)((float)((uint32_t)simple_tally) * 100.0 / (double)(file_size-removed_bytes_tally) );
-	int percentage_difference = (int)lroundf((float)perdiff);
+	double perdiff = (double)((double)(simple_tally) * 100.0 / (double)(file_size-removed_bytes_tally) );
+	int percentage_difference = (int)lroundf(perdiff);
 	
 	if (percentage_difference < 90 && file_size > 300000) { //only kick in when files are over 300k & 90% of the size
 		fprintf(stderr, "AtomicParsley error: total existing atoms present as larger than filesize. Aborting. %c\n", '\a');
@@ -4430,10 +4433,10 @@ uint32_t APar_WriteAtomically(FILE* source_file, FILE* temp_file, bool from_file
 	
 	//since we have already writen the length out to the file, it can be changed now with impunity
 	if (parsedAtoms[this_atom].AtomicLength == 0) { //the spec says if an atom has a length of 0, it extends to EOF
-		parsedAtoms[this_atom].AtomicLength = (uint32_t)file_size - parsedAtoms[this_atom].AtomicLength;
+		parsedAtoms[this_atom].AtomicLength = file_size - parsedAtoms[this_atom].AtomicLength;
 	} else if (parsedAtoms[this_atom].AtomicLength == 1) {
 		//part of the pseudo 64-bit support
-		parsedAtoms[this_atom].AtomicLength = (uint32_t)parsedAtoms[this_atom].AtomicLengthExtended;
+		parsedAtoms[this_atom].AtomicLength = parsedAtoms[this_atom].AtomicLengthExtended;
 	} else if (parsedAtoms[this_atom].AtomicContainerState == DUAL_STATE_ATOM) {
 		if (memcmp(parsedAtoms[this_atom].AtomicName, "dref", 4) == 0) {
 			parsedAtoms[this_atom].AtomicLength = 16;
@@ -4536,7 +4539,7 @@ uint32_t APar_WriteAtomically(FILE* source_file, FILE* temp_file, bool from_file
 		fwrite(parsedAtoms[this_atom].AtomicName, atom_name_len, 1, temp_file);
 		bytes_written += atom_name_len;
 		if (parsedAtoms[this_atom].AtomicClassification == VERSIONED_ATOM || parsedAtoms[this_atom].AtomicClassification == PACKED_LANG_ATOM) {
-			UInt32_TO_String4( (uint32_t)parsedAtoms[this_atom].AtomicVerFlags, twenty_byte_buffer);
+			UInt32_TO_String4(parsedAtoms[this_atom].AtomicVerFlags, twenty_byte_buffer);
 			fwrite(twenty_byte_buffer, 4, 1, temp_file);
 			bytes_written += 4;
 		}
@@ -4587,7 +4590,7 @@ uint32_t APar_WriteAtomically(FILE* source_file, FILE* temp_file, bool from_file
 			fwrite(parsedAtoms[this_atom].uuid_ap_atomname, 4, 1, temp_file);
 			bytes_written += 4;
 			
-			UInt32_TO_String4( (uint32_t)parsedAtoms[this_atom].AtomicVerFlags, twenty_byte_buffer);
+			UInt32_TO_String4(parsedAtoms[this_atom].AtomicVerFlags, twenty_byte_buffer);
 			fwrite(twenty_byte_buffer, 4, 1, temp_file);
 			bytes_written += 4;
 		}
@@ -4808,7 +4811,7 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 	
 	if (dynUpd.updage_by_padding && rewrite_original) {
 		fclose(temp_file);
-		uint32_t metadata_len = (uint32_t)findFileSize(temp_file_name);
+		uint64_t metadata_len = findFileSize(temp_file_name);
 
 		temp_file = APar_OpenFile(temp_file_name, "rb");
 		fclose(source_file);
@@ -4821,7 +4824,8 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 		} else if (!(dynUpd.optimization_flags & MEDIADATA__PRECEDES__MOOV) && metadata_len != (dynUpd.first_mdat_atom->AtomicStart - dynUpd.initial_update_atom->AtomicStart)) {
 			fclose(temp_file);
 			remove(temp_file_name);
-			fprintf(stdout, "AtomicParsley error: the insuffiecient space to retag the source file (%u!=%u).\nExiting.\n", metadata_len, dynUpd.first_mdat_atom->AtomicStart - dynUpd.initial_update_atom->AtomicStart);
+			fprintf(stdout,
+				"AtomicParsley error: the insufficient space to retag the source file (%llu!=%llu).\nExiting.\n", metadata_len, dynUpd.first_mdat_atom->AtomicStart - dynUpd.initial_update_atom->AtomicStart);
 			exit(1);		
 		}
 		

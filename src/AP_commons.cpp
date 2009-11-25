@@ -209,7 +209,7 @@ uint32_t APar_ReadFile(char* destination_buffer, FILE* a_file, uint32_t bytes_to
 	uint32_t bytes_read = 0;
 	if (destination_buffer != NULL) {
 		fseeko(a_file, 0, SEEK_SET); // not that 2gb support is required - malloc would probably have a few issues
-		bytes_read = (uint32_t)fread(destination_buffer, 1, (size_t)bytes_to_read, a_file);
+		bytes_read = fread(destination_buffer, 1, bytes_to_read, a_file);
 		file_size += bytes_read; //accommodate huge files embedded within small files for APar_Validate
 	}
 	return bytes_read;
@@ -430,8 +430,8 @@ char* APar_extract_UTC(uint64_t total_secs) {
 			return APar_gmtime64(total_secs, utc_time); //less than Unix epoch
 		} else {
 			total_secs -= 2082844800;
-			uint32_t reduced_seconds = (uint32_t)total_secs;
-			strftime(*&utc_time, 50 , "%a %b %d %H:%M:%S %Y", gmtime((time_t*)&reduced_seconds) );
+			time_t reduced_seconds = (time_t)total_secs;
+			strftime(*&utc_time, 50 , "%a %b %d %H:%M:%S %Y", gmtime(&reduced_seconds) );
 			return *&utc_time;
 		}
 	}
