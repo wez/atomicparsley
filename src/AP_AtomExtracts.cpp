@@ -98,7 +98,7 @@ uint16_t purge_extraneous_characters(char* data) {
 	return purgings;
 }
 
-void mem_append(char* add_string, char* dest_string) {
+void mem_append(const char* add_string, char* dest_string) {
 	uint8_t str_len = strlen(dest_string);
 	if (str_len > 0) {
 		memcpy(dest_string+str_len, ", ", 2);
@@ -742,7 +742,7 @@ APar_TrackLevelInfo
 		count of tracks back in the same struct to that later functions can loop through each track individually, looking for a specific atom.
 		If track's track_num is a non-zero number, then find that atom that *matches* the atom name. Set track's track_atom to that atom for later use
 ----------------------*/
-void APar_TrackLevelInfo(Trackage* track, char* track_search_atom_name) {
+void APar_TrackLevelInfo(Trackage* track, const char* track_search_atom_name) {
 	uint8_t track_tally = 0;
 	short iter = 0;
 	

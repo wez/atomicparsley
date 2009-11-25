@@ -74,4 +74,4 @@ typedef struct _CDROM_TOC {
 } CDROM_TOC, *PCDROM_TOC;
 #endif
 
-uint16_t GenerateMCDIfromCD(char* drive, char* dest_buffer);
+uint16_t GenerateMCDIfromCD(const char* drive, char* dest_buffer);

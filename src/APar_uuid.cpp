@@ -153,10 +153,12 @@ APar_uuid_scanf
 		Skip past a hyphen, make any upper case characters lower (ahh, that hex 'Q') to do a manual scanf on the string. Add its hex representation as a number
 		for 1/2 of the bits (a single byte is 2 hex characters), shift it over to the upper bits, and repeat adding the lower bits. Repeat until done.
 ----------------------*/
-uint8_t APar_uuid_scanf(char* in_formed_uuid, char* raw_uuid) {
+uint8_t APar_uuid_scanf(char* in_formed_uuid, const char* raw_uuid_in) {
 	char *uuid_str, *end_uuid_str, *uuid_byte;
 	uint8_t uuid_pos, uuid_len;
 	uint8_t keeprap = 0;
+	char *raw_uuid = strdup(raw_uuid_in);
+
 	uuid_len = strlen(raw_uuid); //it will be like "55534d54-21d2-4fce-bb88-695cfac9c740"
 	uuid_str = raw_uuid;
 	uuid_pos = 0;
@@ -246,6 +248,7 @@ uint8_t APar_uuid_scanf(char* in_formed_uuid, char* raw_uuid) {
 		uuid_pos++;
 	}
 	APar_endian_uuid_bin_str_conversion(in_formed_uuid);
+	free(raw_uuid);
 	return uuid_pos;
 }
 
@@ -277,7 +280,7 @@ AP_Create_UUID_ver5_sha1_name
 		hash algorithm is fed the reordered netord_namespace uuid to create a hash; the name is then added to the hash to create a hash of the name in the namespace.
 		The final hash is then copied into the out_uuid, and the endian members of the ap_uuid_t are swapped to endian ordering.
 ----------------------*/
-void AP_Create_UUID_ver5_sha1_name(ap_uuid_t* out_uuid, ap_uuid_t desired_namespace, char *name, int namelen) {
+void AP_Create_UUID_ver5_sha1_name(ap_uuid_t* out_uuid, ap_uuid_t desired_namespace, const char *name, int namelen) {
 	sha1_ctx sha_state;
 	char hash[20];
 	ap_uuid_t networkorderd_namespace;
@@ -354,7 +357,7 @@ APar_generate_uuid_from_atomname
 void APar_generate_uuid_from_atomname(char* atom_name, char* uuid_binary_str) {
 	
 	ap_uuid_t blank_namespace = { 0x00000000, 0x0000, 0x0000,
-                              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+                              0x00, 0x00, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00} };
 	ap_uuid_t APar_namespace_uuid;
 	ap_uuid_t AP_atom_uuid;
 
@@ -369,7 +372,7 @@ void APar_generate_uuid_from_atomname(char* atom_name, char* uuid_binary_str) {
 
 void APar_generate_random_uuid(char* uuid_binary_str) {
 	ap_uuid_t rand_uuid = { 0x00000000, 0x0000, 0x0000,
-                              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+                              0x00, 0x00, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }};
 	AP_Create_UUID_ver3_random(&rand_uuid);
 	memcpy(uuid_binary_str, &rand_uuid, sizeof(rand_uuid) );
 	return;
@@ -377,7 +380,8 @@ void APar_generate_random_uuid(char* uuid_binary_str) {
 
 void APar_generate_test_uuid() {
 	ap_uuid_t blank_ns = { 0x00000000, 0x0000, 0x0000,
-													0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+													0x00, 0x00, 
+													{0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }};
 	ap_uuid_t APar_ns_uuid;
 	ap_uuid_t APar_test_uuid;
 	

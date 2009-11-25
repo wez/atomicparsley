@@ -33,7 +33,7 @@ bool MatchLanguageCode(const char* in_code);
 void ListLanguageCodes();
 
 void ListMediaRatings();
-char* Expand_cli_mediastring(char* cli_rating);
+const char* Expand_cli_mediastring(const char* cli_rating);
 
 char* ID3GenreIntToString(int genre);
 uint8_t ID3StringGenreToInt(const char* genre_string);

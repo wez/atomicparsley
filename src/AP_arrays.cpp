@@ -738,8 +738,8 @@ void ListMediaRatings() {
 	return;
 }
 
-char* Expand_cli_mediastring(char* cli_rating) {
-	char* media_rating = NULL;
+const char* Expand_cli_mediastring(const char* cli_rating) {
+	const char* media_rating = NULL;
 	uint16_t total_known_ratings = (uint16_t)(sizeof(known_ratings)/sizeof(*known_ratings));
 	uint8_t rating_len = strlen(cli_rating);
 	

@@ -519,7 +519,7 @@ uint16_t Windows_ioctlProbeTargetDrive(const char* id3args_drive, char* mcdi_dat
 //                                 CD TOC Entry Area                                 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-uint16_t GenerateMCDIfromCD(char* drive, char* dest_buffer) {
+uint16_t GenerateMCDIfromCD(const char* drive, char* dest_buffer) {
 	uint16_t mcdi_bytes = 0;
 #if defined (DARWIN_PLATFORM)
 	mcdi_bytes = OSX_ProbeTargetDrive(drive, dest_buffer);
