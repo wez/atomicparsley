@@ -1145,8 +1145,19 @@ void APar_SampleTableIterator(FILE *file) {
 uint64_t APar_64bitAtomRead(FILE *file, uint32_t jump_point) {
 	uint64_t extended_dataSize = APar_read64(twenty_byte_buffer, file, jump_point+8);
 	
-	//here's the problem: there can be some HUGE MPEG-4 files. They get specified by a 64-bit value. The specification says only use them when necessary - I've seen them on files about 700MB. So this will artificially place a limit on the maximum file size that would be supported under a 32-bit only AtomicParsley (but could still see & use smaller 64-bit values). For my 700MB file, moov was (rounded up) 4MB. So say 4MB x 6 +1MB give or take, and the biggest moov atom I would support is.... a heart stopping 30MB (rounded up). GADZOOKS!!! So, since I have no need to go greater than that EVER, I'm going to stik with uin32_t for filesizes and offsets & that sort. But a smaller 64-bit mdat (essentially a pseudo 32-bit traditional mdat) can be supported as long as its less than UINT32_T_MAX (minus our big fat moov allowance).
-	
+	// here's the problem: there can be some HUGE MPEG-4 files. They get
+	// specified by a 64-bit value. The specification says only use them when
+	// necessary - I've seen them on files about 700MB. So this will
+	// artificially place a limit on the maximum file size that would be
+	// supported under a 32-bit only AtomicParsley (but could still see & use
+	// smaller 64-bit values). For my 700MB file, moov was (rounded up) 4MB. So
+	// say 4MB x 6 +1MB give or take, and the biggest moov atom I would support
+	// is.... a heart stopping 30MB (rounded up). GADZOOKS!!! So, since I have
+	// no need to go greater than that EVER, I'm going to stik with uin32_t for
+	// filesizes and offsets & that sort. But a smaller 64-bit mdat
+	// (essentially a pseudo 32-bit traditional mdat) can be supported as long
+	// as its less than UINT32_T_MAX (minus our big fat moov allowance).
+
 	if ( extended_dataSize > 4294967295UL - 30000000) {
 		contains_unsupported_64_bit_atom = true;
 		fprintf(stdout, "You must be off your block thinking I'm going to tag a file that is at LEAST %llu bytes long.\n", extended_dataSize);
@@ -2110,7 +2121,7 @@ void APar_Unified_atom_Put(AtomicInfo* target_atom, const char* unicode_data, ui
 			} else if (text_tag_style == UTF8_iTunesStyle_256glyphLimited) {
 
 				uint32_t raw_bytes = strlen(unicode_data);
-				total_bytes = utf8_length(unicode_data, 255); //counts the number of characters, not bytes
+				total_bytes = utf8_length(unicode_data, 256); //counts the number of characters, not bytes
 				
 				if (raw_bytes > total_bytes && total_bytes > 255) {
 					
