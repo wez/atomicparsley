@@ -75,6 +75,7 @@
 #define Meta_advisory            'V'
 #define Meta_stik                'S'
 #define Meta_description         'p'
+#define Meta_longdescription     'j'
 #define Meta_TV_Network          'n'
 #define Meta_TV_ShowName         'H'
 #define Meta_TV_EpisodeNumber    'N'
@@ -179,6 +180,7 @@ static const char* shortHelp_text =
 "  --advisory     (string*)    Content advisory (*values: 'clean', 'explicit')\n"
 "  --stik         (string*)    Sets the iTunes \"stik\" atom (see --longhelp)\n"
 "  --description  (string)     Set the description tag\n"
+"  --longdesc     (string)     Set the long description tag\n"
 "  --TVNetwork    (string)     Set the TV Network name\n"
 "  --TVShowName   (string)     Set the TV Show name\n"
 "  --TVEpisode    (string)     Set the TV episode/production code\n"
@@ -279,7 +281,8 @@ static const char* longHelp_text =
 "                                        \"album\", \"composer\", \"show\")\n"
 "\n"
 "NOTE: Except for artwork, only 1 of each tag is allowed; artwork allows multiple pieces.\n"
-"NOTE: Tags that carry text(str) have a limit of 255 utf8 characters; lyrics have no limit.\n"
+"NOTE: Tags that carry text(str) have a limit of 255 utf8 characters;\n"
+"however lyrics and long descriptions have no limit.\n"
 "------------------------------------------------------------------------------------------------\n"
 " To delete a single atom, set the tag to null (except artwork):\n"
 "  --artist \"\" --lyrics \"\"\n"
@@ -1039,6 +1042,7 @@ int main( int argc, char *argv[]) {
 		{ "artwork",          required_argument,  NULL,						Meta_artwork },
 		{ "stik",             required_argument,  NULL,           Meta_stik },
     { "description",      required_argument,  NULL,           Meta_description },
+    { "longdesc",      required_argument,  NULL,         Meta_longdescription },
     { "TVNetwork",        required_argument,  NULL,           Meta_TV_Network },
     { "TVShowName",       required_argument,  NULL,           Meta_TV_ShowName },
     { "TVEpisode",        required_argument,  NULL,           Meta_TV_Episode },
@@ -1485,7 +1489,17 @@ int main( int argc, char *argv[]) {
 			APar_Unified_atom_Put(descriptionData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
 			break;
 		}
-		
+		case Meta_longdescription : {
+			APar_ScanAtoms(ISObasemediafile);
+			if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "longdesc") ) {
+				break;
+			}
+			
+			AtomicInfo* descriptionData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.ldes.data", optarg, AtomFlags_Data_Text);
+			APar_Unified_atom_Put(descriptionData_atom, optarg, UTF8_iTunesStyle_Unlimited, 0, 0);
+			break;
+		}
+			
 		case Meta_TV_Network : {
 			APar_ScanAtoms(ISObasemediafile);
 			if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "TV Network") ) {

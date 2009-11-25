@@ -8,3 +8,4 @@ config.status
 configure
 src/Makefile
 src/config.h
+src/config.h.in*
