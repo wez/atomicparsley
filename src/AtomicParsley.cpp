@@ -61,15 +61,12 @@
 
 //#define DEBUG_V
 
-///////////////////////////////////////////////////////////////////////////////////////
-//                               Global Variables                                    //
-///////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//                     Global Variables                                    //
+/////////////////////////////////////////////////////////////////////////////
 
 bool modified_atoms = false;
 bool alter_original = false;
-
-bool svn_build = true; //controls which type of versioning - svn build-time stamp
-//bool svn_build = false; //controls which type of versioning - release number
 
 FILE* source_file = NULL;
 uint64_t file_size;
@@ -90,7 +87,7 @@ bool force_existing_hierarchy = false;
 int metadata_style = UNDEFINED_STYLE;
 bool deep_atom_scan = false;
 
-uint32_t max_buffer = 4096*125; // increased to 512KB
+uint32_t max_buffer = 10*1024*1024;
 
 uint64_t bytes_before_mdat=0;
 uint64_t bytes_into_mdat = 0;
@@ -120,9 +117,9 @@ uint8_t UnicodeOutputStatus = UNIVERSAL_UTF8; //on windows, controls whether inp
 
 uint8_t forced_suffix_type = NO_TYPE_FORCING;
 
-///////////////////////////////////////////////////////////////////////////////////////
-//                                Versioning                                         //
-///////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//                      Versioning                                         //
+/////////////////////////////////////////////////////////////////////////////
 
 void ShowVersionInfo() {
 
@@ -132,32 +129,31 @@ void ShowVersionInfo() {
 	if (UnicodeOutputStatus == WIN32_UTF16) {
 		memcpy(unicode_enabled, "(utf16)", 7);
 
-//its utf16 in the sense that any text entering on a modern Win32 system enters as utf16le - but gets converted immediately after AP.exe starts to utf8
-//all arguments, strings, filenames, options are sent around as utf8. For modern Win32 systems, filenames get converted to utf16 for output as needed.
-//Any strings to be set as utf16 in 3gp assets are converted to utf16be as needed (true for all OS implementations).
-//Printing out to the console should be utf8.
+		// its utf16 in the sense that any text entering on a modern Win32 system
+		// enters as utf16le - but gets converted immediately after AP.exe starts
+		// to utf8 all arguments, strings, filenames, options are sent around as
+		// utf8. For modern Win32 systems, filenames get converted to utf16 for
+		// output as needed.  Any strings to be set as utf16 in 3gp assets are
+		// converted to utf16be as needed (true for all OS implementations).
+		// Printing out to the console should be utf8.
+
 	} else if (UnicodeOutputStatus == UNIVERSAL_UTF8) {
 		memcpy(unicode_enabled, "(raw utf8)", 10);
 		
-//utf8 in the sense that any text entered had its utf16 upper byte stripped and reduced to (unchecked) raw utf8 for utilities that work in utf8. Any
-//unicode (utf16) filenames were clobbered in that processes are invalid now. Any intermediate folder with unicode in it will now likely cause an error of
-//some sort.
+		// utf8 in the sense that any text entered had its utf16 upper byte
+		// stripped and reduced to (unchecked) raw utf8 for utilities that work in
+		// utf8. Any unicode (utf16) filenames were clobbered in that processes are
+		// invalid now. Any intermediate folder with unicode in it will now likely
+		// cause an error of some sort.
 	}
 
 #else
 #define unicode_enabled	"(utf8)"
 #endif
 
-	if (svn_build) {  //below is the versioning from svn if used; remember to switch to AtomicParsley_version for a release
+	fprintf(stdout, "AtomicParsley version: %s %s\n",
+		AtomicParsley_version, unicode_enabled);
 
-		fprintf(stdout, "AtomicParsley from svn built on %s %s\n", __DATE__, unicode_enabled);
-	
-	} else {  //below is the release versioning
-
-		fprintf(stdout, "AtomicParsley version: %s %s\n", AtomicParsley_version, unicode_enabled); //release version
-	}
-
-	return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -185,42 +181,6 @@ int APar_TestArtworkBinaryData(const char* artworkPath) {
 	}
 	return artwork_dataType;
 }
-
-#if defined (DARWIN_PLATFORM)
-// enables writing out the contents of a single memory-resident atom out to a text file; for in-house testing purposes only - and unused in some time
-void APar_AtomicWriteTest(short AtomicNumber, bool binary) {
-	AtomicInfo anAtom = parsedAtoms[AtomicNumber];
-	
-	char* indy_atom_path = (char *)malloc(sizeof(char)*MAXPATHLEN); //this malloc can escape memset because its only for in-house testing
-	strcat(indy_atom_path, "/Users/");
-	strcat(indy_atom_path, getenv("USER") );
-	strcat(indy_atom_path, "/Desktop/singleton_atom.txt");
-
-	FILE* single_atom_file;
-	single_atom_file = fopen(indy_atom_path, "wb");
-	if (single_atom_file != NULL) {
-		
-		if (binary) {
-			fwrite(anAtom.AtomicData, (size_t)(anAtom.AtomicLength - 12), 1, single_atom_file);
-		} else {
-			char* data = (char*)malloc(sizeof(char)*4);
-			UInt32_TO_String4(anAtom.AtomicLength, data);
-		
-			fwrite(data, 4, 1, single_atom_file);
-			fwrite(anAtom.AtomicName, 4, 1, single_atom_file);
-		
-			UInt32_TO_String4(anAtom.AtomicVerFlags, data);
-			fwrite(data, 4, 1, single_atom_file);
-
-			fwrite(anAtom.AtomicData, strlen(anAtom.AtomicData)+1, 1, single_atom_file);
-			free(data);
-		}
-	}
-	fclose(single_atom_file);
-	free(indy_atom_path);
-	return;
-}
-#endif
 
 void APar_FreeMemory() {
 	for(int iter=0; iter < atom_number; iter++) {
@@ -1147,32 +1107,6 @@ void APar_SampleTableIterator(FILE *file) {
 	return;
 }
 
-uint64_t APar_64bitAtomRead(FILE *file, uint64_t jump_point) {
-	uint64_t extended_dataSize = APar_read64(twenty_byte_buffer, file, jump_point+8);
-	
-	// here's the problem: there can be some HUGE MPEG-4 files. They get
-	// specified by a 64-bit value. The specification says only use them when
-	// necessary - I've seen them on files about 700MB. So this will
-	// artificially place a limit on the maximum file size that would be
-	// supported under a 32-bit only AtomicParsley (but could still see & use
-	// smaller 64-bit values). For my 700MB file, moov was (rounded up) 4MB. So
-	// say 4MB x 6 +1MB give or take, and the biggest moov atom I would support
-	// is.... a heart stopping 30MB (rounded up). GADZOOKS!!! So, since I have
-	// no need to go greater than that EVER, I'm going to stik with uin32_t for
-	// filesizes and offsets & that sort. But a smaller 64-bit mdat
-	// (essentially a pseudo 32-bit traditional mdat) can be supported as long
-	// as its less than UINT32_T_MAX (minus our big fat moov allowance).
-
-#if 0
-	if ( extended_dataSize > 4294967295UL - 30000000) {
-		fprintf(stdout, "You must be off your block thinking I'm going to tag a file that is at LEAST %llu bytes long.\n", extended_dataSize);
-		fprintf(stdout, "AtomicParsley doesn't have full 64-bit support\n");
-		exit(2);
-	}
-#endif
-	return extended_dataSize;
-}
-
 /*----------------------
 APar_MatchToKnownAtom
   atom_name - the name of our newly found atom
@@ -1498,7 +1432,9 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 					
 					//mdat.length=1; and ONLY supported for mdat atoms - no idea if the spec says "only mdat", but that's what I'm doing for now
 					if ( (strncmp(atom, "mdat", 4) == 0) && (generalAtomicLevel == 1) && (dataSize == 1) ) {
-						uint64_t extended_dataSize = APar_64bitAtomRead(file, jump);
+
+						uint64_t extended_dataSize = APar_read64(
+											twenty_byte_buffer, file, jump+8);
 						APar_AtomizeFileInfo(jump, 1, extended_dataSize, atom, generalAtomicLevel, KnownAtoms[filtered_known_atom].container_state,
                                   KnownAtoms[filtered_known_atom].box_type, atom_verflags, atom_language, &uuid_info );
 						
@@ -4375,6 +4311,13 @@ void APar_ShellProgressBar(uint64_t bytes_written) {
 	if (dynUpd.updage_by_padding) {
 		return;
 	}
+	static int update_count = 0;
+
+	if (update_count++ < 5) {
+		return;
+	}
+	update_count = 0;
+
 	strcpy(file_progress_buffer, " Progress: ");
 	
 	double dispprog = (double)bytes_written / (double)new_file_size
@@ -4403,7 +4346,6 @@ void APar_ShellProgressBar(uint64_t bytes_written) {
 		
 	fprintf(stdout, "%s\r", file_progress_buffer);
 	fflush(stdout);
-	return;
 }
 
 void APar_MergeTempFile(FILE* dest_file, FILE *src_file, uint64_t src_file_size, uint64_t dest_position, char* &buffer) {
@@ -4531,38 +4473,42 @@ uint64_t APar_WriteAtomically(FILE* source_file, FILE* temp_file,
 	}
 	
 	if (from_file) {
-		// here we read in the original atom into the buffer. If the length is greater than our buffer length,
-		// we loop, reading in chunks of the atom's data into the buffer, and immediately write it out, reusing the buffer.
+		// here we read in the original atom into the buffer. If the length is
+		// greater than our buffer length, we loop, reading in chunks of the
+		// atom's data into the buffer, and immediately write it out, reusing
+		// the buffer.
 		
-		while (bytes_written <= parsedAtoms[this_atom].AtomicLength) {
-			if (bytes_written + max_buffer <= parsedAtoms[this_atom].AtomicLength ) {
-				//fprintf(stdout, "Writing atom %s from file looping into buffer\n", parsedAtoms[this_atom].AtomicName);
-//fprintf(stdout, "Writing atom %s from file looping into buffer %u - %u | %u\n", parsedAtoms[this_atom].AtomicName, parsedAtoms[this_atom].AtomicLength, bytes_written_tally, bytes_written);
-				//read&write occurs from & including atom name through end of atom
-				fseeko(source_file,
-					bytes_written + parsedAtoms[this_atom].AtomicStart,
-					SEEK_SET);
-				fread(buffer, 1, max_buffer, source_file);
-				
-				fseeko(temp_file, bytes_written_tally + bytes_written,
-					SEEK_SET);
-				fwrite(buffer, max_buffer, 1, temp_file);
-				bytes_written += max_buffer;
-				
-				APar_ShellProgressBar(bytes_written_tally + bytes_written);
-				
-			} else { //we either came up on a short atom (most are), or the last bit of a really long atom
-				//fprintf(stdout, "Writing atom %s from file directly into buffer\n", parsedAtoms[this_atom].AtomicName);
-				fseeko(source_file, (bytes_written + parsedAtoms[this_atom].AtomicStart), SEEK_SET);
-				fread(buffer, 1, parsedAtoms[this_atom].AtomicLength - bytes_written, source_file);
-				
-				fseeko(temp_file, bytes_written_tally + bytes_written, SEEK_SET);
-				fwrite(buffer, parsedAtoms[this_atom].AtomicLength - bytes_written, 1, temp_file);
-				bytes_written += parsedAtoms[this_atom].AtomicLength - bytes_written;
-				
-				APar_ShellProgressBar(bytes_written_tally + bytes_written);
-				
+		uint64_t toread = parsedAtoms[this_atom].AtomicLength - bytes_written;
+		size_t didread;
+		size_t didwrite;
+
+		fseeko(source_file,
+			bytes_written + parsedAtoms[this_atom].AtomicStart,
+			SEEK_SET);
+		fseeko(temp_file, bytes_written_tally + bytes_written, SEEK_SET);
+
+		while (toread) {
+			char *bpos;
+
+			didread = fread(buffer, 1, MIN(max_buffer, toread), source_file);
+			if (didread == 0) {
+				fprintf(stderr, "read: eof=%d err=%d %s\n",
+					feof(source_file),
+					ferror(source_file),
+					strerror(errno));
 				break;
+			}
+			toread -= didread;
+
+			bpos = buffer;
+
+			while (didread) {
+				didwrite = fwrite(bpos, 1, didread, temp_file);
+				didread -= didwrite;
+				bpos += didwrite;
+				bytes_written += didwrite;
+				
+				APar_ShellProgressBar(bytes_written_tally + bytes_written);
 			}
 		}
 		
@@ -4776,6 +4722,12 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 			
 			}
 	}
+
+	// turn off buffering on the output, since we have a big buffer ourselves
+	if (temp_file) {
+		setbuf(temp_file, NULL);
+	}
+	setbuf(source_file, NULL);
 	
 	if (temp_file != NULL) { //body of atom writing here
 		
@@ -4783,7 +4735,8 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 			thisAtomNumber = dynUpd.initial_update_atom->AtomicNumber;
 			fprintf(stdout, "\n Updating metadata... ");
 		} else {
-			fprintf(stdout, "\n Started writing to temp file.\n");
+			fprintf(stdout, "\n Started writing to %s.\n",
+				outfile ? outfile : "temp file");
 		}
 		
 		while (true) {
@@ -4843,7 +4796,8 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 			if (gapless_void_padding > 0 && pad_prefs.default_padding_size > 0) { //only when some sort of padding is wanted will the gapless null padding be copied
 				APar_copy_gapless_padding(temp_file, temp_file_bytes_written, file_buffer);
 			}
-			fprintf(stdout, "\n Finished writing to temp file.\n");
+			fprintf(stdout, "\n Finished writing to %s.\n",
+				outfile ? outfile : "temp file");
 			fclose(temp_file);
 		}
 		
@@ -4956,3 +4910,5 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 	
 	return;
 }
+
+// vim:ts=2:sw=2:noet:
