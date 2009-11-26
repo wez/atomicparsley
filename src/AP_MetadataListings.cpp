@@ -1523,8 +1523,7 @@ void APar_PrintAtomicTree() {
 	
 	fprintf(stdout, "------------------------------------------------------\n");
 	fprintf(stdout, "Total size: %llu bytes; ", (uint64_t)file_size);
-	fprintf(stdout, "%i atoms total. ", atom_number-1);
-	ShowVersionInfo();
+	fprintf(stdout, "%i atoms total.\n", atom_number-1);
 	fprintf(stdout, "Media data: %llu bytes; %llu bytes all other atoms (%2.3lf%% atom overhead).\n", 
 		mdatData, file_size - mdatData,
 		(double)(file_size - mdatData)/(double)file_size * 100.0 );
@@ -1544,6 +1543,8 @@ void APar_PrintAtomicTree() {
 		fprintf(stdout, "\nGapless playback null space at end of file: %llu bytes.", gapless_void_padding);
 	}
 	fprintf(stdout, "\n------------------------------------------------------\n");
+	ShowVersionInfo();
+	fprintf(stdout, "------------------------------------------------------\n");
 	
 	free(tree_padding);
 	tree_padding = NULL;
