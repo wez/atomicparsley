@@ -87,7 +87,14 @@ bool force_existing_hierarchy = false;
 int metadata_style = UNDEFINED_STYLE;
 bool deep_atom_scan = false;
 
-uint32_t max_buffer = 10*1024*1024;
+uint32_t max_buffer = 
+#ifdef __linux__
+	0.5 /* splice() allows us to use less buffer space */
+#else
+	10
+#endif
+	*1024*1024
+;
 
 uint64_t bytes_before_mdat=0;
 uint64_t bytes_into_mdat = 0;
@@ -4397,6 +4404,131 @@ void APar_MergeTempFile(FILE* dest_file, FILE *src_file, uint64_t src_file_size,
 	return;
 }
 
+#ifdef __linux__
+/* use kernel provided zero-copy interface to improve throughput
+ * around the data passthru portions of our operation; no sense
+ * copying multiple GB of data around in memory if we can avoid it */
+uint64_t splice_copy(int sfd, int ofd, uint64_t block_size,
+	uint64_t src_offset, uint64_t dest_offset, uint64_t tally)
+{
+	int pfd[2];
+	int res;
+	uint64_t lim = LONG_MAX;
+	loff_t spos = src_offset;
+	loff_t dpos = dest_offset;
+	long didread;
+	long didwrite;
+	uint64_t bytes_written = 0;
+
+	res = pipe(pfd);
+	if (res < 0) {
+		return 0;
+	}
+
+	while (block_size) {
+		size_t toread = MIN(block_size, lim);
+
+		if (toread < block_size) {
+			fprintf(stderr, "Limiting size to %lu vs %llu\n", toread, block_size);
+		}
+
+		/* splice source data into pipe.
+		 * This will typically be 64k at a time */
+		didread = splice(sfd, &spos, pfd[1], NULL, toread,
+			SPLICE_F_MORE|SPLICE_F_MOVE);
+
+		if (didread <= 0) {
+			if (errno == EINVAL) {
+				/* splice is not supported by source */
+				break;
+			}
+			fprintf(stderr, "splice(read): %ld of %lu (%s)\n",
+				didread, toread, strerror(errno));
+			break;
+		}
+
+		block_size -= didread;
+
+		while (didread > 0) {
+			/* splice from pipe into dest */
+			didwrite = splice(pfd[0], NULL, ofd, &dpos, didread,
+					SPLICE_F_MORE|SPLICE_F_MOVE);
+
+			if (didwrite <= 0) {
+				if (errno == EINVAL) {
+					/* splice is not supported by dest */
+					break;
+				}
+				fprintf(stderr, "splice(write): %ld of %lu (%s)\n",
+						didwrite, didread, strerror(errno));
+				break;
+			}
+
+			bytes_written += didwrite;
+			didread -= didwrite;
+		}
+		APar_ShellProgressBar(tally + bytes_written);
+	}
+
+	close(pfd[0]);
+	close(pfd[1]);
+	return bytes_written;
+}
+#endif
+
+uint64_t block_copy(FILE *source_file, FILE *out_file,
+	char *&buffer,
+	uint64_t tally, uint64_t block_size,
+	uint64_t src_offset, uint64_t dest_offset)
+{
+	uint64_t toread = block_size;
+	uint64_t bytes_written = 0;
+	size_t didread;
+	size_t didwrite;
+
+#ifdef __linux__
+	if (block_size > 65536) {
+		fflush(out_file);
+
+		bytes_written = splice_copy(fileno(source_file), fileno(out_file),
+											block_size, src_offset, dest_offset, tally);
+
+		if (bytes_written != 0) {
+			return bytes_written;
+		}
+	}
+#endif
+
+	fseeko(source_file, src_offset, SEEK_SET);
+	fseeko(out_file, dest_offset, SEEK_SET);
+
+	while (toread) {
+		char *bpos;
+
+		didread = fread(buffer, 1, MIN(max_buffer, toread), source_file);
+		if (didread == 0) {
+			fprintf(stderr, "read: eof=%d err=%d %s\n",
+					feof(source_file),
+					ferror(source_file),
+					strerror(errno));
+			break;
+		}
+		toread -= didread;
+
+		bpos = buffer;
+
+		while (didread) {
+			didwrite = fwrite(bpos, 1, didread, out_file);
+			didread -= didwrite;
+			bpos += didwrite;
+			bytes_written += didwrite;
+
+			APar_ShellProgressBar(tally + bytes_written);
+		}
+	}
+	return bytes_written;
+}
+
 uint64_t APar_WriteAtomically(FILE* source_file, FILE* temp_file,
 	bool from_file, char* &buffer, uint64_t bytes_written_tally,
 	short this_atom)
@@ -4477,40 +4609,14 @@ uint64_t APar_WriteAtomically(FILE* source_file, FILE* temp_file,
 		// greater than our buffer length, we loop, reading in chunks of the
 		// atom's data into the buffer, and immediately write it out, reusing
 		// the buffer.
-		
-		uint64_t toread = parsedAtoms[this_atom].AtomicLength - bytes_written;
-		size_t didread;
-		size_t didwrite;
-
-		fseeko(source_file,
+		//
+		bytes_written += block_copy(source_file, temp_file, buffer,
+			bytes_written_tally, 
+			parsedAtoms[this_atom].AtomicLength - bytes_written,
 			bytes_written + parsedAtoms[this_atom].AtomicStart,
-			SEEK_SET);
-		fseeko(temp_file, bytes_written_tally + bytes_written, SEEK_SET);
+			bytes_written_tally + bytes_written);
 
-		while (toread) {
-			char *bpos;
-
-			didread = fread(buffer, 1, MIN(max_buffer, toread), source_file);
-			if (didread == 0) {
-				fprintf(stderr, "read: eof=%d err=%d %s\n",
-					feof(source_file),
-					ferror(source_file),
-					strerror(errno));
-				break;
-			}
-			toread -= didread;
-
-			bpos = buffer;
-
-			while (didread) {
-				didwrite = fwrite(bpos, 1, didread, temp_file);
-				didread -= didwrite;
-				bpos += didwrite;
-				bytes_written += didwrite;
-				
-				APar_ShellProgressBar(bytes_written_tally + bytes_written);
-			}
-		}
+		return bytes_written;
 		
 	} else { // we are going to be writing not from the file, but directly from the tree (in memory).
 		uint64_t atom_name_len = 4;

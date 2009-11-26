@@ -26,6 +26,9 @@
 #if defined HAVE_CONFIG_H
 #include "config.h"
 #endif
+#ifdef __linux__
+# include <fcntl.h>
+#endif
 
 #ifndef _UINT8_T
 #define _UINT8_T
