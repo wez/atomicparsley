@@ -99,7 +99,7 @@ endif
 ifeq ("$(DARWIN_BUILD_UNIVERSAL)", "yes")
 STRIP = strip $(top_srcdir)/AtomicParsley_$(DARWIN_NATIVE_ARCH); \
 	strip $(top_srcdir)/AtomicParsley_$(DARWIN_CROSS_ARCH)
-LINK = link-uiniversal
+LINK = link-universal
 #COMMON_OBJ = $(patsubst %_$(DARWIN_NATIVE_ARCH).o,%.o,$(wildcard *.o))
 endif
 
@@ -119,10 +119,12 @@ $(AP_OBJ_DIR)/%.o: %.cpp
 ifeq ("$(DARWIN_BUILD_UNIVERSAL)", "yes")
 	@echo "$< ..."
 	$(CXX) -arch $(DARWIN_NATIVE_ARCH) $(CXXFLAGS) -I../src $(CPPFLAGS) $(EXTRACPPFLAGS) -MT $(AP_OBJ_DIR)/$*.o -MD -MP -MF $(AP_OBJ_DIR)/$*.Tpo -c -o $(AP_OBJ_DIR)/$*_$(DARWIN_NATIVE_ARCH).o $*.cpp
-	$(CXX) -arch $(DARWIN_CROSS_ARCH) $(CXXFLAGS) -I../src $(CPPFLAGS) $(EXTRACPPFLAGS) -MT $(AP_OBJ_DIR)/$*.o -MD -MP -MF $(AP_OBJ_DIR)/$*.Tpo -c -o $(AP_OBJ_DIR)/$*_$(DARWIN_CROSS_ARCH).o $*.cpp
+	$(CXX) -arch $(DARWIN_CROSS_ARCH) $(CXXFLAGS) -I../src $(CPPFLAGS) $(EXTRACPPFLAGS) -MT $(AP_OBJ_DIR)/$*.o -MD -MP -MF $(AP_OBJ_DIR)/$*_$(DARWIN_CROSS_ARCH).Tpo -c -o $(AP_OBJ_DIR)/$*_$(DARWIN_CROSS_ARCH).o $*.cpp
 else
 	$(CXX) $(CXXFLAGS) -I../src $(CPPFLAGS) $(EXTRACPPFLAGS) -MT $(AP_OBJ_DIR)/$*.o -MD -MP -MF $(AP_OBJ_DIR)/$*.Tpo -c -o $(AP_OBJ_DIR)/$*.o $*.cpp
 endif
+
+#include $(AP_OBJ_DIR)/*.Tpo
 
 $(AP_OBJ_DIR)/%.o: %.mm
 ifeq ("$(DARWIN_BUILD_UNIVERSAL)", "yes")
@@ -138,10 +140,10 @@ link:
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(top_srcdir)/AtomicParsley $(ALL_OBJ) $(EXTRA_LIBS)
 	$(STRIP)
 
-link-uiniversal:
+link-universal:
 	@echo "Linking & lipo joining ..."
 	$(CXX) -arch $(DARWIN_NATIVE_ARCH) $(CXXFLAGS) $(LDFLAGS) -o $(top_srcdir)/AtomicParsley_$(DARWIN_NATIVE_ARCH) $(AP_OBJ_DIR)/*_$(DARWIN_NATIVE_ARCH).o $(EXTRA_LIBS)
-	$(CXX) -arch $(DARWIN_CROSS_ARCH) $(CXXFLAGS) $(LDFLAGS) -isysroot $(DARWIN_UNIVERSAL_SDK_ROOT) -o $(top_srcdir)/AtomicParsley_$(DARWIN_CROSS_ARCH) $(AP_OBJ_DIR)/*_$(DARWIN_CROSS_ARCH).o $(EXTRA_LIBS)
+	$(CXX) -arch $(DARWIN_CROSS_ARCH) $(CXXFLAGS) $(LDFLAGS) $(DARWIN_UNIVERSAL_SDK_ROOT) -o $(top_srcdir)/AtomicParsley_$(DARWIN_CROSS_ARCH) $(AP_OBJ_DIR)/*_$(DARWIN_CROSS_ARCH).o $(EXTRA_LIBS)
 	$(STRIP)
 	lipo -arch $(DARWIN_NATIVE_ARCH) $(top_srcdir)/AtomicParsley_$(DARWIN_NATIVE_ARCH) -arch $(DARWIN_CROSS_ARCH) $(top_srcdir)/AtomicParsley_$(DARWIN_CROSS_ARCH) -create -output $(top_srcdir)/AtomicParsley
 
