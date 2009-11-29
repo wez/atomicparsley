@@ -9,3 +9,17 @@ configure
 src/Makefile
 src/config.h
 src/config.h.in*
+Makefile.in
+aclocal.m4
+depcomp
+install-sh
+missing
+src/*.o
+src/extras/*.o
+.deps
+compile
+src/.deps
+.dirstamp
+config.guess
+config.sub
+src/stamp-h1
