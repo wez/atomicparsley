@@ -19,17 +19,6 @@
 																																		*/
 //==================================================================//
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdio.h>
-
-#if defined HAVE_CONFIG_H
-#include "config.h"
-#endif
-#ifdef __linux__
-# include <fcntl.h>
-#endif
-
 #ifndef _UINT8_T
 #define _UINT8_T
 typedef unsigned char         uint8_t;
@@ -111,7 +100,7 @@ uint32_t APar_FindValueInAtom(char* uint32_buffer, FILE* ISObasemediafile, short
 void APar_UnpackLanguage(unsigned char lang_code[], uint16_t packed_language);
 uint16_t PackLanguage(const char* language_code, uint8_t lang_offset);
 
-#if (!defined HAVE_LROUNDF) && (!defined (__GLIBC__))
+#if !defined(HAVE_LROUNDF)
 int lroundf(float a);
 #endif
 

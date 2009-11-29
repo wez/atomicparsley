@@ -265,7 +265,7 @@ uint16_t PackLanguage(const char* language_code, uint8_t lang_offset) { //?? is 
 //                                platform specifics                                 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-#if (!defined HAVE_LROUNDF) && (!defined (__GLIBC__))
+#if !defined(HAVE_LROUNDF)
 int lroundf(float a) {
 	return a/1;
 }

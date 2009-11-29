@@ -73,6 +73,7 @@ linux/cdrom.h \
 math.h \
 signal.h \
 stddef.h \
+stdint.h \
 stdio.h \
 stdlib.h \
 string.h \

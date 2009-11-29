@@ -19,14 +19,8 @@
                                                                    */
 //==================================================================//
 
-#import <Cocoa/Cocoa.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <sys/time.h>
-#include <string.h>
-
 #include "AtomicParsley.h"
+#import <Cocoa/Cocoa.h>
 #include "AP_NSImage.h"
 
 bool isJPEG=false;
