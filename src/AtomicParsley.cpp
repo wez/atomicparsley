@@ -4324,32 +4324,27 @@ void APar_ShellProgressBar(uint64_t bytes_written) {
 	}
 	update_count = 0;
 
-	strcpy(file_progress_buffer, " Progress: ");
-	
 	double dispprog = (double)bytes_written / (double)new_file_size
 						* max_display_width;
 	int display_progress = (int)lroundf(dispprog);
 	double percomp = 100.0 * (double)bytes_written / (double)new_file_size;
 	int percentage_complete = (int)lroundf(percomp);
-		
-	for (int i = 0; i <= max_display_width; i++) {
-		if (i < display_progress ) {
-			strcat(file_progress_buffer, "=");
-		} else if (i == display_progress) {
-			sprintf(file_progress_buffer, "%s>%d%%", file_progress_buffer, percentage_complete);
-		} else {
-			strcat(file_progress_buffer, "-");
-		}
-	}
-	if (percentage_complete < 100) {
-		strcat(file_progress_buffer, "-");
-		if (percentage_complete < 10) {
-			strcat(file_progress_buffer, "-");
-		}
-	}
 	
-	strcat(file_progress_buffer, "|");
-		
+	char *p = file_progress_buffer;
+	strcpy(p, " Progress: ");
+	p += strlen(p);
+
+	memset(p, '=', display_progress);
+	p += display_progress;
+
+	sprintf(p, ">%3d%% ", percentage_complete);
+	p += strlen(p);
+
+	memset(p, '-', max_display_width - display_progress);
+	p += max_display_width - display_progress;
+	p[0] = '|';
+	p[1] = '\0';
+
 	fprintf(stdout, "%s\r", file_progress_buffer);
 	fflush(stdout);
 }
@@ -4433,7 +4428,7 @@ uint64_t splice_copy(int sfd, int ofd, uint64_t block_size,
 			SPLICE_F_MORE|SPLICE_F_MOVE);
 
 		if (didread <= 0) {
-			if (errno == EINVAL) {
+			if (errno == EINVAL || errno == ENOSYS) {
 				/* splice is not supported by source */
 				break;
 			}
@@ -4450,7 +4445,7 @@ uint64_t splice_copy(int sfd, int ofd, uint64_t block_size,
 					SPLICE_F_MORE|SPLICE_F_MOVE);
 
 			if (didwrite <= 0) {
-				if (errno == EINVAL) {
+				if (errno == EINVAL || errno == ENOSYS) {
 					/* splice is not supported by dest */
 					break;
 				}
