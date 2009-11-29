@@ -1,6 +1,6 @@
 syntax: glob
 obj_dir
-AtomicParsley
+AtomicParsley*
 Makefile
 autom4te.cache
 config.log
