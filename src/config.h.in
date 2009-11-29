@@ -1,8 +1,5 @@
 /* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define program version */
-#undef AP_VER
-
 /* build binary with debug output */
 #undef DEBUG
 
@@ -107,6 +104,9 @@
 /* Define to 1 if you have the `strstr' function. */
 #undef HAVE_STRSTR
 
+/* Define to 1 if you have the `strtol' function. */
+#undef HAVE_STRTOL
+
 /* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
    */
 #undef HAVE_SYS_DIR_H
@@ -133,8 +133,17 @@
 /* Define to 1 if you have the <wchar.h> header file. */
 #undef HAVE_WCHAR_H
 
+/* Define to 1 if you have the `wmemset' function. */
+#undef HAVE_WMEMSET
+
 /* Define to 1 if you have the <zlib.h> header file. */
 #undef HAVE_ZLIB_H
+
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+#undef NO_MINUS_C_MINUS_O
+
+/* Name of package */
+#undef PACKAGE
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
@@ -154,11 +163,11 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
+/* Version number of package */
+#undef VERSION
+
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
 
 /* Define to rpl_malloc if the replacement function should be used. */
 #undef malloc
-
-/* OS Platform name */
-#undef os_name

@@ -2,72 +2,121 @@ dnl vim:ts=2:sw=2:et:
 dnl Process this file with autoconf to produce a configure script.
 
 dnl Some intro checks and defines
-AC_INIT(atomicparsley,0.9.3,http://bitbucket.org/wez/atomicparsley/issues/new/)
+
 AC_PREREQ(2.50)
-AC_CONFIG_SRCDIR(src/AtomicParsley.cpp)
-AC_CONFIG_HEADER(src/config.h)
 
-AC_PROG_CXX
-AC_PROG_MAKE_SET
+AC_INIT([atomicparsley],[0.9.3],
+  [http://bitbucket.org/wez/atomicparsley/issues/new/])
+  
+dnl Need to disable dependency tracking option so that the universal
+dnl build option works for OSX
+AM_INIT_AUTOMAKE([dist-bzip2 foreign no-dependencies subdir-objects -Wall])
 
-AC_HEADER_DIRENT
-AC_HEADER_STDC
-AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([stdio.h string.h stdlib.h time.h math.h signal.h \
-                  wchar.h \
-                  stddef.h \
-                  sys/types.h sys/stat.h errno.h \
-                  zlib.h])
-
-AC_CHECK_HEADERS(getopt.h, [HAVE_GETOPT_H=1; AC_SUBST(HAVE_GETOPT_H)])
-
-AC_CHECK_HEADERS(linux/cdrom.h)
-
-AC_C_CONST
-
-AC_CHECK_FUNCS([fseeko fsetpos memset memcmp remove rename sranddev sscanf strdup strerror strftime strncmp strncasecmp strrchr strsep strstr strtol wmemset])
-AC_FUNC_MALLOC
-AC_CHECK_FUNCS(lroundf)
-
-AC_CHECK_LIB(z, deflateEnd, [HAVE_LIBZ=1; AC_SUBST(HAVE_LIBZ)])
-
-AP_NATIVE_ARCH=`arch`
-case $AP_NATIVE_ARCH in
-  ppc*)
-    AP_CROSS_ARCH="i386"
-    ;;
-  *)
-    AP_CROSS_ARCH="ppc"
-    ;;
-esac
-AC_SUBST(AP_CROSS_ARCH)
-AC_SUBST(AP_NATIVE_ARCH)
-
-AP_OS_NAME=`uname -s | cut -d '_' -f1`
-os_name=$AP_OS_NAME
-AC_SUBST(os_name)
-AC_DEFINE_UNQUOTED(os_name, $AP_OS_NAME, [OS Platform name])
-if test "$os_name" = "Darwin" ; then
-  HAVE_DARWIN_PLATFORM="true"
-  AC_SUBST(HAVE_DARWIN_PLATFORM)
-fi
-
-CFLAGS="-D_FILE_OFFSET_BITS=64 $CFLAGS"
-CXXFLAGS="-D_FILE_OFFSET_BITS=64 $CXXFLAGS"
+AC_CANONICAL_HOST
 
 AC_ARG_ENABLE(universal, dnl
 [  --disable-universal     build a universal binary on Mac OS X [default=yes]],
               universal=$enableval, universal=yes)
-AC_MSG_CHECKING([if we are os/x universal])
-if test "$universal$AP_OS_NAME" = "yesDarwin" ; then
-  AC_MSG_RESULT([building for $AP_NATIVE_ARCH and $AP_CROSS_ARCH])
-else
-  universal="no"
-   AC_MSG_RESULT([no])
-fi
-AC_SUBST(universal)
-AC_SUBST(DARWIN_U_SYSROOT)
 
+case $host in
+  *darwin*)
+
+    AP_NATIVE_ARCH=`arch`
+    case $AP_NATIVE_ARCH in
+      ppc*)
+        AP_CROSS_ARCH="i386"
+      ;;
+    *)
+        AP_CROSS_ARCH="ppc"
+      ;;
+    esac
+    AC_SUBST(AP_CROSS_ARCH)
+    AC_SUBST(AP_NATIVE_ARCH)
+
+    HAVE_DARWIN_PLATFORM="true"
+    AC_SUBST(HAVE_DARWIN_PLATFORM)
+
+    AC_MSG_CHECKING([if we are os/x universal])
+    if test "$universal" = "yes" ; then
+      AC_MSG_RESULT([building for $AP_NATIVE_ARCH and $AP_CROSS_ARCH])
+      UNIVERSAL_FLAGS="-arch $AP_NATIVE_ARCH -arch $AP_CROSS_ARCH"
+      AC_SUBST(UNIVERSAL_FLAGS)
+    fi
+    AC_MSG_RESULT([no])
+    ;;
+  *)
+    universal="no"
+    HAVE_DARWIN_PLATFORM="false"
+    ;;
+esac
+
+AC_SUBST(universal)
+
+AC_CONFIG_SRCDIR(src/AtomicParsley.cpp)
+AC_CONFIG_HEADER(src/config.h)
+
+AM_PROG_CC_C_O
+AC_PROG_CXX
+AC_PROG_OBJC
+
+AC_HEADER_DIRENT
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADERS([\
+stdio.h \
+string.h \
+stdlib.h \
+time.h \
+math.h \
+signal.h \
+wchar.h \
+stddef.h \
+sys/types.h \
+sys/stat.h \
+errno.h  \
+zlib.h \
+linux/cdrom.h \
+])
+
+AC_CHECK_HEADERS(getopt.h, [HAVE_GETOPT_H=1; AC_SUBST(HAVE_GETOPT_H)])
+
+AC_C_CONST
+
+AC_CHECK_FUNCS([\
+fseeko \
+fsetpos \
+lroundf \
+memset \
+memcmp \
+remove \
+rename \
+sranddev \
+sscanf \
+strdup \
+strerror \
+strftime \
+strncmp \
+strncasecmp \
+strrchr \
+strsep \
+strstr \
+strtol \
+wmemset \
+])
+
+AC_FUNC_MALLOC
+
+AC_CHECK_LIB(z, deflateEnd, [
+  HAVE_LIBZ=1
+  AC_SUBST(HAVE_LIBZ)
+  LIBS="$LIBS -lz"
+],[
+  AC_MSG_ERROR([zlib is required])
+]
+)
+
+CFLAGS="-D_FILE_OFFSET_BITS=64 $CFLAGS"
+CXXFLAGS="-D_FILE_OFFSET_BITS=64 $CXXFLAGS"
 
 AC_ARG_ENABLE(debug, dnl
 [  --disable-debug_build   do not build a debug version [default=yes]],
@@ -77,11 +126,11 @@ if test "$debug" = "yes" ; then
   AC_SUBST(debug)
 fi
 
-echo "Creating files"
-AC_OUTPUT([Makefile src/Makefile])
-echo
+AM_CONDITIONAL([NEED_GETOPT], [test x$HAVE_GETOPT_H = x])
+AM_CONDITIONAL([DARWIN], [test x$HAVE_DARWIN_PLATFORM = xtrue])
+AM_CONDITIONAL([UNIVERSAL], [test x$universal = xyes])
 
-
+AC_OUTPUT([Makefile])
 
 echo "+----------------------------------------------+"
 echo "|                  SUCCESS                     |"
@@ -93,12 +142,10 @@ echo "+----------------------------------------------+"
 echo "|             YOUR CONFIGURATION               |"
 echo "+----------------------------------------------+"
 
-echo "  Version:      $PACKAGE_VERSION"
+echo "  Version:           $PACKAGE_VERSION"
 
-if test "$universal" = "no" ; then
-	echo "  MacOSX universal build:       disabled"
-else
-	echo "  MacOSX universal build:       enabled"
+if test "$universal" = "yes" ; then
+	echo "  universal build:   enabled"
 fi	
 
 if test "$debug" = "no" ; then
