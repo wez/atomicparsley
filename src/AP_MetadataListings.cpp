@@ -334,7 +334,6 @@ void APar_Extract_ID3v2_file(AtomicInfo* id32_atom, const char* frame_str, const
 	
 	int frameID = MatchID3FrameIDstr(frame_str, id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion);
 	int frameType = KnownFrames[frameID+1].ID3v2_FrameType;
-	uint8_t frameCompositionList = GetFrameCompositionDescription(frameType);
 	
 	if (destination_folder == NULL) {
 		basepath_len = (strrchr(originfile, '.') - originfile);

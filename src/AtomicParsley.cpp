@@ -3160,7 +3160,10 @@ bool APar_Readjust_iloc_atom(short iloc_number) {
 #endif
 	
 	for (uint16_t an_item=1; an_item <= item_count; an_item++) {
-		uint16_t an_item_ID = UInt16FromBigEndian(parsedAtoms[iloc_number].AtomicData+aggregate_offset);
+#ifdef DEBUG_V
+		uint16_t an_item_ID = 
+#endif
+		UInt16FromBigEndian(parsedAtoms[iloc_number].AtomicData+aggregate_offset);
 		uint16_t a_data_ref_idx = UInt16FromBigEndian(parsedAtoms[iloc_number].AtomicData+aggregate_offset+2);
 		uint64_t base_offset = 0;
 		uint64_t curr_container_pos = 0;
@@ -3322,11 +3325,15 @@ bool APar_Readjust_TFHD_fragment_atom(uint64_t mdat_position, short tfhd_number)
 	memset(tfhd_atomFlags_scrap, 0, 10);
 	//parsedAtoms[tfhd_number].AtomicVerFlags = APar_read32(tfhd_atomFlags_scrap, source_file, parsedAtoms[tfhd_number].AtomicStart+8);
  
-	if (parsedAtoms[tfhd_number].AtomicVerFlags & 0x01) { //seems the atomflags suggest bitpacking, but the spec doesn't specify it; if the 1st bit is set...
+	if (parsedAtoms[tfhd_number].AtomicVerFlags & 0x01) {
+		// seems the atomflags suggest bitpacking, but the spec doesn't specify it;
+		// if the 1st bit is set...
+#if 0 /* not used */
 		memset(tfhd_atomFlags_scrap, 0, 10);	
 		memcpy(tfhd_atomFlags_scrap, parsedAtoms[tfhd_number].AtomicData, 4);
 		
 		uint32_t track_ID = UInt32FromBigEndian(tfhd_atomFlags_scrap); //unused
+#endif
 		uint64_t tfhd_offset = UInt64FromBigEndian(parsedAtoms[tfhd_number].AtomicData +4);
 		
 		if (!determined_offset) {
@@ -3533,9 +3540,9 @@ void APar_DetermineDynamicUpdate() {
 		return;
 	}
 	uint64_t mdat_pos = 0;
-	uint64_t moov_udta_pos = APar_QuickSumAtomicLengths(dynUpd.moov_udta_atom);
-	uint64_t moov_last_trak_pos = APar_QuickSumAtomicLengths(dynUpd.last_trak_child_atom);
-	uint64_t moov_meta_pos = APar_QuickSumAtomicLengths(dynUpd.moov_meta_atom);
+  //uint64_t moov_udta_pos = APar_QuickSumAtomicLengths(dynUpd.moov_udta_atom);
+	//uint64_t moov_last_trak_pos = APar_QuickSumAtomicLengths(dynUpd.last_trak_child_atom);
+	//uint64_t moov_meta_pos = APar_QuickSumAtomicLengths(dynUpd.moov_meta_atom);
 	uint64_t moov_pos = APar_QuickSumAtomicLengths(dynUpd.moov_atom);
 	uint64_t root_meta_pos = APar_QuickSumAtomicLengths(dynUpd.file_meta_atom);
 	

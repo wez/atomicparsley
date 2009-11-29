@@ -96,15 +96,21 @@ CD_TOC_* cdTOC = NULL;
 #endif
 
 
-/*ÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑ
-MCDI describes the CD TOC - actually talks about "a binary dump of the TOC". So, a TOC is made up of:
-a 4 byte TOC header (2 bytes length of the entire TOC, 1 byte start session, 1 byte end session)
-an array of track entries, and depending on the mode, of varying lengths. For audio CDs, TOC track entries are mode1 (or for CD-R/RW mode5, but lets stick to mode1)
-a mode1 track entry is 11 bytes:
-1byte session, 1 byte (packed control/address), 1byte NULL (unused TNO), 1 byte for tracknumber (expressed as the word POINT in mmc nomenclature), 3bytes relative start frametime, 1 byte NULL, 3 bytes duration timeframe
+/*
+MCDI describes the CD TOC - actually talks about "a binary dump of the TOC".
+So, a TOC is made up of: a 4 byte TOC header (2 bytes length of the entire TOC,
+1 byte start session, 1 byte end session) an array of track entries, and
+depending on the mode, of varying lengths. For audio CDs, TOC track entries are
+mode1 (or for CD-R/RW mode5, but lets stick to mode1) a mode1 track entry is 11
+bytes: 1byte session, 1 byte (packed control/address), 1byte NULL (unused TNO),
+1 byte for tracknumber (expressed as the word POINT in mmc nomenclature),
+3bytes relative start frametime, 1 byte NULL, 3 bytes duration timeframe
 
-while "binary dump of the TOC" is there, its also modified so that the timeframe listing in mm:ss::frames (3bytes) is converted to a 4byte LBA timecode.
-Combining the first 4 bytes of the "binary dump of the TOC" with the modifications of the 3byte(frame)->4byte(block), we arrive at MCDI as:
+while "binary dump of the TOC" is there, its also modified so that the
+timeframe listing in mm:ss::frames (3bytes) is converted to a 4byte LBA
+timecode.  Combining the first 4 bytes of the "binary dump of the TOC" with the
+modifications of the 3byte(frame)->4byte(block), we arrive at MCDI as:
+
 struct mcdi_track_entry {
   uint8_t   cd_toc_session;
   uint8_t   cd_toc_controladdress; //bitpacked uint4_t of control & address
@@ -123,18 +129,25 @@ struct mcdi_frame {
   struct mcdi_track_entry lead_out;
   };
 
-The problem with including the TOC header is that it can't be used directly because on the CD toc entries are 3byte msf address, but here they are 4byte LBA. In any event
-this header should not have ever been included because the length can be deduced from the frame length & tracks by dividing by 8. So, the header length that MCDI refers to:
-is it for MSF or LBA addressing? Well, since the rest of MCDI is LBA-based, lets say LBA - which means it needs to be calculated. As it just so happens, then its the
-length of the frame. All that needs to be added are the first & last tracks.
+The problem with including the TOC header is that it can't be used directly
+because on the CD toc entries are 3byte msf address, but here they are 4byte
+LBA. In any event this header should not have ever been included because the
+length can be deduced from the frame length & tracks by dividing by 8. So, the
+header length that MCDI refers to: is it for MSF or LBA addressing? Well, since
+the rest of MCDI is LBA-based, lets say LBA - which means it needs to be
+calculated. As it just so happens, then its the length of the frame. All that
+needs to be added are the first & last tracks.
 
-Unfortunately, this frame can't be used as a CD Identifier *AS IS* across platforms. Because the leadout track is platform specific (a Linux leadout is 0xAA, MacOSX leadout
-is 0xA2), consideration of the leadout track would have to be given by anything else using this frame.
-ÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑ*/
+Unfortunately, this frame can't be used as a CD Identifier *AS IS* across
+platforms. Because the leadout track is platform specific (a Linux leadout is
+0xAA, MacOSX leadout is 0xA2), consideration of the leadout track would have to
+be given by anything else using this frame.
 
-///////////////////////////////////////////////////////////////////////////////////////
-//                      Generating MCDI data from a CD TOC                           //
-///////////////////////////////////////////////////////////////////////////////////////
+*/
+
+///////////////////////////////////////////////////////////////////////////
+//          Generating MCDI data from a CD TOC                           //
+///////////////////////////////////////////////////////////////////////////
 
 uint8_t DataControlField(uint8_t controlfield) {
 #if defined (__ppc__) || defined (__ppc64__)
@@ -216,9 +229,9 @@ uint16_t FormMCDIdata(char* mcdi_data) {
 	return mcdi_len;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////
-//                                Platform Specifics                                 //
-///////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//                      Platform Specifics                                 //
+/////////////////////////////////////////////////////////////////////////////
 
 #if defined (HAVE_LINUX_CDROM_H)
 void Linux_ReadCDTOC(int cd_fd) {
@@ -232,9 +245,6 @@ void Linux_ReadCDTOC(int cd_fd) {
 		return;
 	}
 	cdTOC = (CD_TOC_*)calloc(1, sizeof(CD_TOC_));
-	//cdTOC->toc_length = 0; //not used anyway
-	//cdTOC->first_session = 0; //not used anyway
-	//cdTOC->last_session = 0; //not used anyway
 	cdTOC->track_description = NULL;
 
 	for (uint8_t i = toc_header.cdth_trk0; i <= toc_header.cdth_trk1+1; i++) {
@@ -247,9 +257,11 @@ void Linux_ReadCDTOC(int cd_fd) {
 		toc_entry.cdte_format = CDROM_MSF; //although it could just be easier to use CDROM_LBA
 		
 		if (ioctl(cd_fd, CDROMREADTOCENTRY, &toc_entry) == -1) {
-      fprintf(stderr, "AtomicParsley error: there was an error reading a CD Table of Contents entry (linux cdrom).\n");
+			fprintf(stderr,
+				"AtomicParsley error: there was an error reading a "
+				"CD Table of Contents entry (linux cdrom).\n");
 			return;
-    }
+		}
 		
 		if (cdTOC->track_description == NULL) {
 			cdTOC->track_description = (CD_TDesc*)calloc(1, (sizeof(CD_TDesc)));
@@ -355,7 +367,7 @@ void OSX_ReadCDTOC(io_object_t cdobject) {
 												
 	cdTOCdata = (CFDataRef)CFDictionaryGetValue(cd_props, CFSTR (kIOCDMediaTOCKey));
 	if (cdTOCdata != NULL) {
-		uint16_t cdTOClen = Extract_cdTOCrawdata(cdTOCdata, cdTOCrawdata);
+	   	Extract_cdTOCrawdata(cdTOCdata, cdTOCrawdata);
 	}
 	CFRelease(cd_props);
 	cd_props = NULL;
@@ -515,9 +527,9 @@ uint16_t Windows_ioctlProbeTargetDrive(const char* id3args_drive, char* mcdi_dat
 }
 #endif
 
-///////////////////////////////////////////////////////////////////////////////////////
-//                                 CD TOC Entry Area                                 //
-///////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+//                      CD TOC Entry Area                                 //
+////////////////////////////////////////////////////////////////////////////
 
 uint16_t GenerateMCDIfromCD(const char* drive, char* dest_buffer) {
 	uint16_t mcdi_bytes = 0;

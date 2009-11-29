@@ -1948,7 +1948,6 @@ int main( int argc, char *argv[]) {
 				uint8_t a_track = 0;//unused
 				char atom_path[100];
 				AtomicInfo* video_desc_atom = NULL;
-				AtomicInfo* ipod_uuid = NULL;
 				
 				memset(atom_path, 0, 100);
 	
