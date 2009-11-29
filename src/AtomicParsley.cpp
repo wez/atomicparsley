@@ -4428,10 +4428,6 @@ uint64_t splice_copy(int sfd, int ofd, uint64_t block_size,
 	while (block_size) {
 		size_t toread = MIN(block_size, lim);
 
-		if (toread < block_size) {
-			fprintf(stderr, "Limiting size to %lu vs %llu\n", toread, block_size);
-		}
-
 		/* splice source data into pipe.
 		 * This will typically be 64k at a time */
 		didread = splice(sfd, &spos, pfd[1], NULL, toread,
