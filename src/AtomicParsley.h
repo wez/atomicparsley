@@ -1,3 +1,6 @@
+#ifndef ATOMIC_PARSLEY_H
+#define ATOMIC_PARSLEY_H
+
 //==================================================================//
 /*
     AtomicParsley - AtomicParsley.h
@@ -19,17 +22,70 @@
                                                                    */
 //==================================================================//
 
+#include "config.h"
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#if HAVE_SYS_TIME_H
+# include <sys/time.h>
+#endif
+#include <time.h>
+#include <math.h>
+#include <errno.h>
+
+#if HAVE_STDDEF_H
+# include <stddef.h>
+#endif
+
+#if HAVE_FCNTL_H
+# include <fcntl.h>
+#endif
+#if HAVE_SYS_IOCTL_H
+# include <sys/ioctl.h>
+#endif
+#if HAVE_LINUX_CDROM_H
+# include <linux/cdrom.h>
+#endif
+#if HAVE_SYS_MOUNT_H
+# include <sys/mount.h>
+#endif
+#if HAVE_SYS_PARAM_H
+# include <sys/param.h>
+#endif
+#if HAVE_WINDOWS_H
+# include <windows.h>
+#endif
+#if HAVE_WCHAR_H
+# include <wchar.h>
+#endif
+#if HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+#if HAVE_IO_H
+# include <io.h>
+#endif
+#if HAVE_SIGNAL_H
+# include <signal.h>
+#endif
+#if HAVE_GETOPT_H
+# include <getopt.h>
+#else
+# include "extras/getopt.h"
+#endif
+
+
 #if defined (_WIN32) || defined (_MSC_VER)
 #define MAXPATHLEN 255
-#else
-#include <sys/param.h>
 #endif
 
 #if defined (_MSC_VER)
 #define _UNICODE
 #define strncasecmp strnicmp
-
-#include <windows.h>  /* for WriteConsoleW */
 #endif
 
 #include "AP_commons.h"
@@ -344,4 +400,6 @@ void APar_MetadataFileDump(const char* ISObasemediafile);
 void APar_Optimize(bool mdat_test_only);
 void APar_DetermineAtomLengths();
 void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewrite_original);
+
+#endif
 

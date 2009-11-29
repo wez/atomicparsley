@@ -25,24 +25,9 @@
                                                                    */
 //==================================================================//
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <signal.h>
-#include <wchar.h>
-
-#if defined HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#if defined HAVE_GETOPT_H
-#include <getopt.h>
-#else
-#include "./extras/getopt.h"
-#endif
+#include "AtomicParsley.h"
 
 #include "AP_commons.h"
-#include "AtomicParsley.h"
 #include "AP_AtomExtracts.h"
 #include "AP_iconv.h"                 /* for xmlInitEndianDetection used in endian utf16 conversion */
 #include "AP_arrays.h"

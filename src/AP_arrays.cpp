@@ -24,14 +24,8 @@
                                                                    */
 //==================================================================//
 
-//#include <sys/types.h>
-//#include <sys/stat.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
+#include "AtomicParsley.h"
 #include "AP_commons.h"     //just so win32/msvc can get uint8_t defined
-#include "AtomicParsley.h"  //for stiks & sfIDs
 
 //////////////
 

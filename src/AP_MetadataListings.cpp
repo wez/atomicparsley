@@ -19,16 +19,9 @@
                                                                    */
 //==================================================================//
 
-#include <string.h>
-#include <stdlib.h>
-
-#if defined (WIN32)
-#include <wchar.h> 
-#endif
-
+#include "AtomicParsley.h"
 #include "AP_commons.h"
 #include "AP_iconv.h"
-#include "AtomicParsley.h"
 #include "AP_ID3v2_tags.h"
 #include "AP_arrays.h"
 #include "APar_uuid.h"

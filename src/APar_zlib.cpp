@@ -19,23 +19,9 @@
                                                                    */
 //==================================================================//
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
+#include "AtomicParsley.h"
 #include "AP_commons.h"
-
-#if defined HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#if defined HAVE_ZLIB_H
-
-#if defined (WIN32) || defined (__CYGWIN__)
-#include "zlib.h"   //QT 
-#else
-#include <zlib.h>   //QT 
-#endif
+#include <zlib.h>
 
 #if defined (WIN32)
 #include <windows.h>
@@ -91,8 +77,6 @@ void APar_win32_zlib_FreeLibrary() {
 
 #endif
 
-#endif //HAVE_ZLIB_H
-
 static void* zalloc(void *opaque, unsigned int items, unsigned int size) {
 	return calloc(items, size);
 }
@@ -111,7 +95,6 @@ APar_zlib_inflate
     fill
 ----------------------*/
 void APar_zlib_inflate(char* in_buffer, uint32_t in_buf_len, char* out_buffer, uint32_t out_buf_len) {
-#if defined HAVE_ZLIB_H
 	z_stream zlib;
 
 	// Decompress to another buffer
@@ -125,14 +108,12 @@ void APar_zlib_inflate(char* in_buffer, uint32_t in_buf_len, char* out_buffer, u
 	inflateInit(&zlib);
 	inflate(&zlib, Z_PARTIAL_FLUSH);
 	inflateEnd(&zlib);
-#endif
 	return ;
 }
 
 uint32_t APar_zlib_deflate(char* in_buffer, uint32_t in_buf_len, char* out_buffer, uint32_t out_buf_len) {
 	uint32_t compressed_bytes = 0;
 	
-#if defined HAVE_ZLIB_H
 	z_stream zlib;
 
 	// Compress(default level 6) to another buffer
@@ -149,6 +130,5 @@ uint32_t APar_zlib_deflate(char* in_buffer, uint32_t in_buf_len, char* out_buffe
 		compressed_bytes = zlib.total_out;
 		deflateEnd(&zlib);
 	}
-#endif
 	return compressed_bytes;
 }

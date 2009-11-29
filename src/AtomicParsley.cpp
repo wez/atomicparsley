@@ -26,26 +26,6 @@
                                                                    */
 //==================================================================//
 
-#if defined HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <time.h>
-#include <math.h>
-#include <wchar.h>
-
-#if defined (HAVE_UNISTD_H)
-#include <unistd.h>
-#elif defined (_MSC_VER)
-#include <io.h>
-#endif
-
 #include "AtomicParsley.h"
 #include "AP_AtomDefinitions.h"
 #include "AP_iconv.h"
