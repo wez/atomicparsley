@@ -57,6 +57,10 @@ AC_CONFIG_HEADER(src/config.h)
 
 AM_PROG_CC_C_O
 AC_PROG_CXX
+if test "$GCC" = "yes" ; then
+  CFLAGS="$CFLAGS -Wall"
+  CXXFLAGS="$CXXFLAGS -Wall"
+fi
 AC_PROG_OBJC
 
 AC_HEADER_DIRENT

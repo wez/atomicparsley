@@ -1907,7 +1907,6 @@ char* APar_ConvertField_to_UTF8(ID3v2Frame* targetframe, int fieldtype) {
 	char* utf8str = NULL;
 	uint8_t targetfield = 0xFF;
 	uint8_t textencoding = 0;
-	uint32_t utf8maxalloc = 0;
 	
 	for (uint8_t frm_field = 0; frm_field < targetframe->ID3v2_FieldCount; frm_field++) {
 		if ( (targetframe->ID3v2_Frame_Fields+frm_field)->ID3v2_Field_Type == fieldtype) {
@@ -2029,7 +2028,6 @@ APar_ID3FrameAmmend
 ----------------------*/
 void APar_ID3FrameAmmend(AtomicInfo* id32_atom, const char* frame_str, const char* frame_payload, AdjunctArgs* adjunct_payloads, uint8_t str_encoding) {
 	ID3v2Frame* targetFrame = NULL;
-	ID3v2Frame* eval_frame = NULL;
 	
 	if (id32_atom == NULL) return;
 	GlobalID3Tag = id32_atom->ID32_TagInfo;
