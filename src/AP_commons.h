@@ -19,43 +19,6 @@
 																																		*/
 //==================================================================//
 
-#ifndef _UINT8_T
-#define _UINT8_T
-typedef unsigned char         uint8_t;
-#endif /*_UINT8_T */
-
-#ifndef _UINT16_T
-#define _UINT16_T
-typedef unsigned short       uint16_t;
-#endif /* _UINT16_T */
-
-#ifndef _UINT32_T
-#ifndef __uint32_t_defined
-typedef unsigned int         uint32_t;
-#endif
-#endif /*_UINT32_T */
-
-#ifndef _UINT64_T
-#define _UINT64_T
-#if defined (_MSC_VER)
-typedef unsigned __int64	 uint64_t;
-#else
-typedef unsigned long long   uint64_t;
-#endif /* _MSC_VER */
-#endif /* _UINT64_T */
-
-#ifndef _INT16_T
-#define _INT16_T
-typedef short       int16_t;
-#endif /* _INT16_T */
-
-//part of xorgens rand
-#if !defined (_MSC_VER)
-typedef unsigned long UINT; /* Type for random 32 or 64-bit integer, 
-                               e.g. unsigned long, unsigned long long,
-                               uint64_t, unsigned int or uint32_t */
-#endif
-
 #if defined (__ppc__) || defined (__ppc64__)
 #define SWAP16(x) (x)
 #define SWAP32(x) (x)
@@ -73,11 +36,7 @@ typedef unsigned long UINT; /* Type for random 32 or 64-bit integer,
 #undef HAVE_SRANDDEV
 #endif
 
-#if defined (_WIN32)
-#define MAXTIME_32 (uint64_t)6377812095
-#else
 #define MAXTIME_32 6377812095ULL
-#endif
 
 off_t findFileSize(const char *utf8_filepath);
 FILE* APar_OpenFile(const char* utf8_filepath, const char* file_flags);

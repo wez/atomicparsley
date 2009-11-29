@@ -734,26 +734,28 @@ bool APar_assert(bool expression, int error_msg, const char* supplemental_info) 
 
 /* For type definitions see xorgens.h */
 
+typedef unsigned long xorgenUINT;
+
 unsigned long xor4096i() {
   /* 32-bit or 64-bit integer random number generator 
      with period at least 2**4096-1.
      
-     It is assumed that "UINT" is a 32-bit or 64-bit integer 
+     It is assumed that "xorgenUINT" is a 32-bit or 64-bit integer 
      (see typedef statements in xorgens.h).
      
      xor4096i should be called exactly once with nonzero seed, and
      thereafter with zero seed.  
      
      One random number uniformly distributed in [0..2**wlen) is returned,
-     where wlen = 8*sizeof(UINT) = 32 or 64.
+     where wlen = 8*sizeof(xorgenUINT) = 32 or 64.
 
      R. P. Brent, 20060628.
   */
 
-  /* UINT64 is TRUE if 64-bit UINT,
-     UINT32 is TRUE otherwise (assumed to be 32-bit UINT). */
+  /* UINT64 is TRUE if 64-bit xorgenUINT,
+     UINT32 is TRUE otherwise (assumed to be 32-bit xorgenUINT). */
      
-#define UINT64 (sizeof(UINT)>>3)
+#define UINT64 (sizeof(xorgenUINT)>>3)
 #define UINT32 (1 - UINT64) 
 
 #define wlen (64*UINT64 +  32*UINT32)
@@ -765,10 +767,10 @@ unsigned long xor4096i() {
 #define d    (29*UINT64 +  15*UINT32)
 #define ws   (27*UINT64 +  16*UINT32) 
 
-	UINT seed = 0;
+	xorgenUINT seed = 0;
 	
-  static UINT w, weyl, zero = 0, x[r];
-  UINT t, v;
+  static xorgenUINT w, weyl, zero = 0, x[r];
+  xorgenUINT t, v;
   static int i = -1 ;              /* i < 0 indicates first call */
   int k;
 	
@@ -779,7 +781,7 @@ unsigned long xor4096i() {
 		srand((int) time(NULL));
 #endif
 		double doubleseed = ( (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
-		seed = (UINT)(doubleseed*rand());
+		seed = (xorgenUINT)(doubleseed*rand());
 	}
   
   if ((i < 0) || (seed != zero)) { /* Initialisation necessary */
@@ -789,7 +791,7 @@ unsigned long xor4096i() {
     if (UINT32) 
       weyl = 0x61c88647;
     else 
-      weyl = ((((UINT)0x61c88646)<<16)<<16) + (UINT)0x80b583eb;
+      weyl = ((((xorgenUINT)0x61c88646)<<16)<<16) + (xorgenUINT)0x80b583eb;
                  
     v = (seed!=zero)? seed:~seed;  /* v must be nonzero */
 
@@ -797,7 +799,7 @@ unsigned long xor4096i() {
       v ^= v<<10; v ^= v>>15;      /* Recurrence has period 2**wlen-1 */ 
       v ^= v<<4;  v ^= v>>13;      /* for wlen = 32 or 64 */
       }
-    for (w = v, k = 0; (UINT)k < r; k++) { /* Initialise circular array */
+    for (w = v, k = 0; (xorgenUINT)k < r; k++) { /* Initialise circular array */
       v ^= v<<10; v ^= v>>15; 
       v ^= v<<4;  v ^= v>>13;
       x[k] = v + (w+=weyl);                
