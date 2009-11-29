@@ -25,21 +25,9 @@
 																																		*/
 //==================================================================//
 
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <wchar.h>
-#include <errno.h>
-
-#if defined (WIN32)
-#include <windows.h>
-#else
-#include <sys/time.h>
-#endif
-
+#include "AtomicParsley.h"
 #include "AP_commons.h"
 #include "AP_iconv.h"
-#include "AtomicParsley.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////////////

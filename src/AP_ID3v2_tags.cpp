@@ -19,10 +19,6 @@
                                                                    */
 //==================================================================//
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
 #include "AtomicParsley.h"
 #include "AP_commons.h"
 #include "AP_ID3v2_tags.h"
@@ -33,10 +29,6 @@
 #include "AP_arrays.h"
 
 #include "AP_ID3v2_FrameDefinitions.h"
-
-#if defined HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 ID3v2Tag* GlobalID3Tag = NULL;
 

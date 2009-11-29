@@ -31,10 +31,8 @@
                       alignment macros (for msvc)
 */
 
+#include "AtomicParsley.h"
 #include "APar_sha1.h"
-
-#include <stddef.h>
-#include <string.h>
 
 /* SWAP does an endian swap on architectures that are little-endian,
    as SHA1 needs some data in a big-endian form.  */

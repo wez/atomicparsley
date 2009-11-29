@@ -19,11 +19,8 @@
 */
 //==================================================================//
 
-#include <string.h>
-#include <stdlib.h>
-
+#include "AtomicParsley.h"
 #if defined (WIN32)
-#include <windows.h>
 #include "AP_iconv.h"
 #endif
 

@@ -19,12 +19,6 @@
 																																		*/
 //==================================================================//
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <math.h>
-
 #include "AtomicParsley.h"
 #include "AP_ID3v2_tags.h"
 #include "AP_MetadataListings.h"

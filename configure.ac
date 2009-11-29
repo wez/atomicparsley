@@ -67,19 +67,28 @@ AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([\
-stdio.h \
-string.h \
-stdlib.h \
-time.h \
+fcntl.h \
+getopt.h \
+linux/cdrom.h \
 math.h \
 signal.h \
-wchar.h \
 stddef.h \
-sys/types.h \
+stdio.h \
+stdlib.h \
+string.h \
+sys/ioctl.h \
+sys/param.h \
+sys/mount.h \
 sys/stat.h \
+sys/types.h \
+sys/time.h \
+time.h \
 errno.h  \
 zlib.h \
 linux/cdrom.h \
+unistd.h \
+wchar.h \
+windows.h \
 ])
 
 AC_CHECK_HEADERS(getopt.h, [HAVE_GETOPT_H=1; AC_SUBST(HAVE_GETOPT_H)])

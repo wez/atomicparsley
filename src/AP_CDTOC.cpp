@@ -23,25 +23,10 @@
 //currently only Mac OS X is implemented - using IOKit framework.
 //another avenue (applicable to other *nix platforms): ioctl
 
-#if defined HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include "AtomicParsley.h"
+#include "AP_CDTOC.h"
 
-#if defined (HAVE_LINUX_CDROM_H)
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <linux/cdrom.h>
-#include <fcntl.h>
-
-/* From <linux/cdrom.h>: */
-//#define	CDROM_LEADOUT		0xAA
-#elif defined (DARWIN_PLATFORM)
-
-#include <stdio.h>
-#include <sys/mount.h>
-#include <sys/param.h>
+#if defined (DARWIN_PLATFORM)
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/IOKitLib.h>
 #include <IOKit/storage/IOCDTypes.h>
@@ -49,14 +34,8 @@
 #include <IOKit/IOBSD.h>
 
 const uint8_t MACOSX_LEADOUT_TRACK = 0xA2;
-
-#elif defined (WIN32)
-#include <string.h>
-#include <windows.h>
-
 #endif
 
-#include "AP_CDTOC.h"
 
 const uint8_t CDOBJECT_DATACD = 0;
 const uint8_t CDOBJECT_AUDIOCD = 1;
