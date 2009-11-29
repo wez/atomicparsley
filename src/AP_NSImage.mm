@@ -201,7 +201,7 @@ bool ResizeGivenImage(const char* filePath, PicPrefs myPicPrefs, char* resized_p
         
 		NSBitmapImageRep* bitmap = [ [NSBitmapImageRep alloc]
 																	initWithFocusedViewRect: destinationRect ];
-		_NSBitmapImageFileType filetype;
+		NSBitmapImageFileType filetype;
 		NSDictionary *props;
 		
 		if ( (isPNG && !myPicPrefs.allJPEG) || myPicPrefs.allPNG) {
