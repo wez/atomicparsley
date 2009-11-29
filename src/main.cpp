@@ -70,6 +70,7 @@
 #define Meta_grouping            'G'
 #define Meta_album_artist        'A'
 #define Meta_compilation         'C'
+#define Meta_hdvideo             'O'
 #define Meta_BPM                 'B'
 #define Meta_artwork             'r'
 #define Meta_advisory            'V'
@@ -87,6 +88,7 @@
 #define Meta_podcast_URL         'L'
 #define Meta_podcast_GUID        'J'
 #define Meta_PurchaseDate        'D'
+#define Meta_apID                'Y'
 #define Meta_EncodingTool        0xB7
 #define Meta_PlayGapless         0xBA
 #define Meta_SortOrder           0xBF
@@ -177,6 +179,7 @@ static const char* shortHelp_text =
 "  --bpm          (number)     Set the tempo/bpm\n"
 "  --albumArtist  (string)     Set the album artist tag\n"
 "  --compilation  (boolean)    Set the compilation flag (true or false)\n"
+"  --hdvideo      (boolean)    Set the hdvideo flag (true or false)\n"
 "  --advisory     (string*)    Content advisory (*values: 'clean', 'explicit')\n"
 "  --stik         (string*)    Sets the iTunes \"stik\" atom (see --longhelp)\n"
 "  --description  (string)     Set the description tag\n"
@@ -193,6 +196,7 @@ static const char* shortHelp_text =
 "  --podcastGUID  (URL)        Set the episode's URL tag\n"
 "  --purchaseDate (UTC)        Set time of purchase\n"
 "  --encodingTool (string)     Set the name of the encoder\n"
+"  --apID         (string)     Set the Account Name\n"
 "  --gapless      (boolean)    Set the gapless playback flag\n"
 "  --contentRating (string*)   Set tv/mpaa rating (see -rDNS-help)\n"
 "\n"
@@ -253,6 +257,7 @@ static const char* longHelp_text =
 "  --bpm              ,  -B   (num)    Set the tempo/bpm tag: \"moov.udta.meta.ilst.tmpo.data\"\n"
 "  --albumArtist      ,  -A   (str)    Set the album artist tag: \"moov.udta.meta.ilst.aART.data\"\n"
 "  --compilation      ,  -C   (bool)   Sets the \"cpil\" atom (true or false to delete the atom)\n"
+"  --hdvideo          ,  -V   (bool)   Sets the \"hdvd\" atom (true or false to delete the atom)\n"
 "  --advisory         ,  -y   (1of3)   Sets the iTunes lyrics advisory ('remove', 'clean', 'explicit') \n"
 "  --stik             ,  -S   (1of7)   Sets the iTunes \"stik\" atom (--stik \"remove\" to delete) \n"
 "                                           \"Movie\", \"Normal\", \"TV Show\" .... others: \n"
@@ -260,6 +265,7 @@ static const char* longHelp_text =
 "                                           or set in an integer value with --stik value=(num)\n"
 "                                      Note: --stik Audiobook will change file extension to '.m4b'\n"
 "  --description      ,  -p   (str)    Sets the description on the \"desc\" atom\n"
+"  --longdesc         ,  -j   (str)    Sets the long description on the \"ldes\" atom\n"
 "  --TVNetwork        ,  -n   (str)    Sets the TV Network name on the \"tvnn\" atom\n"
 "  --TVShowName       ,  -H   (str)    Sets the TV Show name on the \"tvsh\" atom\n"
 "  --TVEpisode        ,  -I   (str)    Sets the TV Episode on \"tven\":\"209\", but its a string: \"209 Part 1\"\n"
@@ -274,6 +280,7 @@ static const char* longHelp_text =
 "  --purchaseDate     ,  -D   (UTC)    Set Universal Coordinated Time of purchase on a \"purd\" atom\n"
 "                                       (use \"timestamp\" to set UTC to now; can be akin to id3v2 TDTG tag)\n"
 "  --encodingTool     ,       (str)    Set the name of the encoder on the \"\302©too\" atom\n"
+"  --apID             ,  -Y   (str)    Set the name of the Account Name on the \"apID\" atom\n"
 "  --gapless          ,       (bool)   Sets the gapless playback flag for a track in a gapless album\n"
 
 "  --sortOrder    (type)      (str)    Sets the sort order string for that type of tag.\n"
@@ -1037,6 +1044,7 @@ int main( int argc, char *argv[]) {
 		{ "grouping",         required_argument,  NULL,						Meta_grouping },
 		{ "albumArtist",      required_argument,  NULL,           Meta_album_artist },
     { "compilation",      required_argument,  NULL,						Meta_compilation },
+    { "hdvideo",          required_argument,  NULL,						Meta_hdvideo },
 		{ "advisory",         required_argument,  NULL,						Meta_advisory },
     { "bpm",              required_argument,  NULL,						Meta_BPM },
 		{ "artwork",          required_argument,  NULL,						Meta_artwork },
@@ -1055,6 +1063,7 @@ int main( int argc, char *argv[]) {
 		{ "podcastGUID",      required_argument,  NULL,           Meta_podcast_GUID },
 		{ "purchaseDate",     required_argument,  NULL,           Meta_PurchaseDate },
 		{ "encodingTool",     required_argument,  NULL,           Meta_EncodingTool },
+		{ "apID",             required_argument,  NULL,           Meta_apID },
 		{ "gapless",          required_argument,  NULL,           Meta_PlayGapless },
 		{ "sortOrder",        required_argument,  NULL,           Meta_SortOrder } ,
 		
@@ -1386,6 +1395,22 @@ int main( int argc, char *argv[]) {
 			break;
 		}
 		
+		case Meta_hdvideo : {
+			APar_ScanAtoms(ISObasemediafile);
+			if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "hdvideo") ) {
+				break;
+			}
+
+			if (strncmp(optarg, "false", 5) == 0 || strlen(optarg) == 0) {
+				APar_RemoveAtom("moov.udta.meta.ilst.hdvd.data", VERSIONED_ATOM, 0);
+			} else {
+				//compilation: [0, 0, 0, 0,   boolean_value]; BUT that first uint32_t is already accounted for in APar_MetaData_atom_Init
+				AtomicInfo* hdvideoData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.hdvd.data", optarg, AtomFlags_Data_UInt);
+				APar_Unified_atom_Put(hdvideoData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, 1, 8); //a hard coded uint8_t of: 1 is compilation
+			}
+			break;
+		}
+
 		case Meta_BPM : {
 			APar_ScanAtoms(ISObasemediafile);
 			if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "BPM") ) {
@@ -1479,6 +1504,17 @@ int main( int argc, char *argv[]) {
 			break;
 		}
 		
+		case Meta_apID : {
+			APar_ScanAtoms(ISObasemediafile);
+			if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "Account Name") ) {
+				break;
+			}
+
+			AtomicInfo* apIDData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.apID.data", optarg, AtomFlags_Data_Text);
+			APar_Unified_atom_Put(apIDData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+			break;
+		}
+
 		case Meta_description : {
 			APar_ScanAtoms(ISObasemediafile);
 			if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "description") ) {
@@ -1489,6 +1525,7 @@ int main( int argc, char *argv[]) {
 			APar_Unified_atom_Put(descriptionData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
 			break;
 		}
+
 		case Meta_longdescription : {
 			APar_ScanAtoms(ISObasemediafile);
 			if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "longdesc") ) {
