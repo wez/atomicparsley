@@ -1236,10 +1236,9 @@ void APar_Manually_Determine_Parent(uint64_t atom_start, uint64_t atom_length, c
 			preceding_atom--;
 		}
 		if (preceding_atom == 0) {
-			memcpy(container, "FILE_LEVEL", 11);
+			strcpy(container, "FILE_LEVEL");
 		}
 	}
-	return;
 }
 
 /*----------------------
@@ -1361,7 +1360,7 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 					uint16_t atom_language = 0;
 
 					if (memcmp(atom, "uuid", 4) == 0) {
-						memset(uuid_info.binary_uuid, 0, 20);
+						memset(uuid_info.binary_uuid, 0, 17);
 						
 						APar_readX(uuid_info.binary_uuid, file, jump+8, 16);
 						
@@ -1602,7 +1601,7 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 		}
 		if (brand == 0x69736F6D) { //'isom' test for amc files & its (?always present?) uuid 0x63706764A88C11D48197009027087703
 			char EZ_movie_uuid[100];
-			memset(EZ_movie_uuid, 0, 100);
+			memset(EZ_movie_uuid, 0, sizeof(EZ_movie_uuid));
 			memcpy(EZ_movie_uuid, "uuid=\x63\x70\x67\x64\xA8\x8C\x11\xD4\x81\x97\x00\x90\x27\x08\x77\x03", 21); //this is in an endian form, so it needs to be converted
 			APar_endian_uuid_bin_str_conversion(EZ_movie_uuid+5);
 			if ( APar_FindAtom(EZ_movie_uuid, false, EXTENDED_ATOM, 0, true) != NULL) {
@@ -2418,9 +2417,9 @@ AtomicInfo* APar_uuid_atom_Init(const char* atom_path, const char* uuidName, con
 	char uuid_path[256];
 	char uuid_binary_str[20];
 	char uuid_4char_name[10];
-	memset(uuid_path, 0, 20);
-	memset(uuid_binary_str, 0, 20);
-	memset(uuid_4char_name, 0, 10);
+	memset(uuid_path, 0, sizeof(uuid_path));
+	memset(uuid_binary_str, 0, sizeof(uuid_binary_str));
+	memset(uuid_4char_name, 0, sizeof(uuid_4char_name));
 	uint16_t path_len = 0;
 	
 	if (shellAtom) {
@@ -4259,7 +4258,7 @@ void APar_DeriveNewPath(const char *filePath, char* temp_path, int output_type, 
 	}
 	
 	if (forced_suffix_type == FORCE_M4B_TYPE) {
-		memcpy(temp_path + strlen(temp_path), ".m4b", 5);
+		memcpy(temp_path + strlen(temp_path), ".m4b", 4);
 	} else {
 		memcpy(temp_path + strlen(temp_path), suffix, strlen(suffix) );
 	}
