@@ -50,9 +50,6 @@ ings in this Software without prior written authorization from him.
 // Original code for IsoLatin1 and UTF-16 by "Martin J. Duerst" <duerst@w3.org>
 
 #include "AtomicParsley.h"
-#if defined (WIN32)
-#include "AP_iconv.h"
-#endif
 
 const unsigned short cp437upperbytes[128] = {
 	0x00C7, 0x00FC, 0x00E9, 0x00E2, 0x00E4, 0x00E0, 0x00E5, 0x00E7,
