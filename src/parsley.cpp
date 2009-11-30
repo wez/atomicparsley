@@ -27,15 +27,7 @@
 //==================================================================//
 
 #include "AtomicParsley.h"
-#include "AP_AtomDefinitions.h"
-#include "AP_arrays.h"
-#include "AP_ID3v2_tags.h"
-#include "AP_MetadataListings.h"
-
-#if defined (DARWIN_PLATFORM)
-#include "AP_NSImage.h"
-#include "AP_NSFile_utils.h"
-#endif
+#include "AtomDefs.h"
 
 //#define DEBUG_V
 
@@ -137,7 +129,7 @@ void ShowVersionInfo() {
 #endif
 
 	fprintf(stdout, "AtomicParsley version: %s %s\n",
-		AtomicParsley_version, unicode_enabled);
+		PACKAGE_VERSION, unicode_enabled);
 
 }
 

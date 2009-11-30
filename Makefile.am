@@ -1,5 +1,8 @@
 
 bin_PROGRAMS = AtomicParsley
+noinst_HEADERS = src/AtomDefs.h src/AtomicParsley.h src/CDtoc.h \
+  src/ap_types.h src/id3v2.h src/id3v2defs.h src/id3v2types.h \
+  src/util.h
 
 AM_CPPFLAGS = -DHAVE_CONFIG_H
 
@@ -13,17 +16,17 @@ AM_LDFLAGS = $(UNIVERSAL_FLAGS) \
 endif
 
 AtomicParsley_SOURCES = \
-	src/AP_commons.cpp \
-	src/AP_arrays.cpp \
-	src/AP_iconv.cpp \
-	src/AtomicParsley.cpp \
-	src/AP_AtomExtracts.cpp \
-	src/APar_sha1.cpp \
-	src/APar_uuid.cpp \
-	src/AP_ID3v2_tags.cpp \
-	src/AP_MetadataListings.cpp \
-	src/AP_CDTOC.cpp \
-	src/APar_zlib.cpp \
+	src/util.cpp \
+	src/arrays.cpp \
+	src/iconv.cpp \
+	src/parsley.cpp \
+	src/extracts.cpp \
+	src/sha1.cpp \
+	src/uuid.cpp \
+	src/id3v2.cpp \
+	src/metalist.cpp \
+	src/CDtoc.cpp \
+	src/compress.cpp \
 	src/main.cpp 
 
 .mm.o:
@@ -31,8 +34,8 @@ AtomicParsley_SOURCES = \
 
 if DARWIN
 AtomicParsley_SOURCES += \
-	src/AP_NSFile_utils.mm \
-	src/AP_NSImage.mm
+	src/nsfile.mm \
+	src/nsimage.mm
 endif
 
 if NEED_GETOPT

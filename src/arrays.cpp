@@ -25,7 +25,6 @@
 //==================================================================//
 
 #include "AtomicParsley.h"
-#include "AP_commons.h"     //just so win32/msvc can get uint8_t defined
 
 //////////////
 

@@ -20,9 +20,6 @@
 //==================================================================//
 
 #include "AtomicParsley.h"
-#include "AP_ID3v2_tags.h"
-#include "AP_MetadataListings.h"
-#include "AP_AtomExtracts.h"
 
 MovieInfo movie_info = {0};
 iods_OD iods_info = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF};

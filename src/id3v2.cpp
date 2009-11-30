@@ -20,12 +20,8 @@
 //==================================================================//
 
 #include "AtomicParsley.h"
-#include "AP_commons.h"
-#include "AP_ID3v2_tags.h"
-#include "AP_CDTOC.h"
-#include "AP_arrays.h"
-
-#include "AP_ID3v2_FrameDefinitions.h"
+#include "CDtoc.h"
+#include "id3v2defs.h"
 
 ID3v2Tag* GlobalID3Tag = NULL;
 

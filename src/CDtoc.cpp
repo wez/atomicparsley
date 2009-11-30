@@ -24,7 +24,7 @@
 //another avenue (applicable to other *nix platforms): ioctl
 
 #include "AtomicParsley.h"
-#include "AP_CDTOC.h"
+#include "CDtoc.h"
 
 #if defined (DARWIN_PLATFORM)
 #include <CoreFoundation/CoreFoundation.h>

@@ -20,11 +20,9 @@
 //==================================================================//
 
 #include "AtomicParsley.h"
-#include "AP_commons.h"
 #include <zlib.h>
 
 #if defined (WIN32)
-#include <windows.h>
 static bool zlibdll_loaded = 0;
 static HINSTANCE zlib_library;
 

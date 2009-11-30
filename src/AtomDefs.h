@@ -19,6 +19,8 @@
 																																		*/
 //==================================================================//
 
+#include "AtomicParsley.h"
+
 atomDefinition KnownAtoms[] = {
 	//name		parent atom(s)			container					number								box_type
 	{"<()>",	{"_ANY_LEVEL"},	    UNKNOWN_ATOM_TYPE, UKNOWN_REQUIREMENTS,	UNKNOWN_ATOM },      //our unknown atom (self-defined)

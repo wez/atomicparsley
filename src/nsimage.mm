@@ -21,7 +21,6 @@
 
 #include "AtomicParsley.h"
 #import <Cocoa/Cocoa.h>
-#include "AP_NSImage.h"
 
 bool isJPEG=false;
 bool isPNG=false;
