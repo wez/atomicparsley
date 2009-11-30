@@ -27,12 +27,6 @@
 
 #include "AtomicParsley.h"
 
-#include "AP_commons.h"
-#include "AP_AtomExtracts.h"
-#include "AP_arrays.h"
-#include "AP_ID3v2_tags.h"
-#include "AP_MetadataListings.h"
-
 // define one-letter cli options for
 #define OPT_HELP                 'h'
 #define OPT_TEST		             'T'

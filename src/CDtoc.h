@@ -19,9 +19,6 @@
                                                                    */
 //==================================================================//
 
-#include "AP_commons.h"
-
-
 #if defined (WIN32)
 //these #defines & structs are copied from the MS W2k DDK headers so the entire DDK isn't required to be installed to compile AP_CDTOC for MCDI support
 #define DEVICE_TYPE ULONG

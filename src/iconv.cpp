@@ -149,9 +149,6 @@ const unsigned short cp858upperbytes[128] = {
 	0x00B0, 0x00A8, 0x00B7, 0x00B9, 0x00B3, 0x00B2, 0x25A0, 0x00A0
 };
 
-
-#include "AP_commons.h"
-
 //==================================================================//
 // utf conversion functions from libxml2
 /*
