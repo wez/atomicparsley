@@ -52,7 +52,7 @@ esac
 
 AC_SUBST(universal)
 
-AC_CONFIG_SRCDIR(src/AtomicParsley.cpp)
+AC_CONFIG_SRCDIR(src/parsley.cpp)
 AC_CONFIG_HEADER(src/config.h)
 
 AM_PROG_CC_C_O
@@ -62,6 +62,7 @@ if test "$GCC" = "yes" ; then
   CXXFLAGS="$CXXFLAGS -Wall"
 fi
 AC_PROG_OBJC
+AC_C_BIGENDIAN
 
 AC_HEADER_DIRENT
 AC_HEADER_STDC

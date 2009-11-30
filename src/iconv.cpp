@@ -180,17 +180,13 @@ ings in this Software without prior written authorization from him.
 
 // Original code for IsoLatin1 and UTF-16 by "Martin J. Duerst" <duerst@w3.org>
 
-static int xmlLittleEndian = 1;
-
-void xmlInitEndianDetection() {
-	unsigned short int tst = 0x1234;
-	unsigned char *ptr = (unsigned char *) &tst;
-
-	if (*ptr == 0x12) xmlLittleEndian = 0;
-    else if (*ptr == 0x34) xmlLittleEndian = 1;
-		
-	return;
-}
+static int xmlLittleEndian = 
+#ifdef WORDS_BIGENDIAN
+	0
+#else
+	1
+#endif
+	;
 
 /**
  * isolat1ToUTF8:
