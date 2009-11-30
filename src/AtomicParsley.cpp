@@ -4380,7 +4380,7 @@ void APar_MergeTempFile(FILE* dest_file, FILE *src_file, uint64_t src_file_size,
 		}		
 	}
 	if (dynUpd.optimization_flags & MEDIADATA__PRECEDES__MOOV) {
-#if defined (WIN32)
+#if defined (_MSC_VER)
 		fflush(dest_file);
 		SetEndOfFile((HANDLE)_get_osfhandle(fileno(dest_file)));
 #else
