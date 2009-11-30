@@ -49,8 +49,6 @@
 
 #include "AtomicParsley.h"
 #include "AP_commons.h"
-#include "APar_sha1.h"
-#include "APar_uuid.h"
 
 /*----------------------
 print_hash
