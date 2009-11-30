@@ -144,9 +144,6 @@ ings in this Software without prior written authorization from him.
 */
 
 // Original code for IsoLatin1 and UTF-16 by "Martin J. Duerst" <duerst@w3.org>
-
-extern int xmlLittleEndian;
-
 void xmlInitEndianDetection();
 
 int isolat1ToUTF8(unsigned char* out, int outlen, const unsigned char* in, int inlen);

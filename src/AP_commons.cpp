@@ -433,7 +433,7 @@ uint32_t APar_get_mpeg4_time() {
 	uint64_t wintime = 0;
 	GetSystemTimeAsFileTime (&file_time);
 	wintime = (((uint64_t) file_time.dwHighDateTime << 32) | file_time.dwLowDateTime) / 10000000;
-	wintime -= 9561628800;
+	wintime -= 9561628800ULL;
 	return (uint32_t)wintime;
 
 #else
