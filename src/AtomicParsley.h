@@ -22,6 +22,11 @@
                                                                    */
 //==================================================================//
 
+#if defined (_MSC_VER)
+#define _UNICODE
+#define strncasecmp strnicmp
+#endif
+
 #include "config.h"
 
 #define __STDC_LIMIT_MACROS
@@ -100,16 +105,10 @@
 # define MAXPATHLEN
 #endif
 
-#if defined (_MSC_VER)
-#define _UNICODE
-#define strncasecmp strnicmp
-#endif
-
 #include "util.h"
 
 #define MAX_ATOMS 1024
 #define MAXDATA_PAYLOAD 1256
-
 #define DEFAULT_PADDING_LENGTH          2048;
 #define MINIMUM_REQUIRED_PADDING_LENGTH 0;
 #define MAXIMUM_REQUIRED_PADDING_LENGTH 5000;
@@ -158,56 +157,83 @@ void ShowVersionInfo();
 void APar_FreeMemory();
 
 short APar_FindParentAtom(int order_in_tree, uint8_t this_atom_level);
-AtomicInfo* APar_FindAtomInTrack(uint8_t &total_tracks, uint8_t &track_num, char* search_atom_str);
-AtomicInfo* APar_FindAtom(const char* atom_name, bool createMissing, uint8_t atom_type, uint16_t atom_lang,
-                                                 bool match_full_uuids = false, const char* reverseDNSdomain = NULL);
 
-int APar_MatchToKnownAtom(const char* atom_name, const char* atom_container, bool fromFile, const char* find_atom_path);
+AtomicInfo* APar_FindAtomInTrack(uint8_t &total_tracks, uint8_t &track_num,
+  char* search_atom_str);
+
+AtomicInfo* APar_FindAtom(const char* atom_name, bool createMissing,
+  uint8_t atom_type, uint16_t atom_lang, bool match_full_uuids = false,
+  const char* reverseDNSdomain = NULL);
+
+int APar_MatchToKnownAtom(const char* atom_name, const char* atom_container,
+  bool fromFile, const char* find_atom_path);
+
 void APar_ScanAtoms(const char *path, bool deepscan_REQ = false);
 void APar_IdentifyBrand(char* file_brand);
 
-AtomicInfo* APar_CreateSparseAtom(AtomicInfo* surrogate_atom, AtomicInfo* parent_atom, short preceding_atom);
-void APar_Unified_atom_Put(AtomicInfo* target_atom, const char* unicode_data, uint8_t text_tag_style, uint64_t ancillary_data, uint8_t anc_bit_width);
-void APar_atom_Binary_Put(AtomicInfo* target_atom, const char* binary_data, uint32_t bytecount, uint64_t atomic_data_offset);
+AtomicInfo* APar_CreateSparseAtom(AtomicInfo* surrogate_atom,
+  AtomicInfo* parent_atom, short preceding_atom);
+
+void APar_Unified_atom_Put(AtomicInfo* target_atom, const char* unicode_data,
+  uint8_t text_tag_style, uint64_t ancillary_data, uint8_t anc_bit_width);
+
+void APar_atom_Binary_Put(AtomicInfo* target_atom, const char* binary_data,
+  uint32_t bytecount, uint64_t atomic_data_offset);
 
 /* iTunes-style metadata */
-void APar_MetaData_atomArtwork_Set(const char* artworkPath, char* env_PicOptions);
+void APar_MetaData_atomArtwork_Set(const char* artworkPath,
+  char* env_PicOptions);
+
 void APar_MetaData_atomGenre_Set(const char* atomPayload);
-void APar_MetaData_atom_QuickInit(short atom_num, const uint32_t atomFlags, uint32_t supplemental_length, uint32_t allotment = MAXDATA_PAYLOAD + 1);
-AtomicInfo* APar_MetaData_atom_Init(const char* atom_path, const char* MD_Payload, const uint32_t atomFlags);
+void APar_MetaData_atom_QuickInit(short atom_num, const uint32_t atomFlags,
+  uint32_t supplemental_length, uint32_t allotment = MAXDATA_PAYLOAD + 1);
 
-AtomicInfo* APar_reverseDNS_atom_Init(const char* rDNS_atom_name, const char* rDNS_payload, const uint32_t* atomFlags, const char* rDNS_domain);
+AtomicInfo* APar_MetaData_atom_Init(const char* atom_path,
+  const char* MD_Payload, const uint32_t atomFlags);
 
-/* uuid user extension metadata; made to look much like iTunes-style metadata with a 4byte NULL */
-AtomicInfo* APar_uuid_atom_Init(const char* atom_path, const char* uuidName, const uint32_t dataType, const char* uuidValue, bool shellAtom);
+AtomicInfo* APar_reverseDNS_atom_Init(const char* rDNS_atom_name,
+  const char* rDNS_payload, const uint32_t* atomFlags, const char* rDNS_domain);
 
-uint16_t APar_TestVideoDescription(AtomicInfo* video_desc_atom, FILE* ISObmff_file); //test whether the ipod uuid can be added for a video track
+/* uuid user extension metadata; made to look much like iTunes-style metadata
+ * with a 4byte NULL */
+AtomicInfo* APar_uuid_atom_Init(const char* atom_path, const char* uuidName,
+  const uint32_t dataType, const char* uuidValue, bool shellAtom);
+
+//test whether the ipod uuid can be added for a video track
+uint16_t APar_TestVideoDescription(AtomicInfo* video_desc_atom,
+  FILE* ISObmff_file);
+
 void APar_Generate_iPod_uuid(char* atom_path);
 
 /* 3GP-style metadata */
-uint32_t APar_3GP_Keyword_atom_Format(char* keywords_globbed, uint8_t keyword_count, bool set_UTF16_text, char* &formed_keyword_struct);
-AtomicInfo* APar_UserData_atom_Init(const char* userdata_atom_name, const char* atom_payload, uint8_t udta_container, uint8_t track_idx, uint16_t userdata_lang);
+uint32_t APar_3GP_Keyword_atom_Format(char* keywords_globbed,
+  uint8_t keyword_count, bool set_UTF16_text, char* &formed_keyword_struct);
+
+AtomicInfo* APar_UserData_atom_Init(const char* userdata_atom_name,
+  const char* atom_payload, uint8_t udta_container, uint8_t track_idx,
+  uint16_t userdata_lang);
 
 /* ID3v2 (2.4) style metadata, non-external form */
-AtomicInfo* APar_ID32_atom_Init(const char* frameID_str, char meta_area, const char* lang_str, uint16_t id32_lang);
+AtomicInfo* APar_ID32_atom_Init(const char* frameID_str, char meta_area,
+  const char* lang_str, uint16_t id32_lang);
 
-void APar_RemoveAtom(const char* atom_path, uint8_t atom_type, uint16_t UD_lang, const char* rDNS_domain = NULL);
+void APar_RemoveAtom(const char* atom_path, uint8_t atom_type,
+  uint16_t UD_lang, const char* rDNS_domain = NULL);
+
 void APar_freefree(int purge_level);
 
 void APar_MetadataFileDump(const char* ISObasemediafile);
 
 void APar_Optimize(bool mdat_test_only);
 void APar_DetermineAtomLengths();
-void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewrite_original);
+void APar_WriteFile(const char* ISObasemediafile, const char* outfile,
+  bool rewrite_original);
 
-#if defined (WIN32)
-bool APar_win32_zlib_LoadLibrary();
-void APar_win32_zlib_FreeLibrary();
-#endif
+void APar_zlib_inflate(char* in_buffer, uint32_t in_buf_len,
+  char* out_buffer, uint32_t out_buf_len);
 
-void APar_zlib_inflate(char* in_buffer, uint32_t in_buf_len, char* out_buffer, uint32_t out_buf_len);
-
-uint32_t APar_zlib_deflate(char* in_buffer, uint32_t in_buf_len, char* out_buffer, uint32_t out_buf_len);
+uint32_t APar_zlib_deflate(char* in_buffer, uint32_t in_buf_len,
+  char* out_buffer, uint32_t out_buf_len);
 
 
 void APar_print_uuid(ap_uuid_t* uuid, bool new_line = true);
@@ -267,17 +293,30 @@ extern int sha1_stream (FILE *stream, void *resblock);
    digest.  */
 extern void *sha1_buffer (const char *buffer, size_t len, void *resblock);
 
-int isolat1ToUTF8(unsigned char* out, int outlen, const unsigned char* in, int inlen);
-int UTF8Toisolat1(unsigned char* out, int outlen, const unsigned char* in, int inlen);
-int UTF16BEToUTF8(unsigned char* out, int outlen, const unsigned char* inb, int inlenb);
-int UTF8ToUTF16BE(unsigned char* outb, int outlen, const unsigned char* in, int inlen);
-int UTF16LEToUTF8(unsigned char* out, int outlen, const unsigned char* inb, int inlenb);
-int UTF8ToUTF16LE(unsigned char* outb, int outlen, const unsigned char* in, int inlen);
+int isolat1ToUTF8(unsigned char* out, int outlen,
+  const unsigned char* in, int inlen);
+
+int UTF8Toisolat1(unsigned char* out, int outlen,
+  const unsigned char* in, int inlen);
+
+int UTF16BEToUTF8(unsigned char* out, int outlen,
+  const unsigned char* inb, int inlenb);
+
+int UTF8ToUTF16BE(unsigned char* outb, int outlen,
+  const unsigned char* in, int inlen);
+
+int UTF16LEToUTF8(unsigned char* out, int outlen,
+  const unsigned char* inb, int inlenb);
+
+int UTF8ToUTF16LE(unsigned char* outb, int outlen,
+  const unsigned char* in, int inlen);
 
 int isUTF8(const char* in_string);
+
 unsigned int utf8_length(const char *in_string, unsigned int char_limit);
 
-int strip_bogusUTF16toRawUTF8 (unsigned char* out, int inlen, wchar_t* in, int outlen);
+int strip_bogusUTF16toRawUTF8(unsigned char* out, int inlen,
+  wchar_t* in, int outlen);
 
 int test_conforming_alpha_string(char* in_string);
 bool test_limited_ascii(char* in_string, unsigned int str_len);
@@ -289,26 +328,37 @@ void printBOM();
 void APar_fprintf_UTF8_data(const char* utf8_encoded_data);
 void APar_unicode_win32Printout(wchar_t* unicode_out, char* utf8_out);
 
-void APar_Extract_uuid_binary_file(AtomicInfo* uuid_atom, const char* originating_file, char* output_path);
-void APar_Print_APuuid_atoms(const char *path, char* output_path, uint8_t target_information);
+void APar_Extract_uuid_binary_file(AtomicInfo* uuid_atom,
+  const char* originating_file, char* output_path);
 
-void APar_Print_iTunesData(const char *path, char* output_path, uint8_t supplemental_info, uint8_t target_information, AtomicInfo* ilstAtom = NULL);
+void APar_Print_APuuid_atoms(const char *path, char* output_path,
+  uint8_t target_information);
+
+void APar_Print_iTunesData(const char *path, char* output_path,
+  uint8_t supplemental_info, uint8_t target_information,
+  AtomicInfo* ilstAtom = NULL);
+
 void APar_PrintUserDataAssests(bool quantum_listing = false);
 
-void APar_Extract_ID3v2_file(AtomicInfo* id32_atom, const char* frame_str, const char* originfile, const char* destination_folder, AdjunctArgs* id3args);
+void APar_Extract_ID3v2_file(AtomicInfo* id32_atom, const char* frame_str,
+  const char* originfile, const char* destination_folder, AdjunctArgs* id3args);
+
 void APar_Print_ID3v2_tags(AtomicInfo* id32_atom);
 
 void APar_Print_ISO_UserData_per_track();
-void APar_Mark_UserData_area(uint8_t track_num, short userdata_atom, bool quantum_listing);
+void APar_Mark_UserData_area(uint8_t track_num, short userdata_atom,
+  bool quantum_listing);
 
 //trees
 void APar_PrintAtomicTree();
 void APar_SimpleAtomPrintout();
 
 uint32_t APar_4CC_CreatorCode(const char* filepath, uint32_t new_type_code);
-void APar_SupplySelectiveTypeCreatorCodes(const char *inputPath, const char *outputPath, uint8_t forced_type_code);
+void APar_SupplySelectiveTypeCreatorCodes(const char *inputPath,
+  const char *outputPath, uint8_t forced_type_code);
 
-bool ResizeGivenImage(const char* filePath, PicPrefs myPicPrefs, char* resized_path);
+bool ResizeGivenImage(const char* filePath, PicPrefs myPicPrefs,
+  char* resized_path);
 
 char* GenreIntToString(int genre);
 uint8_t StringGenreToInt(const char* genre_string);
@@ -328,6 +378,7 @@ const char* Expand_cli_mediastring(const char* cli_rating);
 
 char* ID3GenreIntToString(int genre);
 uint8_t ID3StringGenreToInt(const char* genre_string);
-#endif
+
+#endif /* ATOMIC_PARSLEY_H */
 
 // vim:ts=2:sw=2:et:

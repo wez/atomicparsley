@@ -156,28 +156,36 @@ enum ID3v2_FrameFlags {
 	ID32_FRAMEFLAG_LENINDICATED   =  0x0001
 };
 
-// the wording of the ID3 (v2.4 in this case) 'informal standard' is not always replete with clarity.
-// text encodings are worded as having a NULL terminator (8or16bit), even for the body of text frames
-// with that in hand, then a description field from COMM should look much like a utf8 text field
-// and yet for TXXX, description is expressely worded as:
+// the wording of the ID3 (v2.4 in this case) 'informal standard' is not always
+// replete with clarity.  text encodings are worded as having a NULL terminator
+// (8or16bit), even for the body of text frames with that in hand, then a
+// description field from COMM should look much like a utf8 text field and yet
+// for TXXX, description is expressely worded as:
 //
-// "The frame body consists of a description of the string, represented as a terminated string, followed by the actual string."
+// "The frame body consists of a description of the string, represented as a
+// terminated string, followed by the actual string."
+//
 //     Description       <text string according to encoding> $00 (00)
 //     Value             <text string according to encoding>
 //
-// Note how description is expressly *worded* as having a NULL terminator, but the text field is not.
-// GEOB text clarifies things better:
-// "The first two strings [mime & filename] may be omitted, leaving only their terminations.
+// Note how description is expressly *worded* as having a NULL terminator, but
+// the text field is not.  GEOB text clarifies things better: "The first two
+// strings [mime & filename] may be omitted, leaving only their terminations.
+//
 //     MIME type              <text string> $00
 //     Filename               <text string according to encoding> $00 (00)
 //
-// so these trailing $00 (00) are the terminators for the strings - not separators between n-length string fields.
-// If the string is devoid of content (not NULLed out, but *devoid* of info), then the only thing that should exist
-// is for a utf16 BOM to exist on text encoding 0x01. The (required) terminator for mime & filename are specifically
-// enumerated in the frame format, which matches the wording of the frame description.
-// ...and so AP does not terminate text fields
+// so these trailing $00 (00) are the terminators for the strings - not
+// separators between n-length string fields.  If the string is devoid of
+// content (not NULLed out, but *devoid* of info), then the only thing that
+// should exist is for a utf16 BOM to exist on text encoding 0x01. The
+// (required) terminator for mime & filename are specifically enumerated in the
+// frame format, which matches the wording of the frame description.  ...and so
+// AP does not terminate text fields
 //
-// Further sealing the case is the reference implementation for id3v2.3 (id3lib) doesn't terminate text fields:
+// Further sealing the case is the reference implementation for id3v2.3
+// (id3lib) doesn't terminate text fields:
+//
 // http://sourceforge.net/project/showfiles.php?group_id=979&package_id=4679
 
 enum text_encodings {

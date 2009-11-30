@@ -22,64 +22,13 @@
 #include "AtomicParsley.h"
 #include <zlib.h>
 
-#if defined (WIN32)
-static bool zlibdll_loaded = 0;
-static HINSTANCE zlib_library;
-
-#define GETPROC(result, name, args)\
-	    typedef result (__cdecl *__PROC__##name) args;\
-		    __PROC__##name name = (__PROC__##name)GetProcAddress (zlib_library, #name);
-
-int (*inflateInit);
-int inflate OF((z_streamp strm, int flush));
-int inflateEnd OF((z_streamp strm));
-int (*deflateInit);
-int deflate OF((z_streamp strm, int flush));
-int deflateEnd(z_streamp strm);
-
-//end global variables
-
-bool APar_win32_zlib_LoadLibrary() {
-	HINSTANCE zlib_lib;
-	if (zlibdll_loaded) return true;
-	
-	zlib_lib = LoadLibrary("zlib1.dll");
-	if (zlib_lib == NULL){
-		fprintf(stdout,"AtomicParsley warning: zlib library missing. Compression is disabled.\n");
-		return false;
-	}
-
-	GETPROC(int, inflateInit, (z_streamp, int));
-	GETPROC(int, inflate, (z_streamp, int));
-	GETPROC(int, inflateEnd, (z_streamp));
-	GETPROC(int, deflateInit, (z_streamp, int));
-	GETPROC(int, deflate, (z_streamp, int));
-	GETPROC(int, deflateEnd, (z_streamp));
-
-	if (inflateInit && inflate && inflateEnd && deflateInit && deflate && deflateEnd) {
-		zlibdll_loaded = true;
-		zlib_library = zlib_lib;
-	} else {
-		fprintf(stdout,"AtomicParsley warning: zlib library addressing failed. Compression is disabled.\n");
-		return false;
-	}
-	return true;
-}
-
-void APar_win32_zlib_FreeLibrary() {
-	if (!zlibdll_loaded) return;
-	FreeLibrary(zlib_library);
-	zlibdll_loaded = false;
-	return;
-}
-
-#endif
-
-static void* zalloc(void *opaque, unsigned int items, unsigned int size) {
+static void* zalloc(void *opaque, unsigned int items, unsigned int size)
+{
 	return calloc(items, size);
 }
 
-static void zfree(void *opaque, void *ptr) {
+static void zfree(void *opaque, void *ptr)
+{
 	free(ptr);
 }
 
@@ -92,12 +41,16 @@ APar_zlib_inflate
 
     fill
 ----------------------*/
-void APar_zlib_inflate(char* in_buffer, uint32_t in_buf_len, char* out_buffer, uint32_t out_buf_len) {
+void APar_zlib_inflate(char* in_buffer, uint32_t in_buf_len,
+	char* out_buffer, uint32_t out_buf_len)
+{
 	z_stream zlib;
 
+	memset(&zlib, 0, sizeof(zlib));
+
 	// Decompress to another buffer
-  zlib.zalloc = zalloc;
-  zlib.zfree = zfree;
+	zlib.zalloc = zalloc;
+	zlib.zfree = zfree;
 	zlib.opaque = NULL;
 	zlib.avail_out = out_buf_len +1;
 	zlib.next_out = (unsigned char*)out_buffer;
@@ -109,14 +62,17 @@ void APar_zlib_inflate(char* in_buffer, uint32_t in_buf_len, char* out_buffer, u
 	return ;
 }
 
-uint32_t APar_zlib_deflate(char* in_buffer, uint32_t in_buf_len, char* out_buffer, uint32_t out_buf_len) {
+uint32_t APar_zlib_deflate(char* in_buffer, uint32_t in_buf_len,
+	char* out_buffer, uint32_t out_buf_len)
+{
 	uint32_t compressed_bytes = 0;
-	
 	z_stream zlib;
 
+	memset(&zlib, 0, sizeof(zlib));
+
 	// Compress(default level 6) to another buffer
-  zlib.zalloc = zalloc;
-  zlib.zfree = zfree;
+  	zlib.zalloc = zalloc;
+	zlib.zfree = zfree;
 	zlib.opaque = NULL;
 	zlib.avail_out = out_buf_len +1;
 	zlib.next_out = (unsigned char*)out_buffer;
