@@ -24,10 +24,18 @@
 
 #include "config.h"
 
+#define __STDC_LIMIT_MACROS
+#define __STDC_FORMAT_MACROS
+#define __STDC_CONSTANT_MACROS
+
+#include <sys/types.h>
+#ifdef __GLIBC__
+# define HAVE_LROUNDF 1
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #if HAVE_SYS_TIME_H
 # include <sys/time.h>
 #endif
@@ -81,6 +89,10 @@
 # include <getopt.h>
 #else
 # include "extras/getopt.h"
+#endif
+
+#ifndef PRIu64
+# define PRIu64 "llu"
 #endif
 
 

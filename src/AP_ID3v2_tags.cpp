@@ -1776,7 +1776,7 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 					playcount = 1;
 				}
 			} else {
-				sscanf(frame_payload, "%llu", &playcount);
+				sscanf(frame_payload, "%" PRIu64 "", &playcount);
 			}
 			
 			if (playcount < 268435455) {
@@ -1814,7 +1814,7 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 							popm_playcount = 1;
 						}
 					} else {
-						sscanf(adjunct_payload->dataArg, "%llu", &popm_playcount);
+						sscanf(adjunct_payload->dataArg, "%" PRIu64 "", &popm_playcount);
 					}
 				}
 			}
