@@ -418,5 +418,122 @@ void APar_Optimize(bool mdat_test_only);
 void APar_DetermineAtomLengths();
 void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewrite_original);
 
+#if defined (WIN32)
+bool APar_win32_zlib_LoadLibrary();
+void APar_win32_zlib_FreeLibrary();
+#endif
+
+void APar_zlib_inflate(char* in_buffer, uint32_t in_buf_len, char* out_buffer, uint32_t out_buf_len);
+
+uint32_t APar_zlib_deflate(char* in_buffer, uint32_t in_buf_len, char* out_buffer, uint32_t out_buf_len);
+
+
+
+/* Declarations of functions and data types used for SHA1 sum
+   library functions.
+   Copyright (C) 2000, 2001, 2003, 2005 Free Software Foundation, Inc.
+*/
+
+typedef struct {
+    uint32_t       time_low;
+    uint16_t       time_mid;
+    uint16_t       time_hi_and_version;
+    uint8_t        clock_seq_hi_and_reserved;
+    uint8_t        clock_seq_low;
+    unsigned char  node[6];
+} ap_uuid_t;
+
+void APar_print_uuid(ap_uuid_t* uuid, bool new_line = true);
+void APar_sprintf_uuid(ap_uuid_t* uuid, char* destination);
+uint8_t APar_uuid_scanf(char* in_formed_uuid, const char* raw_uuid);
+
+void APar_endian_uuid_bin_str_conversion(char* raw_uuid);
+
+uint8_t APar_extract_uuid_version(ap_uuid_t* uuid, char* binary_uuid_str);
+void APar_generate_uuid_from_atomname(char* atom_name, char* uuid_binary_str);
+void APar_generate_random_uuid(char* uuid_binary_str);
+
+typedef uint32_t md5_uint32;
+
+/* Structure to save state of computation between the single steps.  */
+struct sha1_ctx
+{
+  md5_uint32 A;
+  md5_uint32 B;
+  md5_uint32 C;
+  md5_uint32 D;
+  md5_uint32 E;
+
+  md5_uint32 total[2];
+  md5_uint32 buflen;
+	char buffer[128];   //char buffer[128] __attribute__ ((__aligned__ (__alignof__ (md5_uint32))));
+};
+
+
+/* Initialize structure containing state of computation. */
+extern void sha1_init_ctx (struct sha1_ctx *ctx);
+
+/* Starting with the result of former calls of this function (or the
+   initialization function update the context for the next LEN bytes
+   starting at BUFFER.
+   It is necessary that LEN is a multiple of 64!!! */
+extern void sha1_process_block (const void *buffer, size_t len,
+				struct sha1_ctx *ctx);
+
+/* Starting with the result of former calls of this function (or the
+   initialization function update the context for the next LEN bytes
+   starting at BUFFER.
+   It is NOT required that LEN is a multiple of 64.  */
+extern void sha1_process_bytes (const void *buffer, size_t len,
+				struct sha1_ctx *ctx);
+
+/* Process the remaining bytes in the buffer and put result from CTX
+   in first 20 bytes following RESBUF.  The result is always in little
+   endian byte order, so that a byte-wise output yields to the wanted
+   ASCII representation of the message digest.
+
+   IMPORTANT: On some systems it is required that RESBUF be correctly
+   aligned for a 32 bits value.  */
+extern void *sha1_finish_ctx (struct sha1_ctx *ctx, void *resbuf);
+
+
+/* Put result from CTX in first 20 bytes following RESBUF.  The result is
+   always in little endian byte order, so that a byte-wise output yields
+   to the wanted ASCII representation of the message digest.
+
+   IMPORTANT: On some systems it is required that RESBUF is correctly
+   aligned for a 32 bits value.  */
+extern void *sha1_read_ctx (const struct sha1_ctx *ctx, void *resbuf);
+
+
+/* Compute SHA1 message digest for bytes read from STREAM.  The
+   resulting message digest number will be written into the 20 bytes
+   beginning at RESBLOCK.  */
+extern int sha1_stream (FILE *stream, void *resblock);
+
+/* Compute SHA1 message digest for LEN bytes beginning at BUFFER.  The
+   result is always in little endian byte order, so that a byte-wise
+   output yields to the wanted ASCII representation of the message
+   digest.  */
+extern void *sha1_buffer (const char *buffer, size_t len, void *resblock);
+
+void xmlInitEndianDetection();
+
+int isolat1ToUTF8(unsigned char* out, int outlen, const unsigned char* in, int inlen);
+int UTF8Toisolat1(unsigned char* out, int outlen, const unsigned char* in, int inlen);
+int UTF16BEToUTF8(unsigned char* out, int outlen, const unsigned char* inb, int inlenb);
+int UTF8ToUTF16BE(unsigned char* outb, int outlen, const unsigned char* in, int inlen);
+int UTF16LEToUTF8(unsigned char* out, int outlen, const unsigned char* inb, int inlenb);
+int UTF8ToUTF16LE(unsigned char* outb, int outlen, const unsigned char* in, int inlen);
+
+/*------------- these functions are independent of any secondary licensing -------------*/
+
+int isUTF8(const char* in_string);
+unsigned int utf8_length(const char *in_string, unsigned int char_limit);
+
+int strip_bogusUTF16toRawUTF8 (unsigned char* out, int inlen, wchar_t* in, int outlen);
+
+int test_conforming_alpha_string(char* in_string);
+bool test_limited_ascii(char* in_string, unsigned int str_len);
 #endif
 

@@ -28,9 +28,7 @@
 
 #include "AtomicParsley.h"
 #include "AP_AtomDefinitions.h"
-#include "AP_iconv.h"
 #include "AP_arrays.h"
-#include "APar_uuid.h"
 #include "AP_ID3v2_tags.h"
 #include "AP_MetadataListings.h"
 
