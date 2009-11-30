@@ -505,7 +505,7 @@ void APar_ExtractDataAtom(int this_atom_number) {
 								break;
 							}
 							case 8 : {
-								fprintf(stdout, "%llu\n", UInt64FromBigEndian(data_payload) );
+								fprintf(stdout, "%" PRIu64 "\n", UInt64FromBigEndian(data_payload) );
 								break;
 							}
 					}
@@ -644,13 +644,13 @@ void APar_Print_iTunesData(const char *path, char* output_path, uint8_t suppleme
 		}
 		if (supplemental_info && 0x04) { //PRINT_PADDING_SPACE
 			if (!moov_atom_was_mooved) {
-				fprintf(stdout, "padding available: %llu bytes\n", dynUpd.padding_bytes);
+				fprintf(stdout, "padding available: %" PRIu64 " bytes\n", dynUpd.padding_bytes);
 			} else {
 				fprintf(stdout, "padding available: 0 (reorg)\n");
 			}
 		}
 		if (supplemental_info && 0x08 && dynUpd.moov_udta_atom != NULL) { //PRINT_USER_DATA_SPACE
-			fprintf(stdout, "user data space: %llu\n", dynUpd.moov_udta_atom->AtomicLength);
+			fprintf(stdout, "user data space: %" PRIu64 "\n", dynUpd.moov_udta_atom->AtomicLength);
 		}
 		if (supplemental_info && 0x10) { //PRINT_USER_DATA_SPACE
 			fprintf(stdout, "media data space: %u\n", APar_ProvideTallyForAtom("mdat") );
@@ -1238,7 +1238,7 @@ void APar_Print_ID3v2_tags(AtomicInfo* id32_atom) {
 			if (target_frameinfo->ID3v2_Frame_Fields->field_length == 4) {
 				fprintf(stdout, ": %u\n", syncsafe32_to_UInt32(target_frameinfo->ID3v2_Frame_Fields->field_string) );
 			} else if (target_frameinfo->ID3v2_Frame_Fields->field_length > 4) {
-				fprintf(stdout, ": %llu\n", syncsafeXX_to_UInt64(target_frameinfo->ID3v2_Frame_Fields->field_string, target_frameinfo->ID3v2_Frame_Fields->field_length) );
+				fprintf(stdout, ": %" PRIu64 "\n", syncsafeXX_to_UInt64(target_frameinfo->ID3v2_Frame_Fields->field_string, target_frameinfo->ID3v2_Frame_Fields->field_length) );
 			}
 		
 		} else if (target_frameinfo->ID3v2_FrameType == ID3_POPULAR_FRAME) {
@@ -1247,7 +1247,7 @@ void APar_Print_ID3v2_tags(AtomicInfo* id32_atom) {
 				if ((target_frameinfo->ID3v2_Frame_Fields+2)->field_length == 4) {
 					fprintf(stdout, "; playcount=%u\n", syncsafe32_to_UInt32((target_frameinfo->ID3v2_Frame_Fields+2)->field_string));
 				} else if ((target_frameinfo->ID3v2_Frame_Fields+2)->field_length > 4) {
-					fprintf(stdout, "; playcount=%llu\n", syncsafeXX_to_UInt64((target_frameinfo->ID3v2_Frame_Fields+2)->field_string, (target_frameinfo->ID3v2_Frame_Fields+2)->field_length));
+					fprintf(stdout, "; playcount=%" PRIu64 "\n", syncsafeXX_to_UInt64((target_frameinfo->ID3v2_Frame_Fields+2)->field_string, (target_frameinfo->ID3v2_Frame_Fields+2)->field_length));
 				} else {
 					fprintf(stdout, "\n"); //don't know what it was supposed to be, so skip it
 				}
@@ -1421,7 +1421,7 @@ void APar_PrintAtomicTree() {
 		
 		if (thisAtom->AtomicLength == 0) {
 			fprintf(stdout,
-				"%sAtom %s @ %llu of size: %llu (%llu*), ends @ %llu\n",
+				"%sAtom %s @ %" PRIu64 " of size: %" PRIu64 " (%" PRIu64 "*), ends @ %" PRIu64 "\n",
 				tree_padding, twenty_byte_buffer, thisAtom->AtomicStart,
 				( (uint64_t)file_size - thisAtom->AtomicStart),
 				thisAtom->AtomicLength, (uint64_t)file_size );
@@ -1429,7 +1429,7 @@ void APar_PrintAtomicTree() {
 				"\t\t\t (*)denotes length of atom goes to End-of-File\n");
 		
 		} else if (thisAtom->AtomicLength == 1) {
-			fprintf(stdout, "%sAtom %s @ %llu of size: %llu (^), ends @ %llu\n", tree_padding, twenty_byte_buffer, thisAtom->AtomicStart, thisAtom->AtomicLengthExtended, (thisAtom->AtomicStart + thisAtom->AtomicLengthExtended) );
+			fprintf(stdout, "%sAtom %s @ %" PRIu64 " of size: %" PRIu64 " (^), ends @ %" PRIu64 "\n", tree_padding, twenty_byte_buffer, thisAtom->AtomicStart, thisAtom->AtomicLengthExtended, (thisAtom->AtomicStart + thisAtom->AtomicLengthExtended) );
 			fprintf(stdout, "\t\t\t (^)denotes a 64-bit atom length\n");
 			
 		//uuid atoms of any sort
@@ -1438,20 +1438,20 @@ void APar_PrintAtomicTree() {
 			if (UnicodeOutputStatus == WIN32_UTF16) {
 				fprintf(stdout, "%sAtom uuid=", tree_padding);
 				APar_fprintf_UTF8_data(twenty_byte_buffer);
-				fprintf(stdout, " @ %llu of size: %llu, ends @ %llu\n", thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
+				fprintf(stdout, " @ %" PRIu64 " of size: %" PRIu64 ", ends @ %" PRIu64 "\n", thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
 			} else {
-				fprintf(stdout, "%sAtom uuid=%s @ %llu of size: %llu, ends @ %llu\n", tree_padding, twenty_byte_buffer, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
+				fprintf(stdout, "%sAtom uuid=%s @ %" PRIu64 " of size: %" PRIu64 ", ends @ %" PRIu64 "\n", tree_padding, twenty_byte_buffer, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
 			}
 			
 		} else if (thisAtom->AtomicClassification == EXTENDED_ATOM && thisAtom->uuid_style != UUID_DEPRECATED_FORM) {
 			if (thisAtom->uuid_style == UUID_AP_SHA1_NAMESPACE) {
 				fprintf(stdout, "%sAtom uuid=", tree_padding);
 				APar_print_uuid( (ap_uuid_t*)thisAtom->AtomicName, false);
-				fprintf(stdout, "(APuuid=%s) @ %llu of size: %llu, ends @ %llu\n", twenty_byte_buffer, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
+				fprintf(stdout, "(APuuid=%s) @ %" PRIu64 " of size: %" PRIu64 ", ends @ %" PRIu64 "\n", twenty_byte_buffer, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
 			} else {
 				fprintf(stdout, "%sAtom uuid=", tree_padding);
 				APar_print_uuid( (ap_uuid_t*)thisAtom->AtomicName, false);
-				fprintf(stdout, " @ %llu of size: %llu, ends @ %llu\n", thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
+				fprintf(stdout, " @ %" PRIu64 " of size: %" PRIu64 ", ends @ %" PRIu64 "\n", thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
 			}
 
 		//3gp assets (most of them anyway)
@@ -1462,9 +1462,9 @@ void APar_PrintAtomicTree() {
 			if (UnicodeOutputStatus == WIN32_UTF16) {
 				fprintf(stdout, "%sAtom ", tree_padding);
 				APar_fprintf_UTF8_data(twenty_byte_buffer);
-				fprintf(stdout, " [%s] @ %llu of size: %llu, ends @ %llu\n", unpacked_lang, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
+				fprintf(stdout, " [%s] @ %" PRIu64 " of size: %" PRIu64 ", ends @ %" PRIu64 "\n", unpacked_lang, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
 			} else {
-				fprintf(stdout, "%sAtom %s [%s] @ %llu of size: %llu, ends @ %llu\n", tree_padding, twenty_byte_buffer, unpacked_lang, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
+				fprintf(stdout, "%sAtom %s [%s] @ %" PRIu64 " of size: %" PRIu64 ", ends @ %" PRIu64 "\n", tree_padding, twenty_byte_buffer, unpacked_lang, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
 			}
 
 		//all other atoms (the bulk of them will fall here)
@@ -1473,9 +1473,9 @@ void APar_PrintAtomicTree() {
 			if (UnicodeOutputStatus == WIN32_UTF16) {
 				fprintf(stdout, "%sAtom ", tree_padding);
 				APar_fprintf_UTF8_data(twenty_byte_buffer);
-				fprintf(stdout, " @ %llu of size: %llu, ends @ %llu", thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
+				fprintf(stdout, " @ %" PRIu64 " of size: %" PRIu64 ", ends @ %" PRIu64 "", thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
 			} else {
-				fprintf(stdout, "%sAtom %s @ %llu of size: %llu, ends @ %llu", tree_padding, twenty_byte_buffer, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
+				fprintf(stdout, "%sAtom %s @ %" PRIu64 " of size: %" PRIu64 ", ends @ %" PRIu64 "", tree_padding, twenty_byte_buffer, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
 			}
 
 			if (thisAtom->AtomicContainerState == UNKNOWN_ATOM_TYPE) {
@@ -1514,9 +1514,9 @@ void APar_PrintAtomicTree() {
 	}
 	
 	fprintf(stdout, "------------------------------------------------------\n");
-	fprintf(stdout, "Total size: %llu bytes; ", (uint64_t)file_size);
+	fprintf(stdout, "Total size: %" PRIu64 " bytes; ", (uint64_t)file_size);
 	fprintf(stdout, "%i atoms total.\n", atom_number-1);
-	fprintf(stdout, "Media data: %llu bytes; %llu bytes all other atoms (%2.3lf%% atom overhead).\n", 
+	fprintf(stdout, "Media data: %" PRIu64 " bytes; %" PRIu64 " bytes all other atoms (%2.3lf%% atom overhead).\n", 
 		mdatData, file_size - mdatData,
 		(double)(file_size - mdatData)/(double)file_size * 100.0 );
 
@@ -1528,11 +1528,11 @@ void APar_PrintAtomicTree() {
 		//APar_DetermineDynamicUpdate(true); //gets the size of the padding
 		APar_Optimize(true); //just to know if 'free' atoms can be considered padding, or (in the case of say a faac file) it's *just* 'free'
 		if (!moov_atom_was_mooved) {
-			fprintf(stdout, " Padding available: %llu bytes.", dynUpd.padding_bytes);
+			fprintf(stdout, " Padding available: %" PRIu64 " bytes.", dynUpd.padding_bytes);
 		}
 	}
 	if (gapless_void_padding > 0) {
-		fprintf(stdout, "\nGapless playback null space at end of file: %llu bytes.", gapless_void_padding);
+		fprintf(stdout, "\nGapless playback null space at end of file: %" PRIu64 " bytes.", gapless_void_padding);
 	}
 	fprintf(stdout, "\n------------------------------------------------------\n");
 	ShowVersionInfo();

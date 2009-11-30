@@ -1273,7 +1273,7 @@ void APar_ExtractDetails(FILE* isofile, uint8_t optional_output) {
 				}
 				
 				//codec, language
-				fprintf(stdout, "  %s  %s   %llu", uint32tochar4(track_info.track_codec, uint32_buffer), track_info.unpacked_lang, track_info.sample_aggregate);
+				fprintf(stdout, "  %s  %s   %" PRIu64 "", uint32tochar4(track_info.track_codec, uint32_buffer), track_info.unpacked_lang, track_info.sample_aggregate);
 				
 				if (track_info.encoder_name[0] != 0 && track_info.contains_esds) {
 					purge_extraneous_characters(track_info.encoder_name);

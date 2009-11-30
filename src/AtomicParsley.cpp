@@ -2274,11 +2274,16 @@ void APar_MetaData_atomArtwork_Set(const char* artworkPath, char* env_PicOptions
 			modified_atoms = true;
 			AtomicInfo* desiredAtom = APar_FindAtom(artwork_atom, true, SIMPLE_ATOM, 0);
 			AtomicInfo sample_data_atom = { 0 };
-			short parent_atom = desiredAtom->AtomicNumber; //used on Darwin adding a 2nd image (the original)
+
+#if defined (DARWIN_PLATFORM)			
+			// used on Darwin adding a 2nd image (the original)
+			short parent_atom = desiredAtom->AtomicNumber;
+#endif
+
 			APar_CreateSurrogateAtom(&sample_data_atom, "data", 6, VERSIONED_ATOM, 0, NULL, 0);
 			desiredAtom = APar_CreateSparseAtom(&sample_data_atom, desiredAtom, APar_FindLastChild_of_ParentAtom(desiredAtom->AtomicNumber) );
 
-	#if defined (DARWIN_PLATFORM)			
+#if defined (DARWIN_PLATFORM)			
 			//determine if any picture preferences will impact the picture file in any way
 			myPicturePrefs = APar_ExtractPicPrefs(env_PicOptions);
 
@@ -2298,10 +2303,10 @@ void APar_MetaData_atomArtwork_Set(const char* artworkPath, char* env_PicOptions
 			}
 			free(resized_filepath);
 			resized_filepath=NULL;
-	#else
+#else
 			//perhaps some libjpeg based resizing/modification for non-Mac OS X based platforms
 			APar_MetaData_atomArtwork_Init(desiredAtom->AtomicNumber, artworkPath);
-	#endif
+#endif
 		}
 		APar_FlagMovieHeader();
 	} ////end if (metadata_style == ITUNES_STYLE)
@@ -4112,9 +4117,9 @@ void APar_ValidateAtoms() {
 			if (parsedAtoms[iter].AtomicData == NULL) {
 				fprintf(stderr, "AtomicParsley error: an atom was detected that presents as larger than filesize. Aborting. %c\n", '\a');
 #if defined (_MSC_VER) /* apparently, long long is forbidden there*/
-				fprintf(stderr, "atom %s is %u bytes long which is greater than the filesize of %llu\n", parsedAtoms[iter].AtomicName, parsedAtoms[iter].AtomicLength, (long unsigned int)file_size);
+				fprintf(stderr, "atom %s is %u bytes long which is greater than the filesize of %" PRIu64 "\n", parsedAtoms[iter].AtomicName, parsedAtoms[iter].AtomicLength, (long unsigned int)file_size);
 #else
-				fprintf(stderr, "atom %s is %llu bytes long which is greater than the filesize of %llu\n", parsedAtoms[iter].AtomicName, parsedAtoms[iter].AtomicLength, file_size);
+				fprintf(stderr, "atom %s is %" PRIu64 " bytes long which is greater than the filesize of %" PRIu64 "\n", parsedAtoms[iter].AtomicName, parsedAtoms[iter].AtomicLength, file_size);
 #endif
 				exit(1); //its conceivable to repair such an off length by the surrounding atoms constrained by file_size - just not anytime soon; probly would catch a foobar2000 0.9 tagged file
 			}
@@ -4176,7 +4181,7 @@ void APar_ValidateAtoms() {
 	if (percentage_difference < 90 && file_size > 300000) { //only kick in when files are over 300k & 90% of the size
 		fprintf(stderr, "AtomicParsley error: total existing atoms present as larger than filesize. Aborting. %c\n", '\a');
 		//APar_PrintAtomicTree();
-		fprintf(stdout, "%i %llu\n", percentage_difference, simple_tally);
+		fprintf(stdout, "%i %" PRIu64 "\n", percentage_difference, simple_tally);
 		exit(1);
 	}
 	
@@ -4905,7 +4910,7 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 			fclose(temp_file);
 			remove(temp_file_name);
 			fprintf(stdout,
-				"AtomicParsley error: the insufficient space to retag the source file (%llu!=%llu).\nExiting.\n", metadata_len, dynUpd.first_mdat_atom->AtomicStart - dynUpd.initial_update_atom->AtomicStart);
+				"AtomicParsley error: the insufficient space to retag the source file (%" PRIu64 "!=%" PRIu64 ").\nExiting.\n", metadata_len, dynUpd.first_mdat_atom->AtomicStart - dynUpd.initial_update_atom->AtomicStart);
 			exit(1);		
 		}
 		
