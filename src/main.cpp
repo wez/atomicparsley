@@ -879,34 +879,8 @@ const char* find_ID3_optarg(char *argv[], int start_optargs, const char* arg_str
 
 //***********************************************
 
-#if defined (_MSC_VER)
-int wmain( int argc, wchar_t *arguments[]) {
-	uint16_t name_len = wcslen(arguments[0]);
-	if (wmemcmp(arguments[0] + (name_len-9), L"-utf8.exe", 9) == 0 || wmemcmp(arguments[0] + (name_len-9), L"-UTF8.exe", 9) == 0) {
-		UnicodeOutputStatus = UNIVERSAL_UTF8;
-	} else {
-		UnicodeOutputStatus = WIN32_UTF16;
-	}
-
-	char *argv[350];
-	//for native Win32 & full unicode support (well, cli arguments anyway), take whatever 16bit unicode windows gives (utf16le), and convert EVERYTHING
-	//that is sends to utf8; use those utf8 strings (mercifully subject to familiar standby's like strlen) to pass around the program like getopt_long
-	//to get cli options; convert from utf8 filenames as required for unicode filename support on Windows using wide file functions. Here, EVERYTHING = 350.
-	for(int z=0; z < argc; z++) {
-		uint32_t wchar_length = wcslen(arguments[z])+1;
-		argv[z] = (char *)malloc(sizeof(char)*8*wchar_length );
-		memset(argv[z], 0, 8*wchar_length);
-		if (UnicodeOutputStatus == WIN32_UTF16) {
-			UTF16LEToUTF8((unsigned char*) argv[z], 8*wchar_length, (unsigned char*) arguments[z], wchar_length*2);
-		} else {
-			strip_bogusUTF16toRawUTF8((unsigned char*) argv[z], 8*wchar_length, arguments[z], wchar_length );
-		}
-	}
-	argv[argc] = NULL;
-
-#else
-int main( int argc, char *argv[]) {
-#endif
+int real_main(int argc, char *argv[])
+{
 	if (argc == 1) {
 		fprintf (stdout,"%s\n", shortHelp_text); exit(0);
 	} else if (argc == 2 && ((strncmp(argv[1],"-v",2) == 0) || (strncmp(argv[1],"-version",2) == 0)) ) {
@@ -1766,13 +1740,20 @@ int main( int argc, char *argv[]) {
 			char* uuid_file_mimetype = NULL;
 //			char* uuid_file_filename = NULL;
 			
-			//a uuid in AP is a version 5 uuid created by getting a sha1 hash of a string (the atom name) in a namespace ('AP.sf.net'). This is guaranteed to be
-			//reproducible, so later it can be verified that this uuid (which could come from anywhere), is in fact made by AtomicParsley. This is achieved by
-			//storing the atom name string right after the uuid, and is read back later and a new uuid is created to see if it matches the discovered uuid. If
-			//they match, it will print out or extract to a file; if not, only its name will be displayed in the tree.
-			
-			// --meta-uuid "©foo" 1 'http://www.url.org'  --meta-uuid "pdf1" file /some/path/pic.pdf description="My Booty, Your Booty, Djbouti"
-			
+			// a uuid in AP is a version 5 uuid created by getting a sha1 hash
+			// of a string (the atom name) in a namespace ('AP.sf.net'). This
+			// is guaranteed to be reproducible, so later it can be verified
+			// that this uuid (which could come from anywhere), is in fact made
+			// by AtomicParsley. This is achieved by storing the atom name
+			// string right after the uuid, and is read back later and a new
+			// uuid is created to see if it matches the discovered uuid. If
+			// they match, it will print out or extract to a file; if not, only
+			// its name will be displayed in the tree.
+			//
+			// --meta-uuid "©foo" 1 'http://www.url.org'  --meta-uuid "pdf1"
+			// file /some/path/pic.pdf description="My Booty, Your Booty,
+			// Djbouti"
+
 			if ( memcmp(argv[optind], "text", 5) == 0  || memcmp(argv[optind], "1", 2) == 0 ) uuid_dataType = AtomFlags_Data_Text;
 			if ( memcmp(argv[optind], "file", 5) == 0 ) {
 				uuid_dataType = AtomFlags_Data_uuid_binary;
@@ -2730,15 +2711,7 @@ int main( int argc, char *argv[]) {
 			APar_OpenISOBaseMediaFile(ISObasemediafile, false);
 			
 			APar_FreeMemory();
-			#if defined (_MSC_VER)
-				for(int zz=0; zz < argc; zz++) {
-					if (argv[zz] > 0) {
-						free(argv[zz]);
-						argv[zz] = NULL;
-					}
-				}
-			#endif
-			exit(0); //das right, this is a flag that doesn't get used with other flags.
+			exit(0);
 		}
 		
 		case OPT_NoOptimize : {
@@ -2754,13 +2727,18 @@ int main( int argc, char *argv[]) {
 		} /* end switch */
 	} /* end while */
 	
-	//after all the modifications are enacted on the tree in memory, THEN write out the changes
+	// after all the modifications are enacted on the tree in memory, THEN
+	// write out the changes
+
 	if (modified_atoms) {
 		APar_DetermineAtomLengths();
 		APar_OpenISOBaseMediaFile(ISObasemediafile, true);
 		APar_WriteFile(ISObasemediafile, output_file, alter_original);
 		if (!alter_original) {
-			//The file was opened orignally as read-only; when it came time to writeback into the original file, that FILE was closed, and a new one opened with write abilities, so to close a FILE that no longer exists would.... be retarded.
+			// The file was opened orignally as read-only; when it came time to
+			// writeback into the original file, that FILE was closed, and a
+			// new one opened with write abilities, so to close a FILE that no
+			// longer exists would.... be retarded.
 			APar_OpenISOBaseMediaFile(ISObasemediafile, false);
 		}
 	} else {
@@ -2769,13 +2747,52 @@ int main( int argc, char *argv[]) {
 		}
 	}
 	APar_FreeMemory();
-#if defined (_MSC_VER)
-	for(int zz=0; zz < argc; zz++) {
-		if (argv[zz] > 0) {
-			free(argv[zz]);
-			argv[zz] = NULL;
-		}
-	}
-#endif
 	return 0;
 }
+
+#if defined (_MSC_VER)
+
+int wmain( int argc, wchar_t *arguments[])
+{
+	uint16_t name_len = wcslen(arguments[0]);
+	if (wmemcmp(arguments[0] + (name_len-9), L"-utf8.exe", 9) == 0 ||
+			wmemcmp(arguments[0] + (name_len-9), L"-UTF8.exe", 9) == 0) {
+		UnicodeOutputStatus = UNIVERSAL_UTF8;
+	} else {
+		UnicodeOutputStatus = WIN32_UTF16;
+	}
+
+	char *argv[argc+1];
+
+	// for native Win32 & full unicode support (well, cli arguments anyway),
+	// take whatever 16bit unicode windows gives (utf16le), and convert
+	// EVERYTHING that is sends to utf8; use those utf8 strings (mercifully
+	// subject to familiar standby's like strlen) to pass around the program
+	// like getopt_long to get cli options; convert from utf8 filenames as
+	// required for unicode filename support on Windows using wide file
+	// functions.
+	for(int z=0; z < argc; z++) {
+		uint32_t wchar_length = wcslen(arguments[z])+1;
+		argv[z] = (char *)malloc(sizeof(char)*8*wchar_length );
+		memset(argv[z], 0, 8*wchar_length);
+		if (UnicodeOutputStatus == WIN32_UTF16) {
+			UTF16LEToUTF8((unsigned char*) argv[z], 8*wchar_length, (unsigned char*) arguments[z], wchar_length*2);
+		} else {
+			strip_bogusUTF16toRawUTF8((unsigned char*) argv[z], 8*wchar_length, arguments[z], wchar_length );
+		}
+	}
+	argv[argc] = NULL;
+
+	return real_main(argc, argv);
+}
+
+#else
+
+int main( int argc, char *argv[])
+{
+	return real_main(argc, argv);
+}
+
+#endif
+
+
