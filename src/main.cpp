@@ -984,7 +984,6 @@ int main( int argc, char *argv[]) {
 	char* ISObasemediafile = argv[1];
 	
 	TestFileExistence(ISObasemediafile, true);
-	xmlInitEndianDetection(); 
 	
 	char* padding_options = getenv("AP_PADDING");
 	ExtractPaddingPrefs(padding_options);

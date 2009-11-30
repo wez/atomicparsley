@@ -267,8 +267,6 @@ extern int sha1_stream (FILE *stream, void *resblock);
    digest.  */
 extern void *sha1_buffer (const char *buffer, size_t len, void *resblock);
 
-void xmlInitEndianDetection();
-
 int isolat1ToUTF8(unsigned char* out, int outlen, const unsigned char* in, int inlen);
 int UTF8Toisolat1(unsigned char* out, int outlen, const unsigned char* in, int inlen);
 int UTF16BEToUTF8(unsigned char* out, int outlen, const unsigned char* inb, int inlenb);
@@ -289,9 +287,7 @@ void APar_ExtractBrands(char* filepath);
 
 void printBOM();
 void APar_fprintf_UTF8_data(const char* utf8_encoded_data);
-#if defined (_MSC_VER)
 void APar_unicode_win32Printout(wchar_t* unicode_out, char* utf8_out);
-#endif
 
 void APar_Extract_uuid_binary_file(AtomicInfo* uuid_atom, const char* originating_file, char* output_path);
 void APar_Print_APuuid_atoms(const char *path, char* output_path, uint8_t target_information);
@@ -312,9 +308,7 @@ void APar_SimpleAtomPrintout();
 uint32_t APar_4CC_CreatorCode(const char* filepath, uint32_t new_type_code);
 void APar_SupplySelectiveTypeCreatorCodes(const char *inputPath, const char *outputPath, uint8_t forced_type_code);
 
-#if defined (DARWIN_PLATFORM)
 bool ResizeGivenImage(const char* filePath, PicPrefs myPicPrefs, char* resized_path);
-#endif
 
 char* GenreIntToString(int genre);
 uint8_t StringGenreToInt(const char* genre_string);
