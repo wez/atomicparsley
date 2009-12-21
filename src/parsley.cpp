@@ -4193,7 +4193,7 @@ void APar_ValidateAtoms() {
 
 void APar_DeriveNewPath(const char *filePath, char* temp_path, int output_type, const char* file_kind, const char* forced_suffix, bool random_filename = true) {
 	const char* suffix = NULL;
-	char* file_name = NULL;
+	const char* file_name = NULL;
 	size_t file_name_len = 0;
 	bool relative_path = false;
 	
@@ -4933,7 +4933,7 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 			free_modified_name = true;
 			if (forced_suffix_type == FORCE_M4B_TYPE) { //using --stik Audiobook with --overWrite will change the original file's extension
 				uint16_t filename_len = strlen(ISObasemediafile);
-				char* suffix = strrchr(ISObasemediafile, '.');
+				const char* suffix = strrchr(ISObasemediafile, '.');
 				memcpy(originating_file, ISObasemediafile, filename_len+1 );
 				memcpy(originating_file + (filename_len - strlen(suffix) ), ".m4b", 5 );
 			}
