@@ -175,7 +175,7 @@ void APar_Extract_uuid_binary_file(AtomicInfo* uuid_atom, const char* originatin
 	uint64_t atom_offsets = 0;
 	char* uuid_outfile = (char*)calloc(1, sizeof(char)*MAXPATHLEN+1); //malloc a new string because it may be a cli arg for a specific output path	
 	if (output_path == NULL) {
-		char* orig_suffix = strrchr(originating_file, '.');
+		const char* orig_suffix = strrchr(originating_file, '.');
 		if (orig_suffix == NULL) {
 			fprintf(stdout, "AP warning: a file extension for the input file was not found.\n\tGlobbing onto original filename...\n");
 			path_len = strlen(originating_file);
