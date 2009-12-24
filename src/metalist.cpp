@@ -191,8 +191,7 @@ void APar_Extract_uuid_binary_file(AtomicInfo* uuid_atom, const char* originatin
 	}
 	char* uuid_payload = (char*)calloc(1, sizeof(char) * (uuid_atom->AtomicLength - 36 +1) );
 			
-	fseeko(source_file, uuid_atom->AtomicStart + 36, SEEK_SET);
-	fread(uuid_payload, 1, uuid_atom->AtomicLength - 36, source_file);
+	APar_readX(uuid_payload, source_file, uuid_atom->AtomicStart + 36, uuid_atom->AtomicLength - 36);
 	
 	uint32_t descrip_len = UInt32FromBigEndian(uuid_payload);
 	atom_offsets+=4+descrip_len;
@@ -235,9 +234,8 @@ void APar_ExtractAAC_Artwork(short this_atom_num, char* pic_output_path, short a
 	
 	char* art_payload = (char*)malloc( sizeof(char) * (parsedAtoms[this_atom_num].AtomicLength-16) +1 );	
 	memset(art_payload, 0, (parsedAtoms[this_atom_num].AtomicLength-16) +1 );
-			
-	fseeko(source_file, parsedAtoms[this_atom_num].AtomicStart+16, SEEK_SET);
-	fread(art_payload, 1, parsedAtoms[this_atom_num].AtomicLength-16, source_file);
+	
+	APar_readX(art_payload, source_file, parsedAtoms[this_atom_num].AtomicStart+16, parsedAtoms[this_atom_num].AtomicLength-16);
 	
 	char* suffix = (char *)malloc(sizeof(char)*5);
 	memset(suffix, 0, sizeof(char)*5);
@@ -409,8 +407,7 @@ void APar_ExtractDataAtom(int this_atom_number) {
 			char* data_payload = (char*)malloc( sizeof(char) * (thisAtom->AtomicLength - atom_header_size +1) );
 			memset(data_payload, 0, sizeof(char) * (thisAtom->AtomicLength - atom_header_size +1) );
 			
-			fseeko(source_file, thisAtom->AtomicStart + atom_header_size, SEEK_SET);
-			fread(data_payload, 1, thisAtom->AtomicLength - atom_header_size, source_file);
+			APar_readX(data_payload, source_file, thisAtom->AtomicStart + atom_header_size, thisAtom->AtomicLength - atom_header_size);
 			
 			if (thisAtom->AtomicVerFlags == AtomFlags_Data_Text) {
 				if (thisAtom->AtomicLength < (atom_header_size + 4) ) {
