@@ -144,7 +144,7 @@ CFLAGS="-D_FILE_OFFSET_BITS=64 $CFLAGS"
 CXXFLAGS="-D_FILE_OFFSET_BITS=64 $CXXFLAGS"
 
 AC_ARG_ENABLE(debug, dnl
-[  --disable-debug_build   do not build a debug version [default=yes]],
+[  --disable-debug         do not build a debug version [default=yes]],
               debug=$enableval, debug=no)
 if test "$debug" = "yes" ; then
   AC_DEFINE_UNQUOTED(DEBUG, $debug, [build binary with debug output])
