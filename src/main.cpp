@@ -29,10 +29,10 @@
 
 // define one-letter cli options for
 #define OPT_HELP                 'h'
-#define OPT_TEST		             'T'
-#define OPT_ShowTextData		     't'
+#define OPT_TEST                 'T'
+#define OPT_ShowTextData         't'
 #define OPT_ExtractPix           'E'
-#define OPT_ExtractPixToPath		 'e'
+#define OPT_ExtractPixToPath     'e'
 #define Meta_artist              'a'
 #define Meta_songtitle           's'
 #define Meta_album               'b'
@@ -66,7 +66,9 @@
 #define Meta_podcast_GUID        'J'
 #define Meta_PurchaseDate        'D'
 #define Meta_apID                'Y'
+#define Meta_cnID                0xC0
 #define Meta_EncodingTool        0xB7
+#define Meta_EncodedBy           0xC1
 #define Meta_PlayGapless         0xBA
 #define Meta_SortOrder           0xBF
 
@@ -173,7 +175,9 @@ static const char* shortHelp_text =
 "  --podcastGUID  (URL)        Set the episode's URL tag\n"
 "  --purchaseDate (UTC)        Set time of purchase\n"
 "  --encodingTool (string)     Set the name of the encoder\n"
+"  --encodedBy    (string)     Set the name of the Person/company who encoded the file\n"
 "  --apID         (string)     Set the Account Name\n"
+"  --cnID         (number)     Set the iTunes Catalog ID (see --longhelp)\n"
 "  --gapless      (boolean)    Set the gapless playback flag\n"
 "  --contentRating (string*)   Set tv/mpaa rating (see -rDNS-help)\n"
 "\n"
@@ -257,7 +261,12 @@ static const char* longHelp_text =
 "  --purchaseDate     ,  -D   (UTC)    Set Universal Coordinated Time of purchase on a \"purd\" atom\n"
 "                                       (use \"timestamp\" to set UTC to now; can be akin to id3v2 TDTG tag)\n"
 "  --encodingTool     ,       (str)    Set the name of the encoder on the \"\302©too\" atom\n"
+"  --encodedBy        ,       (str)    Set the name of the Person/company who encoded the file on the \"\302©enc\" atom\n"
 "  --apID             ,  -Y   (str)    Set the name of the Account Name on the \"apID\" atom\n"
+"  --cnID             ,       (num)    Set iTunes Catalog ID, used for combining SD and HD encodes in iTunes on the \"cnID\" atom\n"
+"                                       (To combine you must set \"hdvd\" atom on one file and must have same \"stik\" on both file)\n"
+"                                       (Must not use \"stik\" of value Movie(0), use Short Film(9))\n"
+"                                       (A good idea for numbers is from http://www.imdb.com/ listings)\n"
 "  --gapless          ,       (bool)   Sets the gapless playback flag for a track in a gapless album\n"
 
 "  --sortOrder    (type)      (str)    Sets the sort order string for that type of tag.\n"
@@ -1013,7 +1022,9 @@ int real_main(int argc, char *argv[])
 		{ "podcastGUID",      required_argument,  NULL,           Meta_podcast_GUID },
 		{ "purchaseDate",     required_argument,  NULL,           Meta_PurchaseDate },
 		{ "encodingTool",     required_argument,  NULL,           Meta_EncodingTool },
+		{ "encodedBy",        required_argument,  NULL,           Meta_EncodedBy },
 		{ "apID",             required_argument,  NULL,           Meta_apID },
+		{ "cnID",             required_argument,  NULL,           Meta_cnID },
 		{ "gapless",          required_argument,  NULL,           Meta_PlayGapless },
 		{ "sortOrder",        required_argument,  NULL,           Meta_SortOrder } ,
 		
@@ -1453,6 +1464,17 @@ int real_main(int argc, char *argv[])
 			APar_Unified_atom_Put(encodingtoolData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
 			break;
 		}
+
+		case Meta_EncodedBy : {
+			APar_ScanAtoms(ISObasemediafile);
+			if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "encoded by") ) {
+				break;
+			}
+			
+			AtomicInfo* encodedbyData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©enc.data", optarg, AtomFlags_Data_Text);
+			APar_Unified_atom_Put(encodedbyData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+			break;
+		}
 		
 		case Meta_apID : {
 			APar_ScanAtoms(ISObasemediafile);
@@ -1549,6 +1571,21 @@ int real_main(int argc, char *argv[])
 			//episodenumber is [0, 0, 0, 0,   0, 0, 0, data_value]; BUT that first uint32_t is already accounted for in APar_MetaData_atom_Init
 			APar_Unified_atom_Put(tvepisodenumData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, 0, 16);
 			APar_Unified_atom_Put(tvepisodenumData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, data_value, 16);
+			break;
+		}
+
+		case Meta_cnID : { // the iTunes Catalog ID
+			APar_ScanAtoms(ISObasemediafile);
+			if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "iTunes Catalog ID") ) {
+				break;
+			}
+			
+			uint32_t data_value = 0;
+			sscanf(optarg, "%lu", &data_value );
+			
+			AtomicInfo* cnIDData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.cnID.data", optarg, AtomFlags_Data_UInt);
+			//episodenumber is [0, 0, 0, 0,   0, 0, 0, data_value]; BUT that first uint32_t is already accounted for in APar_MetaData_atom_Init
+			APar_Unified_atom_Put(cnIDData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, data_value, 32);
 			break;
 		}
 		
