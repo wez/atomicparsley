@@ -267,8 +267,6 @@ static const char* longHelp_text =
 "                                       (To combine you must set \"hdvd\" atom on one file and must have same \"stik\" on both file)\n"
 "                                       (Must not use \"stik\" of value Movie(0), use Short Film(9))\n"
 "                                       (A good idea for numbers is from http://www.imdb.com/ listings)\n"
-"                                       (This is supposed to be a 32 bit atom, but currently it is 16 bit and NO error\n"
-"                                        checking is done on it. If you go over value 65535 it will corrupt!)\n"
 "  --gapless          ,       (bool)   Sets the gapless playback flag for a track in a gapless album\n"
 
 "  --sortOrder    (type)      (str)    Sets the sort order string for that type of tag.\n"
@@ -1582,13 +1580,12 @@ int real_main(int argc, char *argv[])
 				break;
 			}
 			
-			uint16_t data_value = 0;
-			sscanf(optarg, "%hu", &data_value );
+			uint32_t data_value = 0;
+			sscanf(optarg, "%lu", &data_value );
 			
 			AtomicInfo* cnIDData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.cnID.data", optarg, AtomFlags_Data_UInt);
 			//episodenumber is [0, 0, 0, 0,   0, 0, 0, data_value]; BUT that first uint32_t is already accounted for in APar_MetaData_atom_Init
-			APar_Unified_atom_Put(cnIDData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, 0, 16);
-			APar_Unified_atom_Put(cnIDData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, data_value, 16);
+			APar_Unified_atom_Put(cnIDData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, data_value, 32);
 			break;
 		}
 		
