@@ -4404,7 +4404,7 @@ uint64_t splice_copy(int sfd, int ofd, uint64_t block_size,
 	}
 
 	while (block_size) {
-		size_t toread = MIN(block_size, lim);
+		long toread = MIN(block_size, lim);
 
 		/* splice source data into pipe.
 		 * This will typically be 64k at a time */
