@@ -141,7 +141,7 @@ int APar_TestArtworkBinaryData(const char* artworkPath) {
 	int artwork_dataType = 0;
 	FILE *artfile = APar_OpenFile(artworkPath, "rb");
 	if (artfile != NULL) {		
-		fread(twenty_byte_buffer, 1, 8, artfile);
+		APar_read64(twenty_byte_buffer, artfile, 0);
 		if ( strncmp(twenty_byte_buffer, "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A", 8) == 0 ) {
 			artwork_dataType = AtomFlags_Data_PNGBinary;
 		} else if ( strncmp(twenty_byte_buffer, "\xFF\xD8\xFF\xE0", 4) == 0 || memcmp(twenty_byte_buffer, "\xFF\xD8\xFF\xE1", 4) == 0 ) {
@@ -1026,8 +1026,7 @@ void APar_TestCompatibleBrand(FILE* file, uint64_t atom_start, uint64_t atom_len
 
 void APar_Extract_stsd_codec(FILE* file, uint64_t midJump) {
 	memset(twenty_byte_buffer, 0, 12);
-	fseeko(file, midJump, SEEK_SET);
-	fread(twenty_byte_buffer, 1, 12, file);
+	APar_readX(twenty_byte_buffer, file, midJump, 12);
 	parsedAtoms[atom_number-1].ancillary_data = UInt32FromBigEndian( twenty_byte_buffer +4 );
   return;
 }
@@ -1263,7 +1262,7 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 			uint64_t dataSize = 0;
 			uint64_t jump = 0;
 			
-			fread(data, 1, 12, file);
+			APar_readX(data, file, 0, 12);
 			char *atom = data+4;
 			
 			if ( memcmp(data, "\x00\x00\x00\x0C\x6A\x50\x20\x20\x0D\x0A\x87\x0A ", 12) == 0 ) {
@@ -1288,7 +1287,7 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 					
 					uuid_info.uuid_form = UUID_DEPRECATED_FORM; //start with the assumption that any found atom is in the depracted uuid form
 					
-					fread(data, 1, 12, file);
+					APar_readX_noseek(data, file, 12);
 					char *atom = data+4;
 					dataSize = UInt32FromBigEndian(data);
 					
@@ -1424,8 +1423,8 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 					if (memcmp(atom, "mean", 4) == 0 && memcmp(parsedAtoms[atom_number-2].AtomicName, "----", 4) == 0) {
 							parsedAtoms[atom_number-1].ReverseDNSdomain = (char *)calloc(1, sizeof(char) * dataSize);
 							
-							fseeko(file, jump + 12, SEEK_SET); //'name' atom is the 2nd child
-							fread(parsedAtoms[atom_number-1].ReverseDNSdomain, 1, dataSize - 12, file);
+							//jump + 12 because 'name' atom is the 2nd child
+							APar_readX(parsedAtoms[atom_number-1].ReverseDNSdomain, file, jump + 12, dataSize - 12);
 					}
 					if (memcmp(atom, "name", 4) == 0 && 
 					    memcmp(parsedAtoms[atom_number-2].AtomicName, "mean", 4) == 0 &&
@@ -1433,8 +1432,8 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 							
 							parsedAtoms[atom_number-1].ReverseDNSname = (char *)calloc(1, sizeof(char) * dataSize);
 							
-							fseeko(file, jump + 12, SEEK_SET); //'name' atom is the 2nd child
-							fread(parsedAtoms[atom_number-1].ReverseDNSname, 1, dataSize - 12, file);
+							//jump + 12 because 'name' atom is the 2nd child
+							APar_readX(parsedAtoms[atom_number-1].ReverseDNSname, file, jump + 12, dataSize - 12);
 					}
 					
 					if (dataSize == 0) { // length = 0 means it reaches to EOF
@@ -4219,7 +4218,10 @@ void APar_DeriveNewPath(const char *filePath, char* temp_path, int output_type, 
 			file_name_len = strlen(file_name);
 			memcpy(temp_path, filePath, filepath_len-file_name_len+1);
 		} else {
-			getcwd(temp_path, MAXPATHLEN);
+			if( getcwd(temp_path, MAXPATHLEN) == NULL ) {
+				printf("Error getting working directory: %s\n", strerror(errno));
+				exit(1);
+			}
 			file_name = (char*)filePath;
 			file_name_len = strlen(file_name);
 			memcpy(temp_path + strlen(temp_path), "/", 1);
@@ -4264,8 +4266,7 @@ void APar_MetadataFileDump(const char* ISObasemediafile) {
 		if (dump_file != NULL) {
 			//body of atom writing here
 			
-			fseeko(source_file, userdata_atom->AtomicStart, SEEK_SET);
-			fread(dump_buffer, 1, (size_t)userdata_atom->AtomicLength, source_file);
+			APar_readX(dump_buffer, source_file, userdata_atom->AtomicStart, (size_t)userdata_atom->AtomicLength);
 			
 			fwrite(dump_buffer, (size_t)userdata_atom->AtomicLength, 1, dump_file);
 			fclose(dump_file);
@@ -4335,8 +4336,7 @@ void APar_MergeTempFile(FILE* dest_file, FILE *src_file, uint64_t src_file_size,
 	uint64_t file_pos = 0;
 	while (file_pos <= src_file_size) {
 		if (file_pos + max_buffer <= src_file_size ) {
-			fseeko(src_file, file_pos, SEEK_SET);
-			fread(buffer, 1, max_buffer, src_file);
+			APar_readX(buffer, src_file, file_pos, max_buffer);
 			
 			//fseek(dest_file, dest_position + file_pos, SEEK_SET);
 #if defined(_MSC_VER)
@@ -4352,8 +4352,7 @@ void APar_MergeTempFile(FILE* dest_file, FILE *src_file, uint64_t src_file_size,
 			file_pos += max_buffer;
 			
 		} else {
-			fseeko(src_file, file_pos, SEEK_SET);
-			fread(buffer, 1, src_file_size - file_pos, src_file);
+			APar_readX(buffer, src_file, file_pos, src_file_size - file_pos);
 			//fprintf(stdout, "buff starts with %s\n", buffer+4);
 #if defined(_MSC_VER)
 			fpos_t file_offset = dest_position + file_pos;
@@ -4374,7 +4373,10 @@ void APar_MergeTempFile(FILE* dest_file, FILE *src_file, uint64_t src_file_size,
 		fflush(dest_file);
 		SetEndOfFile((HANDLE)_get_osfhandle(fileno(dest_file)));
 #else
-		ftruncate(fileno(dest_file), src_file_size+dest_position);
+		if(ftruncate(fileno(dest_file), src_file_size+dest_position) == -1) {
+			perror("Failed to truncate file: ");
+			exit(1);
+		}
 #endif
 	}
 	return;

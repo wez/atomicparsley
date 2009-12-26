@@ -1757,8 +1757,9 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 		}
 		case ID3_PLAYCOUNTER_FRAME : {
 			uint64_t playcount = 0;
-			char play_count_syncsafe[15];
-			memset(play_count_syncsafe, 0, 16);
+			char play_count_syncsafe[16];
+
+			memset(play_count_syncsafe, 0, sizeof(play_count_syncsafe));
 
 			if (memcmp(frame_payload, "+1", 3) == 0) {
 				if (thisFrame->ID3v2_Frame_Length == 4) {
@@ -1787,8 +1788,10 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 		case ID3_POPULAR_FRAME : {
 			unsigned char popm_rating = 0;
 			uint64_t popm_playcount = 0;
-			char popm_play_count_syncsafe[15];
-			memset(popm_play_count_syncsafe, 0, 16);
+			char popm_play_count_syncsafe[16];
+
+			memset(popm_play_count_syncsafe, 0,
+				sizeof(popm_play_count_syncsafe));
 			
 			if (adjunct_payload->ratingArg != NULL) {
 				sscanf(adjunct_payload->ratingArg, "%hhu", &popm_rating);
