@@ -99,6 +99,13 @@
 #ifndef PRIu64
 # define PRIu64 "llu"
 #endif
+#ifndef SCNu32
+# define SCNu32 "lu"
+#endif
+#ifndef SCNu16
+# define SCNu16 "u"
+#endif
+
 
 
 #ifndef MAXPATHLEN
