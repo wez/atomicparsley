@@ -1230,11 +1230,11 @@ int real_main(int argc, char *argv[])
 
 				char* duplicate_info = optarg;
 				char* item_stat = strsep(&duplicate_info,"/");
-				sscanf(item_stat, "%hu", &pos_in_total); //sscanf into a an unsigned char (uint8_t is typedef'ed to a unsigned char by gcc)
+				sscanf(item_stat, "%" SCNu16, &pos_in_total);
 				item_stat = strsep(&duplicate_info,"/");
-				sscanf(item_stat, "%hu", &the_total);
+				sscanf(item_stat, "%" SCNu16, &the_total);
 			} else {
-				sscanf(optarg, "%hu", &pos_in_total);
+				sscanf(optarg, "%" SCNu16, &pos_in_total);
 			}
 			
 			AtomicInfo* tracknumData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.trkn.data", optarg, AtomFlags_Data_Binary);
@@ -1258,12 +1258,12 @@ int real_main(int argc, char *argv[])
 				
 				char* duplicate_info = optarg;
 				char* item_stat = strsep(&duplicate_info,"/");
-				sscanf(item_stat, "%hu", &pos_in_total); //sscanf into a an unsigned char (uint8_t is typedef'ed to a unsigned char by gcc)
+				sscanf(item_stat, "%" SCNu16, &pos_in_total);
 				item_stat = strsep(&duplicate_info,"/");
-				sscanf(item_stat, "%hu", &the_total);
+				sscanf(item_stat, "%" SCNu16, &the_total);
 			
 			} else {
-				sscanf(optarg, "%hu", &pos_in_total);
+				sscanf(optarg, "%" SCNu16, &pos_in_total);
 			}
 			
 			AtomicInfo* disknumData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.disk.data", optarg, AtomFlags_Data_Binary);
@@ -1382,7 +1382,7 @@ int real_main(int argc, char *argv[])
 				APar_RemoveAtom("moov.udta.meta.ilst.tmpo.data", VERSIONED_ATOM, 0);
 			} else {
 				uint16_t bpm_value = 0;
-				sscanf(optarg, "%hu", &bpm_value );
+				sscanf(optarg, "%" SCNu16, &bpm_value );
 				//bpm is [0, 0, 0, 0,   0, bpm_value]; BUT that first uint32_t is already accounted for in APar_MetaData_atom_Init
 				AtomicInfo* bpmData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.tmpo.data", optarg, AtomFlags_Data_UInt);
 				APar_Unified_atom_Put(bpmData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, bpm_value, 16);
@@ -1549,7 +1549,7 @@ int real_main(int argc, char *argv[])
 			}
 			
 			uint16_t data_value = 0;
-			sscanf(optarg, "%hu", &data_value );
+			sscanf(optarg, "%" SCNu16, &data_value );
 			
 			AtomicInfo* tvseasonData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.tvsn.data", optarg, AtomFlags_Data_UInt);
 			//season is [0, 0, 0, 0,   0, 0, 0, data_value]; BUT that first uint32_t is already accounted for in APar_MetaData_atom_Init
@@ -1565,7 +1565,7 @@ int real_main(int argc, char *argv[])
 			}
 			
 			uint16_t data_value = 0;
-			sscanf(optarg, "%hu", &data_value );
+			sscanf(optarg, "%" SCNu16, &data_value );
 			
 			AtomicInfo* tvepisodenumData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.tves.data", optarg, AtomFlags_Data_UInt);
 			//episodenumber is [0, 0, 0, 0,   0, 0, 0, data_value]; BUT that first uint32_t is already accounted for in APar_MetaData_atom_Init
@@ -1581,7 +1581,7 @@ int real_main(int argc, char *argv[])
 			}
 			
 			uint32_t data_value = 0;
-			sscanf(optarg, "%lu", &data_value );
+			sscanf(optarg, "%" SCNu32, &data_value );
 			
 			AtomicInfo* cnIDData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.cnID.data", optarg, AtomFlags_Data_UInt);
 			//episodenumber is [0, 0, 0, 0,   0, 0, 0, data_value]; BUT that first uint32_t is already accounted for in APar_MetaData_atom_Init
@@ -2266,7 +2266,7 @@ int real_main(int argc, char *argv[])
 				}
 			}
 			
-			sscanf(optarg, "%hu", &year_tag);
+			sscanf(optarg, "%" SCNu16, &year_tag);
 			
 			if (userdata_area == MOVIE_LEVEL_ATOM || userdata_area == SINGLE_TRACK_ATOM) {
 				asset_iterations = 1;
@@ -2357,7 +2357,7 @@ int real_main(int argc, char *argv[])
 					if ( memcmp(argv[optind + i], "index=", 6) == 0 ) {
 						char* cls_idx = argv[optind + i];
 						strsep(&cls_idx, "=");
-						sscanf(cls_idx, "%hu", &classification_index);
+						sscanf(cls_idx, "%" SCNu16, &classification_index);
 					}
 					if (memcmp(argv[optind + i], "-", 1) == 0) break; //we've hit another cli argument
 				}
