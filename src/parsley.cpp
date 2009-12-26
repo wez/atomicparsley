@@ -4219,7 +4219,7 @@ void APar_DeriveNewPath(const char *filePath, char* temp_path, int output_type, 
 			memcpy(temp_path, filePath, filepath_len-file_name_len+1);
 		} else {
 			if( getcwd(temp_path, MAXPATHLEN) == NULL ) {
-				printf("Error getting working directory: %s", strerror(errno));
+				printf("Error getting working directory: %s\n", strerror(errno));
 				exit(1);
 			}
 			file_name = (char*)filePath;
