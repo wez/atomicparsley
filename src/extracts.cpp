@@ -1307,8 +1307,7 @@ void APar_ExtractBrands(char* filepath) {
 	uint32_t compatible_brand = 0;
 	bool cb_V2ISOBMFF = false;
 	
-	fseek(a_file, 4, SEEK_SET); //this fseek will to.... the first 30 or so bytes; fseeko isn't required
-	fread(buffer, 1, 4, a_file);
+	APar_read32(buffer, a_file, 4);
 	if (memcmp(buffer, "ftyp", 4) == 0) {
 		atom_length = APar_read32(buffer, a_file, 0);
 	} else {
