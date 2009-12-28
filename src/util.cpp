@@ -121,7 +121,11 @@ void TestFileExistence(const char *filePath, bool errorOut) {
 		fprintf(stderr, "AtomicParsley error: can't open %s for reading: %s\n", filePath, strerror(errno));
 		exit(1);
 	} else {
-		fclose(a_file);
+		if(a_file == NULL) {
+			fprintf(stderr, "AtomicParsley warning: can't open %s for reading but continuing anyway: %s\n", filePath, strerror(errno));
+		} else {
+			fclose(a_file);
+		}
 	}
 }
 
