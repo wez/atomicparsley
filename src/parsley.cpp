@@ -2229,7 +2229,7 @@ APar_MetaData_atomArtwork_Init
 		copied onto the atom.
 ----------------------*/
 void APar_MetaData_atomArtwork_Init(short atom_num, const char* artworkPath) {
-	TestFileExistence(artworkPath, false);
+	TestFileExistence(artworkPath, true);
 	off_t picture_size = findFileSize(artworkPath);
 	
 	if (picture_size > 0) {
