@@ -2867,7 +2867,7 @@ int wmain( int argc, wchar_t *arguments[])
 		UnicodeOutputStatus = WIN32_UTF16;
 	}
 
-	char **argv = calloc(argc + 1, sizeof(char*));
+	char **argv = (char**)calloc(argc + 1, sizeof(char*));
 
 	// for native Win32 & full unicode support (well, cli arguments anyway),
 	// take whatever 16bit unicode windows gives (utf16le), and convert
