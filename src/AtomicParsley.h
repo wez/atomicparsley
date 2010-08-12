@@ -24,7 +24,7 @@
 
 #if defined (_MSC_VER)
 #define _UNICODE
-#define strncasecmp strnicmp
+#define strncasecmp _strnicmp
 #endif
 
 #include "config.h"
@@ -99,6 +99,12 @@
 #ifndef PRIu64
 # define PRIu64 "llu"
 #endif
+#ifndef PRIu16
+# define PRIu16 "hu"
+#endif
+#ifndef PRIu8
+# define PRIu8 "hhu"
+#endif
 #ifndef SCNu32
 # define SCNu32 "lu"
 #endif
@@ -106,10 +112,14 @@
 # define SCNu16 "u"
 #endif
 
+#ifndef MIN
+//#define MIN(X,Y) ((X) < (Y) ? : (X) : (Y))
+#define MIN min
+#endif
 
 
 #ifndef MAXPATHLEN
-# define MAXPATHLEN
+# define MAXPATHLEN 255
 #endif
 
 #include "util.h"
@@ -127,6 +137,7 @@ extern bool parsedfile;
 extern bool file_opened;
 extern bool modified_atoms;
 extern bool alter_original;
+extern bool preserve_timestamps;
 extern bool deep_atom_scan;
 extern bool cvs_build;
 extern bool force_existing_hierarchy;

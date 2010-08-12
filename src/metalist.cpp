@@ -87,7 +87,7 @@ void APar_fprintf_UTF8_data(const char* utf8_encoded_data) {
 		wchar_t* utf16_data = Convert_multibyteUTF8_to_wchar(utf8_encoded_data);
 		fflush(stdout);
 		
-		APar_unicode_win32Printout(utf16_data, utf8_encoded_data);
+		APar_unicode_win32Printout(utf16_data, (char *) utf8_encoded_data);
 		
 		fflush(stdout);
 		free(utf16_data);
@@ -228,6 +228,9 @@ void APar_ExtractAAC_Artwork(short this_atom_num, char* pic_output_path, short a
 	char *base_outpath=(char *)malloc(sizeof(char)*MAXPATHLEN+1);
 	memset(base_outpath, 0, MAXPATHLEN +1);
 	
+	if (strlen(pic_output_path) >= sizeof base_outpath)
+		return;  //catch buffer overrun
+
 	strcpy(base_outpath, pic_output_path);
 	strcat(base_outpath, "_artwork");
 	sprintf(base_outpath, "%s_%d", base_outpath, artwork_count);
@@ -443,7 +446,7 @@ void APar_ExtractDataAtom(int this_atom_number) {
 				
 				} else {
 						if (thisAtom->AtomicVerFlags == AtomFlags_Data_UInt && (thisAtom->AtomicLength <= 20 || thisAtom->AtomicLength == 24) ) {
-						uint8_t bytes_rep = thisAtom->AtomicLength-atom_header_size;
+						uint8_t bytes_rep = (uint8_t) (thisAtom->AtomicLength-atom_header_size);
 						
 						switch(bytes_rep) {
 							case 1 : {
@@ -459,7 +462,7 @@ void APar_ExtractDataAtom(int this_atom_number) {
 									if (returned_stik != NULL) {
 										fprintf(stdout, "%s\n", returned_stik->stik_string);
 									} else {
-										fprintf(stdout, "Unknown value: %hhu\n", (uint8_t)data_payload[0]);
+										fprintf(stdout, "Unknown value: %" PRIu8 "\n", (uint8_t)data_payload[0]);
 									}
 									
 								} else if (strncmp(parent_atom_name, "rtng", 4) == 0) { //okay, this is definitely an 8-bit number

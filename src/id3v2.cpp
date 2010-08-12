@@ -279,8 +279,8 @@ void WriteZlibData(char* buffer, uint32_t buff_len) {
 	if (test_file != NULL) {
 		
 		fwrite(buffer, (size_t)buff_len, 1, test_file);
+		fclose(test_file);
 	}
-	fclose(test_file);
 	free(indy_atom_path);
 	return;
 }
@@ -675,21 +675,21 @@ void APar_ScanID3Frame(ID3v2Frame* targetframe, char* frame_ptr, uint32_t frameL
 					//skip the required separator for multiple strings
 					if (textencoding == TE_LATIN1 || textencoding == TE_UTF8) {
 						offset_into_frame += 1;
-					} else if (textencoding == TE_UTF16LE_WITH_BOM || textencoding == TE_UTF16LE_WITH_BOM) {
+					} else if (textencoding == TE_UTF16LE_WITH_BOM) {
 						offset_into_frame += 2;
 					}
 					
 					//multiple id3v2.4 strings should be separated with a single NULL byte; some implementations might terminate the string AND use a NULL separator
 					if (textencoding == TE_LATIN1 || textencoding == TE_UTF8) {
 						if ((frame_ptr + offset_into_frame)[0] == 0) offset_into_frame+=1;
-					} else if (textencoding == TE_UTF16LE_WITH_BOM || textencoding == TE_UTF16LE_WITH_BOM) {
+					} else if (textencoding == TE_UTF16LE_WITH_BOM) {
 						if ((frame_ptr + offset_into_frame)[0] == 0 && (frame_ptr + offset_into_frame)[1] == 0) offset_into_frame+=2;
 					}
 					
 					//a 3rd NULL would not be good
 					if (textencoding == TE_LATIN1 || textencoding == TE_UTF8) {
 						if ((frame_ptr + offset_into_frame)[0] == 0) break;
-					} else if (textencoding == TE_UTF16LE_WITH_BOM || textencoding == TE_UTF16LE_WITH_BOM) {
+					} else if (textencoding == TE_UTF16LE_WITH_BOM) {
 						if ((frame_ptr + offset_into_frame)[0] == 0 && (frame_ptr + offset_into_frame)[1] == 0) break;
 					}
 					
@@ -2122,7 +2122,7 @@ void APar_ID3FrameAmmend(AtomicInfo* id32_atom, const char* frame_str, const cha
 			if (genre_idx != 0xFF) {
 				char genre_str_idx[2];
 				genre_str_idx[0] = 0; genre_str_idx[1] = 0; genre_str_idx[1] = 0;
-				sprintf(genre_str_idx, "%hhu", genre_idx);
+				sprintf(genre_str_idx, "%" PRIu8 "", genre_idx);
 				APar_FrameDataPut(targetFrame, genre_str_idx, adjunct_payloads, str_encoding);
 			} else {
 				APar_FrameDataPut(targetFrame, frame_payload, adjunct_payloads, str_encoding);
@@ -2164,7 +2164,7 @@ void APar_FreeID32Memory(ID3v2Tag* id32tag) {
 			ID3v2Fields* afield = aframe->ID3v2_Frame_Fields+id3fld;
 			ID3v2Fields* freefield = NULL;
 			while (true) {
-				if ( afield->field_string != NULL ) {
+				if ( afield != NULL && afield->field_string != NULL ) {
 					free( afield->field_string );
 					afield->field_string = NULL;
 				}
