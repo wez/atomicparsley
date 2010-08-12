@@ -150,7 +150,11 @@ uint8_t APar_uuid_scanf(char* in_formed_uuid, const char* raw_uuid_in) {
 	char *uuid_str, *end_uuid_str, *uuid_byte;
 	uint8_t uuid_pos, uuid_len;
 	uint8_t keeprap = 0;
+#if defined (_MSC_VER)
+	char *raw_uuid = _strdup(raw_uuid_in);
+#else
 	char *raw_uuid = strdup(raw_uuid_in);
+#endif
 
 	uuid_len = strlen(raw_uuid); //it will be like "55534d54-21d2-4fce-bb88-695cfac9c740"
 	uuid_str = raw_uuid;

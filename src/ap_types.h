@@ -1,6 +1,8 @@
 #ifndef AP_TYPES_H
 #define AP_TYPES_H
 
+
+
 // Atom version 1byte/ Atom flags 3 bytes; 0x00 00 00 00
 #define AtomFlags_Data_Binary 0
 

@@ -19,9 +19,13 @@
                                                                    */
 //==================================================================//
 
+#include "ap_types.h"
+
 #if defined (WIN32)
 //these #defines & structs are copied from the MS W2k DDK headers so the entire DDK isn't required to be installed to compile AP_CDTOC for MCDI support
+#ifndef DEVICE_TYPE
 #define DEVICE_TYPE ULONG
+#endif
 
 #define FILE_DEVICE_CD_ROM           0x00000002
 

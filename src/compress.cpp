@@ -44,6 +44,7 @@ APar_zlib_inflate
 void APar_zlib_inflate(char* in_buffer, uint32_t in_buf_len,
 	char* out_buffer, uint32_t out_buf_len)
 {
+#if defined HAVE_ZLIB_H
 	z_stream zlib;
 
 	memset(&zlib, 0, sizeof(zlib));
@@ -59,6 +60,8 @@ void APar_zlib_inflate(char* in_buffer, uint32_t in_buf_len,
 	inflateInit(&zlib);
 	inflate(&zlib, Z_PARTIAL_FLUSH);
 	inflateEnd(&zlib);
+#endif
+
 	return ;
 }
 
@@ -66,6 +69,8 @@ uint32_t APar_zlib_deflate(char* in_buffer, uint32_t in_buf_len,
 	char* out_buffer, uint32_t out_buf_len)
 {
 	uint32_t compressed_bytes = 0;
+
+#if defined HAVE_ZLIB_H
 	z_stream zlib;
 
 	memset(&zlib, 0, sizeof(zlib));
@@ -84,5 +89,6 @@ uint32_t APar_zlib_deflate(char* in_buffer, uint32_t in_buf_len,
 		compressed_bytes = zlib.total_out;
 		deflateEnd(&zlib);
 	}
+#endif
 	return compressed_bytes;
 }

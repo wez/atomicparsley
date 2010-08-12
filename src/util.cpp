@@ -170,7 +170,7 @@ uint8_t APar_read8(FILE* ISObasemediafile, uint64_t pos) {
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(&a_byte, 1, 1, ISObasemediafile);
 	if(size != 1) {
-		printf("%s read failed, expect 1, got %u: %s\n", __func__, (unsigned int)size, strerror(errno));
+		printf("%s read failed, expect 1, got %u: %s\n", __FUNCTION__, (unsigned int)size, strerror(errno));
 		exit(1);
 	}
 	return a_byte;
@@ -181,7 +181,7 @@ uint16_t APar_read16(char* buffer, FILE* ISObasemediafile, uint64_t pos) {
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(buffer, 1, 2, ISObasemediafile);
 	if(size != 2) {
-		printf("%s read failed, expect 2, got %u: %s\n", __func__, (unsigned int)size, strerror(errno));
+		printf("%s read failed, expect 2, got %u: %s\n", __FUNCTION__, (unsigned int)size, strerror(errno));
 		exit(1);
 	}
 	return UInt16FromBigEndian(buffer);
@@ -192,7 +192,7 @@ uint32_t APar_read32(char* buffer, FILE* ISObasemediafile, uint64_t pos) {
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(buffer, 1, 4, ISObasemediafile);
 	if(size != 4) {
-		printf("%s read failed, expect 4, got %u: %s\n", __func__, (unsigned int)size, strerror(errno));
+		printf("%s read failed, expect 4, got %u: %s\n", __FUNCTION__, (unsigned int)size, strerror(errno));
 		exit(1);
 	}
 	return UInt32FromBigEndian(buffer);
@@ -203,7 +203,7 @@ uint64_t APar_read64(char* buffer, FILE* ISObasemediafile, uint64_t pos) {
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(buffer, 1, 8, ISObasemediafile);
 	if(size != 8) {
-		printf("%s read failed, expect 8, got %u: %s\n", __func__, (unsigned int)size, strerror(errno));
+		printf("%s read failed, expect 8, got %u: %s\n", __FUNCTION__, (unsigned int)size, strerror(errno));
 		exit(1);
 	}
 	return UInt64FromBigEndian(buffer);
@@ -213,7 +213,7 @@ void APar_readX_noseek(char* buffer, FILE* ISObasemediafile, uint32_t length) {
 	size_t size;
 	size = fread(buffer, 1, length, ISObasemediafile);
 	if(size != length) {
-		printf("%s read failed, expect %u, got %u: %s\n", __func__, length, (unsigned int)size, strerror(errno));
+		printf("%s read failed, expect %u, got %u: %s\n", __FUNCTION__, length, (unsigned int)size, strerror(errno));
 		exit(1);
 	}
 	return;
@@ -224,7 +224,7 @@ void APar_readX(char* buffer, FILE* ISObasemediafile, uint64_t pos, uint32_t len
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(buffer, 1, length, ISObasemediafile);
 	if(size != length) {
-		printf("%s read failed, expect %u, got %u: %s\n", __func__, length, (unsigned int) size, strerror(errno));
+		printf("%s read failed, expect %u, got %u: %s\n", __FUNCTION__, length, (unsigned int) size, strerror(errno));
 		exit(1);
 	}
 	return;
@@ -262,7 +262,7 @@ uint32_t APar_FindValueInAtom(char* uint32_buffer, FILE* ISObasemediafile, short
 			break;
 		}
 	}
-	return current_pos;
+	return (uint32_t) current_pos;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -304,7 +304,7 @@ uint16_t PackLanguage(const char* language_code, uint8_t lang_offset) { //?? is 
 
 #if !defined(HAVE_LROUNDF)
 int lroundf(float a) {
-	return a/1;
+	return (int)(a/1);
 }
 #endif
 
@@ -401,7 +401,7 @@ char* APar_gmtime64(uint64_t total_secs, char* utc_time) {
 	//this will probably be off between Jan 1 & Feb 28 on a leap year by a day.... I'll somehow cope & deal.
 	struct tm timeinfo = {0,0,0,0,0};
 
-	int offset_year = total_secs / 31536000; //60 * 60 * 24 * 365 (ordinary year in seconds; doesn't account for leap year)
+	int offset_year = (int) (total_secs / 31536000); //60 * 60 * 24 * 365 (ordinary year in seconds; doesn't account for leap year)
 	int literal_year = 1904 + offset_year;
 	int literal_days_into_year = ((total_secs % 31536000) / 86400) - (offset_year / 4); //accounts for the leap year
 	
