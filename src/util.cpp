@@ -81,6 +81,7 @@ FILE* APar_OpenFile(const char* utf8_filepath, const char* file_flags) {
 		
 		aFile = _wfopen(utf16_filepath, Lfile_flags);
 		
+		free(Lfile_flags); Lfile_flags=NULL;
 		free(utf16_filepath);
 		utf16_filepath = NULL;
 #endif
@@ -534,6 +535,7 @@ unsigned char* Convert_multibyteUTF16_to_UTF8(char* input_utf16, size_t glyph_le
 }
 
 wchar_t* Convert_multibyteUTF8_to_wchar(const char* input_utf8) { //TODO: is this like mbstowcs?
+	wchar_t *return_val=NULL;
 	size_t string_length = strlen(input_utf8) + 1;  //account for terminating NULL
 	size_t char_glyphs = mbstowcs(NULL, input_utf8, string_length); //passing NULL pre-calculates the size of wchar_t needed
 			
@@ -541,7 +543,9 @@ wchar_t* Convert_multibyteUTF8_to_wchar(const char* input_utf8) { //TODO: is thi
 	memset(utf16_conversion, 0, string_length * 2 );
 			
 	int utf_16_glyphs = UTF8ToUTF16BE(utf16_conversion, char_glyphs * 2, (unsigned char*)input_utf8, string_length);
-	return Convert_multibyteUTF16_to_wchar((char*)utf16_conversion, (size_t)utf_16_glyphs, false );
+	return_val = Convert_multibyteUTF16_to_wchar((char*)utf16_conversion, (size_t)utf_16_glyphs, false );
+	free(utf16_conversion); utf16_conversion=NULL;
+	return (return_val);
 }
 
 //these flags from id3v2 2.4

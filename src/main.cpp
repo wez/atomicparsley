@@ -378,7 +378,7 @@ static const char* fileLevelHelp_text =
 "                                      If possible, padding will be used to update without a full rewrite.\n"
 "\n"
 #if defined (WIN32)
-"  --preserveTime                      Will overwrite the original file in place (--overWrite forcrd),\n"
+"  --preserveTime                      Will overwrite the original file in place (--overWrite forced),\n"
 "                                      but will also keep the original file's timestamps intact.\n"
 "\n"
 #endif
@@ -2859,6 +2859,7 @@ int real_main(int argc, char *argv[])
 
 int wmain( int argc, wchar_t *arguments[])
 {
+	int return_val=0;
 	uint16_t name_len = wcslen(arguments[0]);
 	if (wmemcmp(arguments[0] + (name_len-9), L"-utf8.exe", 9) == 0 ||
 			wmemcmp(arguments[0] + (name_len-9), L"-UTF8.exe", 9) == 0) {
@@ -2886,9 +2887,20 @@ int wmain( int argc, wchar_t *arguments[])
 			strip_bogusUTF16toRawUTF8((unsigned char*) argv[z], 8*wchar_length, arguments[z], wchar_length );
 		}
 	}
+
 	argv[argc] = NULL;
 
-	return real_main(argc, argv);
+	return_val = real_main(argc, argv);
+
+	for (int free_cnt=0; free_cnt<argc; free_cnt++) {
+		free(argv[free_cnt]);
+		argv[free_cnt]=NULL;
+	}
+
+	free(argv);
+	argv=NULL;
+
+	return return_val;
 }
 
 #else
