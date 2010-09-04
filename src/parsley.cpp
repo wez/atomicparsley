@@ -163,6 +163,10 @@ int APar_TestArtworkBinaryData(const char* artworkPath) {
 
 void APar_FreeMemory() {
 	for(int iter=0; iter < atom_number; iter++) {
+		if (parsedAtoms[iter].AtomicName != NULL) {
+				free(parsedAtoms[iter].AtomicName);
+				parsedAtoms[iter].AtomicName=NULL;
+			}
 		if (parsedAtoms[iter].AtomicData != NULL) {
 			free(parsedAtoms[iter].AtomicData);
 			parsedAtoms[iter].AtomicData = NULL;
