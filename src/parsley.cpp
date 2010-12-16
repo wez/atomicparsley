@@ -893,7 +893,9 @@ void APar_AtomizeFileInfo(uint64_t Astart, uint64_t Alength,
 	thisAtom->ancillary_data = 0;
 
 	//set the next atom number of the PREVIOUS atom (we didn't know there would be one until now); this is our default normal mode
-	parsedAtoms[atom_number-1].NextAtomNumber = atom_number;
+	if (atom_number > 0) {
+		parsedAtoms[atom_number-1].NextAtomNumber = atom_number;
+	}
 	thisAtom->NextAtomNumber=0; //this could be the end... (we just can't quite say until we find another atom)
 
 	if (strncmp(Astring, "mdat", 4) == 0) {
