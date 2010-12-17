@@ -70,6 +70,7 @@ AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([\
 fcntl.h \
 inttypes.h \
+io.h \
 getopt.h \
 linux/cdrom.h \
 math.h \
