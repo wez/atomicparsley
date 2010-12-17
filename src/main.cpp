@@ -327,7 +327,7 @@ static const char* longHelp_text =
 
 static const char* fileLevelHelp_text =
 "AtomicParsley help page for general & file level options.\n"
-#if defined (_MSC_VER)
+#if defined (_WIN32)
 "  Note: you can change the input/output behavior to raw 8-bit utf8 if the program name\n"
 "        is appended with \"-utf8\". AtomicParsley-utf8.exe will have problems with files/\n"
 "        folders with unicode characters in given paths.\n"
@@ -420,7 +420,7 @@ static const char* fileLevelHelp_text =
 "  rewrite of the original file. Another case where a full rewrite will occur is when the original file\n"
 "  is not optimized and has 'mdat' preceding 'moov'.\n"
 "\n"
-#if defined (_MSC_VER)
+#if defined (_WIN32)
 "Examples:\n"
 "   c:> SET AP_PADDING=\"DEFAULT_PAD=0\"      or    c:> SET AP_PADDING=\"DEFAULT_PAD=3128\"\n"
 "   c:> SET AP_PADDING=\"DEFAULT_PAD=5128:MIN_PAD=200:MAX_PAD=6049\"\n"
@@ -442,7 +442,7 @@ static const char* fileLevelHelp_text =
 " is to preserve it - if it is present at all. You can choose to eliminate it by setting the environ-\n"
 " mental preference for AP_PADDING to have DEFAULT_PAD=0\n"
 "\n"
-#if defined (_MSC_VER)
+#if defined (_WIN32)
 "Example:\n"
 "   c:> SET AP_PADDING=\"DEFAULT_PAD=0\"\n"
 #else
@@ -913,18 +913,20 @@ int real_main(int argc, char *argv[])
 			fprintf(stdout, "%s\n", shortHelp_text); exit(0);
 
 		} else if ( (strncmp(argv[1],"--longhelp", 10) == 0) || (strncmp(argv[1],"-longhelp", 9) == 0) || (strncmp(argv[1],"-Lh", 3) == 0) ) {
+#if defined (_WIN32)
 			if (UnicodeOutputStatus == WIN32_UTF16) { //convert the helptext to utf16 to preserve © characters
 				int help_len = strlen(longHelp_text)+1;
 				wchar_t* Lhelp_text = (wchar_t *)malloc(sizeof(wchar_t)*help_len);
 				wmemset(Lhelp_text, 0, help_len);
 				UTF8ToUTF16LE((unsigned char*)Lhelp_text, 2*help_len, (unsigned char*)longHelp_text, help_len);
-#if defined (_MSC_VER)
 				APar_unicode_win32Printout(Lhelp_text, (char *) longHelp_text);
-#endif
 				free(Lhelp_text);
 			} else {
+#endif
 				fprintf(stdout, "%s", longHelp_text);
+#if defined (_WIN32)
 			}
+#endif
 			exit(0);
 
 		} else if ( (strncmp(argv[1],"--3gp-help", 10) == 0) || (strncmp(argv[1],"-3gp-help", 9) == 0) || (strncmp(argv[1],"--3gp-h", 7) == 0) ) {
@@ -2855,7 +2857,7 @@ int real_main(int argc, char *argv[])
 	return 0;
 }
 
-#if defined (_MSC_VER)
+#if defined (_WIN32)
 
 int wmain( int argc, wchar_t *arguments[])
 {
@@ -2902,6 +2904,17 @@ int wmain( int argc, wchar_t *arguments[])
 
 	return return_val;
 }
+
+#ifdef __MINGW32__
+
+int main()
+{
+	int argc;
+	wchar_t **argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+	return wmain(argc, argv);
+}
+
+#endif
 
 #else
 
