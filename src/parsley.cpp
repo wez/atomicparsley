@@ -4942,12 +4942,11 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 
 			free(utf16_filepath);
 			utf16_filepath = NULL;
-		} else {
+		} else
 #endif
+		{
 			remove(ISObasemediafile);
-#if defined (_WIN32)
 		}
-#endif
 
 		int err = 0;
 
@@ -4975,12 +4974,11 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 			free(temp_utf16_filepath);
 			utf16_filepath = NULL;
 			temp_utf16_filepath = NULL;
-		} else {
+		} else
 #endif
+		{
 			err = rename(temp_file_name, originating_file);
-#if defined (_WIN32)
 		}
-#endif
 
 		if (err != 0) {
 			switch (errno) {
