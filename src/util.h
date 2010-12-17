@@ -46,6 +46,7 @@ void TestFileExistence(const char *filePath, bool errorOut);
 
 #if defined (_WIN32)
 int fseeko(FILE *stream, uint64_t pos, int whence);
+HANDLE APar_OpenFileWin32(const char* utf8_filepath, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
 #endif
 bool IsUnicodeWinOS();
 
