@@ -374,7 +374,7 @@ void ListID3FrameIDstrings() {
 "  AudioCD ID frame :           disk(num)\n"
 #elif defined (HAVE_LINUX_CDROM_H)
 "  AudioCD ID frame :           (/path)\n"
-#elif defined (WIN32)
+#elif defined (_WIN32)
 "  AudioCD ID frame :           (num)\n"
 #endif
 "  described text frame :       (str) [desc=(str)] [encoding]\n"
@@ -1699,7 +1699,7 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 			thisFrame->ID3v2_Frame_Length += APar_TextFieldDataPut(thisFrame->ID3v2_Frame_Fields+1, adjunct_payload->mimeArg, TE_LATIN1); //mimetype
 			if (memcmp(adjunct_payload->filenameArg, "FILENAMESTAMP", 13) == 0) {
 				const char* derived_filename = NULL;
-#if defined (WIN32)
+#if defined (_WIN32)
 				derived_filename = strrchr(frame_payload, '\\');
 #else
 				derived_filename = strrchr(frame_payload, '/');

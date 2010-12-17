@@ -70,7 +70,7 @@ CD_TOC_* cdTOC = NULL;
 	uint8_t LEADOUT_TRACK_NUMBER = MACOSX_LEADOUT_TRACK;
 #elif defined (HAVE_LINUX_CDROM_H)
 	uint8_t LEADOUT_TRACK_NUMBER = CDROM_LEADOUT;
-#elif defined (WIN32)
+#elif defined (_WIN32)
 	uint8_t LEADOUT_TRACK_NUMBER = 0xAA; //NOTE: for WinXP IOCTL_CDROM_READ_TOC_EX code, its 0xA2
 #endif
 
@@ -428,7 +428,7 @@ uint16_t OSX_ProbeTargetDrive(const char* id3args_drive, char* mcdi_data) {
 
 #endif
 
-#if defined (WIN32)
+#if defined (_WIN32)
 void Windows_ioctlReadCDTOC(HANDLE cdrom_device) {
 	DWORD bytes_returned;
 	CDROM_TOC win_cdrom_toc;
@@ -516,7 +516,7 @@ uint16_t GenerateMCDIfromCD(const char* drive, char* dest_buffer) {
 	mcdi_bytes = OSX_ProbeTargetDrive(drive, dest_buffer);
 #elif defined (HAVE_LINUX_CDROM_H)
 	mcdi_bytes = Linux_ioctlProbeTargetDrive(drive, dest_buffer);
-#elif defined (WIN32)
+#elif defined (_WIN32)
 	mcdi_bytes = Windows_ioctlProbeTargetDrive(drive, dest_buffer);
 #endif
 	return mcdi_bytes;

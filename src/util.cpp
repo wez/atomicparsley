@@ -51,14 +51,13 @@ off_t findFileSize(const char *utf8_filepath) {
 		free(utf16_filepath);
 		utf16_filepath = NULL;
 		return fileStats.st_size;
-	} else {
+	} else
 #endif
+	{
 		struct stat fileStats;
 		stat(utf8_filepath, &fileStats);
 		return fileStats.st_size;
-#if defined (_WIN32)
 	}
-#endif
 	return 0; //won't ever get here.... unless this is win32, set to utf8 and the folder/file had unicode.... TODO (? use isUTF8() for high ascii?)
 }
 
@@ -86,12 +85,11 @@ FILE* APar_OpenFile(const char* utf8_filepath, const char* file_flags) {
 		free(Lfile_flags); Lfile_flags=NULL;
 		free(utf16_filepath);
 		utf16_filepath = NULL;
-	} else {
+	} else
 #endif
+	{
 		aFile = fopen(utf8_filepath, file_flags);
-#if defined (_WIN32)
 	}
-#endif
 	
 	if (!aFile) {
 		fprintf(stdout, "AP error trying to fopen %s: %s\n", utf8_filepath, strerror(errno));
@@ -492,7 +490,7 @@ char* APar_extract_UTC(uint64_t total_secs) {
 }
 
 uint32_t APar_get_mpeg4_time() {
-#if defined(WIN32)
+#if defined (_WIN32)
 	FILETIME  file_time;
 	uint64_t wintime = 0;
 	GetSystemTimeAsFileTime (&file_time);

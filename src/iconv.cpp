@@ -815,7 +815,7 @@ unsigned int utf8_length(const char *in_string, unsigned int char_limit) {
 	return utf8_string_length;
 }
 
-#if defined (WIN32)
+#if defined (_WIN32)
 unsigned char APar_Return_rawutf8_CP(unsigned short cp_bound_glyph) {
 	unsigned short total_known_points = 0;
 	unsigned int win32cp = GetConsoleCP();

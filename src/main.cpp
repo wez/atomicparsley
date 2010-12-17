@@ -95,7 +95,7 @@
 
 #define OPT_OverWrite            'W'
 
-#if defined (WIN32)
+#if defined (_WIN32)
 #define OPT_PreserveTimeStamps	 0xCA
 #endif
 
@@ -377,7 +377,7 @@ static const char* fileLevelHelp_text =
 "  --overWrite        ,  -W            Writes to temp file; deletes original, renames temp to original\n"
 "                                      If possible, padding will be used to update without a full rewrite.\n"
 "\n"
-#if defined (WIN32)
+#if defined (_WIN32)
 "  --preserveTime                      Will overwrite the original file in place (--overWrite forced),\n"
 "                                      but will also keep the original file's timestamps intact.\n"
 "\n"
@@ -743,7 +743,7 @@ static const char* ID3Help_text =
 " --ID3Tag MCDI /dev/hdc\n"
 "       Information to create this frame is taken directly off an Audio CD's TOC. An Audio CD\n"
 "       must be mounted & present.\n"
-#elif defined (WIN32)
+#elif defined (_WIN32)
 " Setting MCDI (Music CD Identifier):\n"
 " --ID3Tag MCDI D\n"
 "       Information to create this frame is taken directly off an Audio CD's TOC. The letter after\n"
@@ -921,12 +921,11 @@ int real_main(int argc, char *argv[])
 				UTF8ToUTF16LE((unsigned char*)Lhelp_text, 2*help_len, (unsigned char*)longHelp_text, help_len);
 				APar_unicode_win32Printout(Lhelp_text, (char *) longHelp_text);
 				free(Lhelp_text);
-			} else {
+			} else
 #endif
+			{
 				fprintf(stdout, "%s", longHelp_text);
-#if defined (_WIN32)
 			}
-#endif
 			exit(0);
 
 		} else if ( (strncmp(argv[1],"--3gp-help", 10) == 0) || (strncmp(argv[1],"-3gp-help", 9) == 0) || (strncmp(argv[1],"--3gp-h", 7) == 0) ) {
@@ -1062,7 +1061,7 @@ int real_main(int argc, char *argv[])
 		{ "output",           required_argument,  NULL,						OPT_OutputFile },
 		{ "preventOptimizing",0,                  NULL,						OPT_NoOptimize },
 		{ "overWrite",        0,                  NULL,						OPT_OverWrite },
-#if defined (WIN32)
+#if defined (_WIN32)
 		{ "preserveTime",        0,                  NULL,					OPT_PreserveTimeStamps },
 #endif
 		{ "ISO-copyright",    required_argument,  NULL,						ISO_Copyright },
@@ -1827,8 +1826,8 @@ int real_main(int argc, char *argv[])
 						//get the file extension/suffix of the file to embed
 						uuid_file_extn = strrchr(uuid_file_path, '.'); //'.' inclusive; say goodbye to AP-0.8.8.tar.bz2
 
-//#ifdef WIN32
-//#define path_delim '\'
+//#ifdef _WIN32
+//#define path_delim '\\'
 //#else
 //#define path_delim '/'
 //#endif
@@ -2768,7 +2767,7 @@ int real_main(int argc, char *argv[])
 			break;
 		}
 
-#if defined (WIN32)
+#if defined (_WIN32)
 		case OPT_PreserveTimeStamps : {
 			alter_original = true;
 			preserve_timestamps = true;
@@ -2804,7 +2803,7 @@ int real_main(int argc, char *argv[])
 
 	if (modified_atoms) {
 
-#if defined (WIN32)
+#if defined (_WIN32)
 			HANDLE hFile, hFileOut;
 			FILETIME createTime, accessTime, writeTime;
 			if (preserve_timestamps == true)
@@ -2826,7 +2825,7 @@ int real_main(int argc, char *argv[])
 		APar_OpenISOBaseMediaFile(ISObasemediafile, true);
 		APar_WriteFile(ISObasemediafile, output_file, alter_original);
 
-#if defined (WIN32)
+#if defined (_WIN32)
 			if (preserve_timestamps == true)
 			{
 
