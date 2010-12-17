@@ -22,9 +22,11 @@
                                                                    */
 //==================================================================//
 
-#if defined (_MSC_VER)
+#ifdef _WIN32
 #define _UNICODE
+#if defined (_MSC_VER)
 #define strncasecmp _strnicmp
+#endif
 #endif
 
 #include "config.h"

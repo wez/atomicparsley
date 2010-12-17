@@ -102,7 +102,7 @@ uint8_t forced_suffix_type = NO_TYPE_FORCING;
 
 void ShowVersionInfo() {
 
-#if defined (_MSC_VER)
+#if defined (_WIN32)
 	char unicode_enabled[12];
 	memset(unicode_enabled, 0, 12);
 	if (UnicodeOutputStatus == WIN32_UTF16) {
@@ -4126,7 +4126,7 @@ void APar_ValidateAtoms() {
 		if (parsedAtoms[iter].AtomicLength > file_size && file_size > 300000) {
 			if (parsedAtoms[iter].AtomicData == NULL) {
 				fprintf(stderr, "AtomicParsley error: an atom was detected that presents as larger than filesize. Aborting. %c\n", '\a');
-#if defined (_MSC_VER) /* apparently, long long is forbidden there*/
+#if defined (_WIN32) /* apparently, long long is forbidden there*/
 				fprintf(stderr, "atom %s is %I64u\n bytes long which is greater than the filesize of %I64u\n", parsedAtoms[iter].AtomicName, parsedAtoms[iter].AtomicLength, file_size);
 #else
 				fprintf(stderr, "atom %s is %" PRIu64 " bytes long which is greater than the filesize of %" PRIu64 "\n", parsedAtoms[iter].AtomicName, parsedAtoms[iter].AtomicLength, file_size);
@@ -4230,7 +4230,7 @@ void APar_DeriveNewPath(const char *filePath, char* temp_path, int output_type, 
 		memcpy(temp_path + base_len, file_kind, strlen(file_kind));
 
 	} else if (output_type == -1) { //make the output file invisible by prefacing the filename with '.'
-#if defined (_MSC_VER)
+#if defined (_WIN32)
 		memcpy(temp_path, filePath, base_len);
 		memcpy(temp_path + base_len, file_kind, strlen(file_kind));
 #else
@@ -4360,7 +4360,7 @@ void APar_MergeTempFile(FILE* dest_file, FILE *src_file, uint64_t src_file_size,
 			APar_readX(buffer, src_file, file_pos, max_buffer);
 
 			//fseek(dest_file, dest_position + file_pos, SEEK_SET);
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 			fpos_t file_offset = dest_position + file_pos;
 #elif defined(__GLIBC__)
       fpos_t file_offset = {0};
@@ -4375,7 +4375,7 @@ void APar_MergeTempFile(FILE* dest_file, FILE *src_file, uint64_t src_file_size,
 		} else {
 			APar_readX(buffer, src_file, file_pos, src_file_size - file_pos);
 			//fprintf(stdout, "buff starts with %s\n", buffer+4);
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 			fpos_t file_offset = dest_position + file_pos;
 #elif defined(__GLIBC__)
       fpos_t file_offset = {0};
@@ -4390,7 +4390,7 @@ void APar_MergeTempFile(FILE* dest_file, FILE *src_file, uint64_t src_file_size,
 		}
 	}
 	if (dynUpd.optimization_flags & MEDIADATA__PRECEDES__MOOV) {
-#if defined (_MSC_VER)
+#if defined (_WIN32)
 		fflush(dest_file);
 		SetEndOfFile((HANDLE)_get_osfhandle(_fileno(dest_file)));
 #else
@@ -4774,7 +4774,7 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 	if (dynUpd.updage_by_padding) {
 		APar_DeriveNewPath(ISObasemediafile, temp_file_name, 0, "-data-", NULL); //APar_DeriveNewPath(ISObasemediafile, temp_file_name, -1, "-data-", NULL);
 		temp_file = APar_OpenFile(temp_file_name, "wb");
-#if defined (_MSC_VER)
+#if defined (_WIN32)
 		char* invisi_command=(char*)malloc(sizeof(char)*2*MAXPATHLEN);
 		sprintf (invisi_command,"ATTRIB +S +H \"%s\"",temp_file_name);
 
@@ -4934,18 +4934,20 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 	} else if (rewrite_original && !outfile) { //disable overWrite when writing out to a specifically named file; presumably the enumerated output file was meant to be the final destination
 		fclose(source_file);
 
+#if defined (_WIN32) /* native Windows requires removing the file first; rename() on POSIX does the removing automatically as needed */
 		if ( IsUnicodeWinOS() && UnicodeOutputStatus == WIN32_UTF16) {
-#if defined (_MSC_VER) /* native windows seems to require removing the file first; rename() on Mac OS X does the removing automatically as needed */
 			wchar_t* utf16_filepath = Convert_multibyteUTF8_to_wchar(ISObasemediafile);
 
 			_wremove(utf16_filepath);
 
 			free(utf16_filepath);
 			utf16_filepath = NULL;
-#endif
 		} else {
+#endif
 			remove(ISObasemediafile);
+#if defined (_WIN32)
 		}
+#endif
 
 		int err = 0;
 
@@ -4962,8 +4964,8 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 			originating_file = (char*)ISObasemediafile;
 		}
 
+#if defined (_WIN32)
 		if ( IsUnicodeWinOS() && UnicodeOutputStatus == WIN32_UTF16) {
-#if defined (_MSC_VER)
 			wchar_t* utf16_filepath = Convert_multibyteUTF8_to_wchar(originating_file);
 			wchar_t* temp_utf16_filepath = Convert_multibyteUTF8_to_wchar(temp_file_name);
 
@@ -4973,10 +4975,12 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 			free(temp_utf16_filepath);
 			utf16_filepath = NULL;
 			temp_utf16_filepath = NULL;
-#endif
 		} else {
+#endif
 			err = rename(temp_file_name, originating_file);
+#if defined (_WIN32)
 		}
+#endif
 
 		if (err != 0) {
 			switch (errno) {

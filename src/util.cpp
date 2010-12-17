@@ -41,8 +41,8 @@ findFileSize
 		(native-endian) filepath & pass that to a wide stat. Or stat it with a utf8 filepath on Unixen & win32 (stripped utf8).
 ----------------------*/
 off_t findFileSize(const char *utf8_filepath) {
+#if defined (_WIN32)
 	if ( IsUnicodeWinOS() && UnicodeOutputStatus == WIN32_UTF16) {
-#if defined (_MSC_VER)
 		wchar_t* utf16_filepath = Convert_multibyteUTF8_to_wchar(utf8_filepath);
 		
 		struct _stat fileStats;
@@ -51,12 +51,14 @@ off_t findFileSize(const char *utf8_filepath) {
 		free(utf16_filepath);
 		utf16_filepath = NULL;
 		return fileStats.st_size;
-#endif
 	} else {
+#endif
 		struct stat fileStats;
 		stat(utf8_filepath, &fileStats);
 		return fileStats.st_size;
+#if defined (_WIN32)
 	}
+#endif
 	return 0; //won't ever get here.... unless this is win32, set to utf8 and the folder/file had unicode.... TODO (? use isUTF8() for high ascii?)
 }
 
@@ -71,8 +73,8 @@ APar_OpenFile
 ----------------------*/
 FILE* APar_OpenFile(const char* utf8_filepath, const char* file_flags) {
 	FILE* aFile = NULL;
+#if defined (_WIN32)
 	if ( IsUnicodeWinOS() && UnicodeOutputStatus == WIN32_UTF16) {
-#if defined (_MSC_VER)
 		wchar_t* Lfile_flags = (wchar_t *)malloc(sizeof(wchar_t)*4);
 		memset(Lfile_flags, 0, sizeof(wchar_t)*4);
 		mbstowcs(Lfile_flags, file_flags, strlen(file_flags) );
@@ -84,10 +86,12 @@ FILE* APar_OpenFile(const char* utf8_filepath, const char* file_flags) {
 		free(Lfile_flags); Lfile_flags=NULL;
 		free(utf16_filepath);
 		utf16_filepath = NULL;
-#endif
 	} else {
+#endif
 		aFile = fopen(utf8_filepath, file_flags);
+#if defined (_WIN32)
 	}
+#endif
 	
 	if (!aFile) {
 		fprintf(stdout, "AP error trying to fopen %s: %s\n", utf8_filepath, strerror(errno));
@@ -131,7 +135,7 @@ void TestFileExistence(const char *filePath, bool errorOut) {
 }
 
 
-#if defined (_MSC_VER)
+#if defined (_WIN32)
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //                                Win32 functions                                    //
@@ -151,7 +155,7 @@ int fseeko(FILE *stream, uint64_t pos, int whence) { //only using SEEK_SET here
 
 // http://www.flipcode.com/articles/article_advstrings01.shtml
 bool IsUnicodeWinOS() {
-#if defined (_MSC_VER)
+#if defined (_WIN32)
   OSVERSIONINFOW		os;
   memset(&os, 0, sizeof(OSVERSIONINFOW));
   os.dwOSVersionInfoSize = sizeof(OSVERSIONINFOW);

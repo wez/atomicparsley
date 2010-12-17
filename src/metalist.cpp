@@ -48,7 +48,7 @@ uint32_t APar_ProvideTallyForAtom(const char* atom_name) {
 void printBOM() {
 	if (BOM_printed) return;
 	
-#if defined (_MSC_VER)
+#if defined (_WIN32)
 	if (UnicodeOutputStatus == WIN32_UTF16) {
 		APar_unicode_win32Printout(L"\xEF\xBB\xBF", "\xEF\xBB\xBF");
 	}
@@ -60,7 +60,7 @@ void printBOM() {
 	return;
 }
 
-#if defined (_MSC_VER)
+#if defined (_WIN32)
 void APar_unicode_win32Printout(wchar_t* unicode_out, char* utf8_out) { //based on http://blogs.msdn.com/junfeng/archive/2004/02/25/79621.aspx
 	//its possible that this isn't even available on windows95
 	DWORD dwBytesWritten;
@@ -80,7 +80,7 @@ void APar_unicode_win32Printout(wchar_t* unicode_out, char* utf8_out) { //based 
 #endif
 
 void APar_fprintf_UTF8_data(const char* utf8_encoded_data) {
-#if defined (_MSC_VER)
+#if defined (_WIN32)
 	if (GetVersion() & 0x80000000 || UnicodeOutputStatus == UNIVERSAL_UTF8) {
 		fprintf(stdout, "%s", utf8_encoded_data); //just printout the raw utf8 bytes (not characters) under pre-NT windows
 	} else {
@@ -122,7 +122,7 @@ void APar_SimplePrintUnicodeAssest(char* unicode_string, int asset_length, bool 
 		}
 		unsigned char* utf8_data = Convert_multibyteUTF16_to_UTF8(unicode_string, asset_length * 6, asset_length);
 
-#if defined (_MSC_VER)
+#if defined (_WIN32)
 		if (GetVersion() & 0x80000000 || UnicodeOutputStatus == UNIVERSAL_UTF8) { //pre-NT or AP-utf8.exe (pish, thats my win98se, and without unicows support convert utf16toutf8 and output raw bytes)
 			unsigned char* utf8_data = Convert_multibyteUTF16_to_UTF8(unicode_string, asset_length * 6, asset_length-14);
 			fprintf(stdout, "%s", utf8_data);
@@ -722,7 +722,7 @@ void APar_PrintUnicodeAssest(char* unicode_string, int asset_length) { //3gp fil
 		
 		unsigned char* utf8_data = Convert_multibyteUTF16_to_UTF8(unicode_string, (asset_length-13) * 6, asset_length-14);
 
-#if defined (_MSC_VER)
+#if defined (_WIN32)
 		if (GetVersion() & 0x80000000 || UnicodeOutputStatus == UNIVERSAL_UTF8) { //pre-NT or AP-utf8.exe (pish, thats my win98se, and without unicows support convert utf16toutf8 and output raw bytes)
 			unsigned char* utf8_data = Convert_multibyteUTF16_to_UTF8(unicode_string, (asset_length -13) * 6, asset_length-14);
 			fprintf(stdout, "%s", utf8_data);
