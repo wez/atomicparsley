@@ -23,9 +23,13 @@
 //==================================================================//
 
 #ifdef _WIN32
+#ifndef _UNICODE
 #define _UNICODE
+#endif
 #if defined (_MSC_VER)
 #define strncasecmp _strnicmp
+#define _CRT_SECURE_NO_WARNINGS
+#pragma warning(disable: 4244) // int64_t assignments to int32_t etc.
 #endif
 #endif
 
