@@ -2809,7 +2809,7 @@ int real_main(int argc, char *argv[])
 			FILETIME createTime, accessTime, writeTime;
 			if (preserve_timestamps == true)
 			{
-				hFile = CreateFile(ISObasemediafile, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
+				hFile = CreateFileA(ISObasemediafile, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
 				if (hFile != INVALID_HANDLE_VALUE)
 					{
 					GetFileTime(hFile,&createTime,&accessTime,&writeTime);
@@ -2830,7 +2830,7 @@ int real_main(int argc, char *argv[])
 			if (preserve_timestamps == true)
 			{
 
-				hFileOut = CreateFile(ISObasemediafile, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
+				hFileOut = CreateFileA(ISObasemediafile, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
 
 				if (hFileOut != INVALID_HANDLE_VALUE)
 					{

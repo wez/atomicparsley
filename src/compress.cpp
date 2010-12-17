@@ -20,7 +20,9 @@
 //==================================================================//
 
 #include "AtomicParsley.h"
+#ifdef HAVE_ZLIB_H
 #include <zlib.h>
+#endif
 
 static void* zalloc(void *opaque, unsigned int items, unsigned int size)
 {
