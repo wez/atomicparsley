@@ -150,6 +150,28 @@ int fseeko(FILE *stream, uint64_t pos, int whence) { //only using SEEK_SET here
 	}
 	return -1;
 }
+
+/*----------------------
+APar_OpenFileWin32
+	utf8_filepath - a pointer to a string (possibly utf8) of the full path to the file
+	... - passed on to the CreateFile function
+
+	take an ascii/utf8 filepath (which if under a unicode enabled Win32 OS was already converted from utf16le to utf8 at program start) and test if
+		AP is running on a unicode enabled Win32 OS. If it is, convert the utf8 filepath to a utf16 (native-endian) filepath & pass that to a wide CreateFile
+		with the 8-bit file flags changed to 16-bit file flags, otherwise pass the utf8 filepath to an ANSI CreateFile
+----------------------*/
+HANDLE APar_OpenFileWin32(const char* utf8_filepath, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile) {
+	if ( IsUnicodeWinOS() && UnicodeOutputStatus == WIN32_UTF16) {
+		HANDLE hFile = NULL;
+		wchar_t* utf16_filepath = Convert_multibyteUTF8_to_wchar(utf8_filepath);
+		hFile = CreateFileW(utf16_filepath, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+		free(utf16_filepath);
+		return hFile;
+	} else {
+		return CreateFileA(utf8_filepath, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+	}
+}
+
 #endif
 
 

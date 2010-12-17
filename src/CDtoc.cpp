@@ -490,7 +490,7 @@ uint16_t Windows_ioctlProbeTargetDrive(const char* id3args_drive, char* mcdi_dat
 	memset(cd_device_path, 0, 16);
 	sprintf(cd_device_path, "\\\\.\\%s:", id3args_drive);
 	
-	HANDLE cdrom_device = CreateFileA(cd_device_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE cdrom_device = APar_OpenFileWin32(cd_device_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (cdrom_device != INVALID_HANDLE_VALUE) {
 		Windows_ioctlReadCDTOC(cdrom_device);
 		if (cdTOC != NULL) {
