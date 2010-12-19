@@ -766,15 +766,15 @@ void ExtractPaddingPrefs(char* env_padding_prefs) {
 
 		if (env_pad_prefs_ptr == NULL) break;
 
-		if (memcmp(env_pad_prefs_ptr, "DEFAULT_PAD=", 12) == 0) {
+		if (strncmp(env_pad_prefs_ptr, "DEFAULT_PAD=", 12) == 0) {
 			strsep(&env_pad_prefs_ptr,"=");
 			sscanf(env_pad_prefs_ptr, "%u", &pad_prefs.default_padding_size);
 		}
-		if (memcmp(env_pad_prefs_ptr, "MIN_PAD=", 8) == 0) {
+		if (strncmp(env_pad_prefs_ptr, "MIN_PAD=", 8) == 0) {
 			strsep(&env_pad_prefs_ptr,"=");
 			sscanf(env_pad_prefs_ptr, "%u", &pad_prefs.minimum_required_padding_size);
 		}
-		if (memcmp(env_pad_prefs_ptr, "MAX_PAD=", 8) == 0) {
+		if (strncmp(env_pad_prefs_ptr, "MAX_PAD=", 8) == 0) {
 			strsep(&env_pad_prefs_ptr,"=");
 			sscanf(env_pad_prefs_ptr, "%u", &pad_prefs.maximum_present_padding_size);
 		}
@@ -788,7 +788,7 @@ void GetBasePath(const char *filepath, char* &basepath) {
 	int split_here = 0;
 	for (int i=strlen(filepath); i >= 0; i--) {
 		const char* this_char=&filepath[i];
-		if ( strncmp(this_char, ".", 1) == 0 ) {
+		if ( *this_char == '.' ) {
 			split_here = i;
 			break;
 		}
@@ -804,26 +804,26 @@ void find_optional_args(char *argv[], int start_optindargs, uint16_t &packed_lan
 
 	for (int i= 0; i <= max_optargs-1; i++) {
 		if ( argv[start_optindargs + i] && start_optindargs + i <= total_args ) {
-			if ( memcmp(argv[start_optindargs + i], "lang=", 5) == 0 ) {
+			if ( strncmp(argv[start_optindargs + i], "lang=", 5) == 0 ) {
 				if (!MatchLanguageCode(argv[start_optindargs +i]+5) ) {
 					packed_lang = PackLanguage("und", 0);
 				} else {
 					packed_lang = PackLanguage(argv[start_optindargs +i], 5);
 				}
 
-			} else if ( memcmp(argv[start_optindargs + i], "UTF16", 5) == 0 ) {
+			} else if ( strcmp(argv[start_optindargs + i], "UTF16") == 0 ) {
 				asUTF16 = true;
-			} else if ( memcmp(argv[optind + i], "movie", 6) == 0 ) {
+			} else if ( strcmp(argv[optind + i], "movie") == 0 ) {
 				udta_container = MOVIE_LEVEL_ATOM;
-			} else if ( memcmp(argv[optind + i], "track=", 6) == 0 ) {
+			} else if ( strncmp(argv[optind + i], "track=", 6) == 0 ) {
 				char* track_index_str = argv[optind + i];
 				strsep(&track_index_str, "=");
 				sscanf(track_index_str, "%" PRIu8 "", &trk_idx);
 				udta_container = SINGLE_TRACK_ATOM;
-			} else if ( memcmp(argv[optind + i], "track", 6) == 0 ) {
+			} else if ( strcmp(argv[optind + i], "track") == 0 ) {
 				udta_container = ALL_TRACKS_ATOM;
 			}
-			if (memcmp(argv[start_optindargs + i], "-", 1) == 0) {
+			if (*argv[start_optindargs + i] == '-') {
 				break; //we've hit another cli argument
 			}
 		}
@@ -838,7 +838,7 @@ void scan_ID3_optargs(char *argv[], int start_optargs, const char* &target_lang,
 	while (argv[start_optargs + i] != NULL) {
 		if ( argv[start_optargs + i] && start_optargs + i <= total_args ) {
 
-			if ( memcmp(argv[start_optargs + i], "lang=", 5) == 0 ) {
+			if ( strncmp(argv[start_optargs + i], "lang=", 5) == 0 ) {
 				if (!MatchLanguageCode(argv[start_optargs +i]+5) ) {
 					packed_lang = PackLanguage("und", 0);
 					target_lang = "und";
@@ -847,23 +847,23 @@ void scan_ID3_optargs(char *argv[], int start_optargs, const char* &target_lang,
 					target_lang = argv[start_optargs + i] + 5;
 				}
 
-			} else if ( memcmp(argv[start_optargs + i], "UTF16LE", 8) == 0 ) {
+			} else if ( strcmp(argv[start_optargs + i], "UTF16LE") == 0 ) {
 				char_encoding = TE_UTF16LE_WITH_BOM;
-			} else if ( memcmp(argv[start_optargs + i], "UTF16BE", 8) == 0 ) {
+			} else if ( strcmp(argv[start_optargs + i], "UTF16BE") == 0 ) {
 				char_encoding = TE_UTF16BE_NO_BOM;
-			} else if ( memcmp(argv[start_optargs + i], "LATIN1", 7) == 0 ) {
+			} else if ( strcmp(argv[start_optargs + i], "LATIN1") == 0 ) {
 				char_encoding = TE_LATIN1;
 
-			} else if ( memcmp(argv[optind + i], "root", 5) == 0 ) {
+			} else if ( strcmp(argv[optind + i], "root") == 0 ) {
 				*meta_container = 0-FILE_LEVEL_ATOM;
-			} else if ( memcmp(argv[optind + i], "track=", 6) == 0 ) {
+			} else if ( strncmp(argv[optind + i], "track=", 6) == 0 ) {
 				char* track_index_str = argv[optind + i];
 				strsep(&track_index_str, "=");
 				sscanf(track_index_str, "%hhu", meta_container);
 			}
 		}
 
-		if (memcmp(argv[start_optargs + i], "-", 1) == 0) {
+		if (*argv[start_optargs + i] == '-') {
 			break; //we've hit another cli argument or deleting some frame
 		}
 		i++;
@@ -878,18 +878,18 @@ const char* find_ID3_optarg(char *argv[], int start_optargs, const char* arg_str
 
 	while (argv[start_optargs + i] != NULL) {
 		if ( argv[start_optargs + i] && start_optargs + i <= total_args ) {
-			if (memcmp(arg_string, "compressed", 11) == 0 && memcmp(argv[start_optargs + i], "compressed", 11) == 0) {
+			if (strcmp(arg_string, "compressed") == 0 && strcmp(argv[start_optargs + i], "compressed") == 0) {
 				return "1";
 			}
-			//if (memcmp(arg_string, "text++", 7) == 0 && memcmp(argv[start_optargs + i], "text++", 7) == 0) {
+			//if (strcmp(arg_string, "text++") == 0 && strcmp(argv[start_optargs + i], "text++") == 0) {
 			//	return "1";
 			//}
-			if (memcmp(argv[start_optargs + i], arg_string, arg_prefix_len) == 0) {
+			if (strncmp(argv[start_optargs + i], arg_string, arg_prefix_len) == 0) {
 				ret_val = argv[start_optargs + i] + arg_prefix_len;
 				break;
 			}
 		}
-		if (memcmp(argv[start_optargs + i], "-", 1) == 0) {
+		if (*argv[start_optargs + i] == '-') {
 			break; //we've hit another cli argument or deleting some frame
 		}
 		i++;
@@ -903,16 +903,16 @@ int real_main(int argc, char *argv[])
 {
 	if (argc == 1) {
 		fprintf (stdout,"%s\n", shortHelp_text); exit(0);
-	} else if (argc == 2 && ((strncmp(argv[1],"-v",2) == 0) || (strncmp(argv[1],"-version",2) == 0)) ) {
+	} else if (argc == 2 && ((strcmp(argv[1],"-v") == 0) || (strcmp(argv[1],"-version") == 0) || (strcmp(argv[1],"--version") == 0)) ) {
 
 		ShowVersionInfo();
 		exit(0);
 
 	} else if (argc == 2) {
-		if ( (strncmp(argv[1],"-help",5) == 0) || (strncmp(argv[1],"--help",6) == 0) || (strncmp(argv[1],"-h",5) == 0 ) ) {
+		if ( (strcmp(argv[1],"-help") == 0) || (strcmp(argv[1],"--help") == 0) || (strcmp(argv[1],"-h") == 0 ) ) {
 			fprintf(stdout, "%s\n", shortHelp_text); exit(0);
 
-		} else if ( (strncmp(argv[1],"--longhelp", 10) == 0) || (strncmp(argv[1],"-longhelp", 9) == 0) || (strncmp(argv[1],"-Lh", 3) == 0) ) {
+		} else if ( (strcmp(argv[1],"--longhelp") == 0) || (strcmp(argv[1],"-longhelp") == 0) || (strcmp(argv[1],"-Lh") == 0) ) {
 #if defined (_WIN32)
 			if (UnicodeOutputStatus == WIN32_UTF16) { //convert the helptext to utf16 to preserve © characters
 				int help_len = strlen(longHelp_text)+1;
@@ -928,49 +928,49 @@ int real_main(int argc, char *argv[])
 			}
 			exit(0);
 
-		} else if ( (strncmp(argv[1],"--3gp-help", 10) == 0) || (strncmp(argv[1],"-3gp-help", 9) == 0) || (strncmp(argv[1],"--3gp-h", 7) == 0) ) {
+		} else if ( (strcmp(argv[1],"--3gp-help") == 0) || (strcmp(argv[1],"-3gp-help") == 0) || (strcmp(argv[1],"--3gp-h") == 0) ) {
 			fprintf(stdout, "%s\n", _3gpHelp_text); exit(0);
 
-		} else if ( (strncmp(argv[1],"--ISO-help", 10) == 0) || (strncmp(argv[1],"--iso-help", 10) == 0) || (strncmp(argv[1],"-Ih", 3) == 0) ) {
+		} else if ( (strcmp(argv[1],"--ISO-help") == 0) || (strcmp(argv[1],"--iso-help") == 0) || (strcmp(argv[1],"-Ih") == 0) ) {
 			fprintf(stdout, "%s\n", ISOHelp_text); exit(0);
 
-		} else if ( (strncmp(argv[1],"--file-help", 11) == 0) || (strncmp(argv[1],"-file-help", 10) == 0) || (strncmp(argv[1],"-fh", 3) == 0) ) {
+		} else if ( (strcmp(argv[1],"--file-help") == 0) || (strcmp(argv[1],"-file-help") == 0) || (strcmp(argv[1],"-fh") == 0) ) {
 			fprintf(stdout, "%s\n", fileLevelHelp_text); exit(0);
 
-		} else if ( (strncmp(argv[1],"--uuid-help", 11) == 0) || (strncmp(argv[1],"-uuid-help", 10) == 0) || (strncmp(argv[1],"-uh", 3) == 0) ) {
+		} else if ( (strcmp(argv[1],"--uuid-help") == 0) || (strcmp(argv[1],"-uuid-help") == 0) || (strcmp(argv[1],"-uh") == 0) ) {
 			fprintf(stdout, "%s\n", uuidHelp_text); exit(0);
 
-		} else if ( (strncmp(argv[1],"--reverseDNS-help", 18) == 0) || (strncmp(argv[1],"-rDNS-help", 10) == 0) || (strncmp(argv[1],"-rh", 3) == 0) ) {
+		} else if ( (strcmp(argv[1],"--reverseDNS-help") == 0) || (strcmp(argv[1],"-rDNS-help") == 0) || (strcmp(argv[1],"-rh") == 0) ) {
 			fprintf(stdout, "%s\n", rDNSHelp_text); exit(0);
 
-		} else if ( (strncmp(argv[1],"--ID3-help", 10) == 0) || (strncmp(argv[1],"-ID3-help", 9) == 0) || (strncmp(argv[1],"-ID3h", 4) == 0) ) {
+		} else if ( (strcmp(argv[1],"--ID3-help") == 0) || (strcmp(argv[1],"-ID3-help") == 0) || (strcmp(argv[1],"-ID3h") == 0) ) {
 			fprintf(stdout, "%s\n", ID3Help_text); exit(0);
 
-		} else if ( memcmp(argv[1], "--genre-list", 12) == 0 ) {
+		} else if ( strcmp(argv[1], "--genre-list") == 0 ) {
 			ListGenresValues(); exit(0);
 
-		} else if ( memcmp(argv[1], "--stik-list", 11) == 0 ) {
+		} else if ( strcmp(argv[1], "--stik-list") == 0 ) {
 			ListStikValues(); exit(0);
 
-		} else if ( memcmp(argv[1], "--language-list", 16) == 0 ||
-								memcmp(argv[1], "--languages-list", 17) == 0 ||
-								memcmp(argv[1], "--list-language", 16) == 0 ||
-								memcmp(argv[1], "--list-languages", 17) == 0 ||
-								memcmp(argv[1], "-ll", 3) == 0) {
+		} else if ( strcmp(argv[1], "--language-list") == 0 ||
+								strcmp(argv[1], "--languages-list") == 0 ||
+								strcmp(argv[1], "--list-language") == 0 ||
+								strcmp(argv[1], "--list-languages") == 0 ||
+								strcmp(argv[1], "-ll") == 0) {
 			ListLanguageCodes(); exit(0);
 
-		} else if (memcmp(argv[1], "--ratings-list", 14) == 0) {
+		} else if (strcmp(argv[1], "--ratings-list") == 0) {
 			ListMediaRatings(); exit(0);
 
-		} else if (memcmp(argv[1], "--ID3frames-list", 17) == 0) {
+		} else if (strcmp(argv[1], "--ID3frames-list") == 0) {
 			ListID3FrameIDstrings(); exit(0);
 
-		} else if (memcmp(argv[1], "--imagetype-list", 17) == 0) {
+		} else if (strcmp(argv[1], "--imagetype-list") == 0) {
 			List_imagtype_strings(); exit(0);
 		}
 	}
 
-	if ( argc == 3 && (memcmp(argv[2], "--brands", 8) == 0 || memcmp(argv[2], "-brands", 7) == 0) ) {
+	if ( argc == 3 && (strcmp(argv[2], "--brands") == 0 || strcmp(argv[2], "-brands") == 0) ) {
 		APar_ExtractBrands(argv[1]); exit(0);
 	}
 
@@ -989,7 +989,7 @@ int real_main(int argc, char *argv[])
 		exit(1);
 	}
 
-	if ( argc > 3 && memcmp(argv[2], "--DeepScan", 10) == 0) {
+	if ( argc > 3 && strcmp(argv[2], "--DeepScan") == 0) {
 		deep_atom_scan = true;
 		APar_ScanAtoms(ISObasemediafile, true);
 	}
@@ -1117,7 +1117,7 @@ int real_main(int argc, char *argv[])
 			APar_ScanAtoms(ISObasemediafile, true);
 			APar_PrintAtomicTree();
 			if (argv[optind]) {
-				if (memcmp(argv[optind], "+dates", 6) == 0) {
+				if (strcmp(argv[optind], "+dates") == 0) {
 					APar_ExtractDetails( APar_OpenISOBaseMediaFile(ISObasemediafile, true), SHOW_TRACK_INFO + SHOW_DATE_INFO );
 				} else {
 					APar_ExtractDetails( APar_OpenISOBaseMediaFile(ISObasemediafile, true), SHOW_TRACK_INFO);
@@ -1134,7 +1134,7 @@ int real_main(int argc, char *argv[])
 
 				APar_OpenISOBaseMediaFile(ISObasemediafile, true);
 
-				if (memcmp(argv[optind], "+", 1) == 0) {
+				if (strcmp(argv[optind], "+") == 0) {
 					APar_Print_iTunesData(ISObasemediafile, NULL, PRINT_FREE_SPACE + PRINT_PADDING_SPACE + PRINT_USER_DATA_SPACE + PRINT_MEDIA_SPACE, PRINT_DATA );
 				} else {
 					fprintf(stdout, "---------------------------\n");
@@ -1361,7 +1361,7 @@ int real_main(int argc, char *argv[])
 				break;
 			}
 
-			if (strncmp(optarg, "false", 5) == 0 || strlen(optarg) == 0) {
+			if (strcmp(optarg, "false") == 0 || strlen(optarg) == 0) {
 				APar_RemoveAtom("moov.udta.meta.ilst.cpil.data", VERSIONED_ATOM, 0);
 			} else {
 				//compilation: [0, 0, 0, 0,   boolean_value]; BUT that first uint32_t is already accounted for in APar_MetaData_atom_Init
@@ -1377,7 +1377,7 @@ int real_main(int argc, char *argv[])
 				break;
 			}
 
-			if (strncmp(optarg, "false", 5) == 0 || strlen(optarg) == 0) {
+			if (strcmp(optarg, "false") == 0 || strlen(optarg) == 0) {
 				APar_RemoveAtom("moov.udta.meta.ilst.hdvd.data", VERSIONED_ATOM, 0);
 			} else {
 				//compilation: [0, 0, 0, 0,   boolean_value]; BUT that first uint32_t is already accounted for in APar_MetaData_atom_Init
@@ -1393,7 +1393,7 @@ int real_main(int argc, char *argv[])
 				break;
 			}
 
-			if (strncmp(optarg, "0", 1) == 0 || strlen(optarg) == 0) {
+			if (strcmp(optarg, "0") == 0 || strlen(optarg) == 0) {
 				APar_RemoveAtom("moov.udta.meta.ilst.tmpo.data", VERSIONED_ATOM, 0);
 			} else {
 				uint16_t bpm_value = 0;
@@ -1411,13 +1411,13 @@ int real_main(int argc, char *argv[])
 				break;
 			}
 
-			if (strncmp(optarg, "remove", 6) == 0 || strlen(optarg) == 0) {
+			if (strcmp(optarg, "remove") == 0 || strlen(optarg) == 0) {
 				APar_RemoveAtom("moov.udta.meta.ilst.rtng.data", VERSIONED_ATOM, 0);
 			} else {
 				uint8_t rating_value = 0;
-				if (strncmp(optarg, "clean", 5) == 0) {
+				if (strcmp(optarg, "clean") == 0) {
 					rating_value = 2; //only \02 is clean
-				} else if (strncmp(optarg, "explicit", 8) == 0) {
+				} else if (strcmp(optarg, "explicit") == 0) {
 					rating_value = 4; //most non \00, \02 numbers are allowed
 				}
 				//rating is [0, 0, 0, 0,   rating_value]; BUT that first uint32_t is already accounted for in APar_MetaData_atom_Init
@@ -1444,12 +1444,12 @@ int real_main(int argc, char *argv[])
 				break;
 			}
 
-			if (strncmp(optarg, "remove", 6) == 0 || strlen(optarg) == 0) {
+			if (strcmp(optarg, "remove") == 0 || strlen(optarg) == 0) {
 				APar_RemoveAtom("moov.udta.meta.ilst.stik.data", VERSIONED_ATOM, 0);
 			} else {
 				uint8_t stik_value = 0;
 
-				if (memcmp(optarg, "value=", 6) == 0) {
+				if (strncmp(optarg, "value=", 6) == 0) {
 					char* stik_val_str_ptr = optarg;
 					strsep(&stik_val_str_ptr,"=");
 					sscanf(stik_val_str_ptr, "%" PRIu8 "", &stik_value);
@@ -1457,7 +1457,7 @@ int real_main(int argc, char *argv[])
 					stiks* return_stik = MatchStikString(optarg);
 					if (return_stik != NULL) {
 						stik_value = return_stik->stik_number;
-						if (memcmp(optarg, "Audiobook", 9) == 0) {
+						if (strcmp(optarg, "Audiobook") == 0) {
 							forced_suffix_type = FORCE_M4B_TYPE;
 						}
 					}
@@ -1632,7 +1632,7 @@ int real_main(int argc, char *argv[])
 				break;
 			}
 
-			if (strncmp(optarg, "false", 5) == 0) {
+			if (strcmp(optarg, "false") == 0) {
 				APar_RemoveAtom("moov.udta.meta.ilst.pcst.data", VERSIONED_ATOM, 0);
 			} else {
 				//podcastflag: [0, 0, 0, 0,   boolean_value]; BUT that first uint32_t is already accounted for in APar_MetaData_atom_Init
@@ -1695,7 +1695,7 @@ int real_main(int argc, char *argv[])
 			char* purd_time;
 			bool free_memory = false;
 			if (optarg != NULL) {
-				if (strncmp(optarg, "timestamp", 9) == 0) {
+				if (strcmp(optarg, "timestamp") == 0) {
 					purd_time = (char *)malloc(sizeof(char)*255);
 					free_memory = true;
 					APar_StandardTime(purd_time);
@@ -1721,7 +1721,7 @@ int real_main(int argc, char *argv[])
 				break;
 			}
 
-			if (strncmp(optarg, "false", 5) == 0 || strlen(optarg) == 0) {
+			if (strcmp(optarg, "false") == 0 || strlen(optarg) == 0) {
 				APar_RemoveAtom("moov.udta.meta.ilst.pgap.data", VERSIONED_ATOM, 0);
 			} else {
 				//gapless playback: [0, 0, 0, 0,   boolean_value]; BUT that first uint32_t is already accounted for in APar_MetaData_atom_Init
@@ -1743,17 +1743,17 @@ int real_main(int argc, char *argv[])
 				break;
 			}
 
-			if ( memcmp(optarg, "name", 5) == 0 ) {
+			if ( strcmp(optarg, "name") == 0 ) {
 				sortOrder_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.sonm.data", argv[optind], AtomFlags_Data_Text);
-			} else if ( memcmp(optarg, "artist", 7) == 0 ) {
+			} else if ( strcmp(optarg, "artist") == 0 ) {
 				sortOrder_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.soar.data", argv[optind], AtomFlags_Data_Text);
-			} else if ( memcmp(optarg, "albumartist", 12) == 0 ) {
+			} else if ( strcmp(optarg, "albumartist") == 0 ) {
 				sortOrder_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.soaa.data", argv[optind], AtomFlags_Data_Text);
-			} else if ( memcmp(optarg, "album", 6) == 0 ) {
+			} else if ( strcmp(optarg, "album") == 0 ) {
 				sortOrder_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.soal.data", argv[optind], AtomFlags_Data_Text);
-			} else if ( memcmp(optarg, "composer", 9) == 0 ) {
+			} else if ( strcmp(optarg, "composer") == 0 ) {
 				sortOrder_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.soco.data", argv[optind], AtomFlags_Data_Text);
-			} else if ( memcmp(optarg, "show", 5) == 0 ) {
+			} else if ( strcmp(optarg, "show") == 0 ) {
 				sortOrder_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.sosn.data", argv[optind], AtomFlags_Data_Text);
 			}
 			APar_Unified_atom_Put(sortOrder_atom, argv[optind], UTF8_iTunesStyle_256glyphLimited, 0, 0);
@@ -1817,8 +1817,8 @@ int real_main(int argc, char *argv[])
 			// file /some/path/pic.pdf description="My Booty, Your Booty,
 			// Djbouti"
 
-			if ( memcmp(argv[optind], "text", 5) == 0  || memcmp(argv[optind], "1", 2) == 0 ) uuid_dataType = AtomFlags_Data_Text;
-			if ( memcmp(argv[optind], "file", 5) == 0 ) {
+			if ( strcmp(argv[optind], "text") == 0  || strcmp(argv[optind], "1") == 0 ) uuid_dataType = AtomFlags_Data_Text;
+			if ( strcmp(argv[optind], "file") == 0 ) {
 				uuid_dataType = AtomFlags_Data_uuid_binary;
 				if (optind+1 < argc) {
 					if (true) { //TODO: test the file to see if it exists
@@ -1840,15 +1840,15 @@ int real_main(int argc, char *argv[])
 					//copy a pointer to description
 					int more_optional_args = 2;
 					while (optind + more_optional_args < argc) {
-						if ( memcmp(argv[optind + more_optional_args], "description=", 12) == 0 && argv[optind + more_optional_args][12]) {
+						if ( strncmp(argv[optind + more_optional_args], "description=", 12) == 0 && argv[optind + more_optional_args][12]) {
 							uuid_file_description = argv[optind + more_optional_args] + 12;
 							desc_len = strlen(uuid_file_description)+1; //+1 for the trailing 1 byte NULL terminator
 						}
-						if ( memcmp(argv[optind + more_optional_args], "mime-type=", 10) == 0 && argv[optind + more_optional_args][10]) {
+						if ( strncmp(argv[optind + more_optional_args], "mime-type=", 10) == 0 && argv[optind + more_optional_args][10]) {
 							uuid_file_mimetype = argv[optind + more_optional_args] + 10;
 							mime_len = strlen(uuid_file_mimetype)+1; //+1 for the trailing 1 byte NULL terminator
 						}
-						if (memcmp(argv[optind+more_optional_args], "--", 2) == 0) {
+						if (strncmp(argv[optind+more_optional_args], "--", 2) == 0) {
 							break; //we've hit another cli argument
 						}
 						more_optional_args++;
@@ -1960,7 +1960,7 @@ int real_main(int argc, char *argv[])
 
 		case Opt_Ipod_AVC_uuid : {
 			if (deep_atom_scan == true) {
-				if (memcmp(optarg, "1200", 3) != 0) {
+				if (strcmp(optarg, "1200") != 0) {
 					fprintf(stdout, "the ipod-uuid has a single preset of '1200' which is required\n"); //1200 might not be the only max macroblock setting down the pike
 					break;
 				}
@@ -2007,7 +2007,7 @@ int real_main(int argc, char *argv[])
 				uint16_t uuid_path_pos = 0;
 				uint16_t uuid_path_len = strlen(optarg);
 				while (compliant_name+uuid_path_pos < compliant_name+uuid_path_len) {
-					if (memcmp(compliant_name+uuid_path_pos, "uuid=", 5) == 0) {
+					if (strncmp(compliant_name+uuid_path_pos, "uuid=", 5) == 0) {
 						uuid_path_pos+=5;
 						break;
 					}
@@ -2019,17 +2019,17 @@ int real_main(int argc, char *argv[])
 				}
 				APar_RemoveAtom(compliant_name, EXTENDED_ATOM, 0);
 
-			} else if (memcmp(compliant_name + (strlen(compliant_name) - 4), "data", 4) == 0) {
+			} else if (strcmp(compliant_name + (strlen(compliant_name) - 4), "data") == 0) {
 				APar_RemoveAtom(compliant_name, VERSIONED_ATOM, 0);
 
 			} else {
 				size_t string_len = strlen(compliant_name);
 				//reverseDNS atom path
-				if (strstr(optarg, ":[") != NULL && memcmp(compliant_name + string_len-1, "]", 1) == 0 ) {
+				if (strstr(optarg, ":[") != NULL && compliant_name[string_len-1] == ']' ) {
 					APar_RemoveAtom(compliant_name, VERSIONED_ATOM, 0);
 
 				//packed language asset
-				} else if (memcmp(compliant_name + string_len - 9, ":lang=", 6) == 0 ) {
+				} else if (strncmp(compliant_name + string_len - 9, ":lang=", 6) == 0 ) {
 					uint16_t packed_lang = PackLanguage(compliant_name + string_len - 3, 0);
 					memset(compliant_name + string_len - 9, 0, 1);
 					APar_RemoveAtom(compliant_name, PACKED_LANG_ATOM, packed_lang);
@@ -2242,12 +2242,12 @@ int real_main(int argc, char *argv[])
 			//cygle through the remaining independant arguments (before the next --cli_flag) and figure out if any are useful to us; already have lang & utf16
 			for (int i= 0; i <= 4; i++) { //3 possible arguments for this tag (the first - which doesn't count - is the data for the tag itself)
 				if ( argv[optind + i] && optind + i <= total_args) {
-					if ( memcmp(argv[optind + i], "trknum=", 7) == 0 ) {
+					if ( strncmp(argv[optind + i], "trknum=", 7) == 0 ) {
 						char* track_num = argv[optind + i];
 						strsep(&track_num,"=");
 						sscanf(track_num, "%" PRIu8 "", &tracknum);
 					}
-					if (memcmp(argv[optind + i], "-", 1) == 0) break;
+					if (*argv[optind + i] == '-') break;
 				}
 			}
 
@@ -2280,14 +2280,14 @@ int real_main(int argc, char *argv[])
 			uint16_t year_tag = 0;
 
 			if ( argv[optind] && optind <= total_args) {
-				if ( memcmp(argv[optind], "movie", 6) == 0 ) {
+				if ( strcmp(argv[optind], "movie") == 0 ) {
 					userdata_area = MOVIE_LEVEL_ATOM;					}
-				if ( memcmp(argv[optind], "track=", 6) == 0 ) {
+				if ( strncmp(argv[optind], "track=", 6) == 0 ) {
 					char* trak_idx = argv[optind];
 					strsep(&trak_idx, "=");
 					sscanf(trak_idx, "%" PRIu8 "", &selected_track);
 					userdata_area = SINGLE_TRACK_ATOM;
-				} else if ( memcmp(argv[optind], "track", 6) == 0 ) {
+				} else if ( strcmp(argv[optind], "track") == 0 ) {
 					userdata_area = ALL_TRACKS_ATOM;
 				}
 			}
@@ -2326,17 +2326,17 @@ int real_main(int argc, char *argv[])
 
 			for (int i= 0; i < 5; i++) { //3 possible arguments for this tag (the first - which doesn't count - is the data for the tag itself)
 				if ( argv[optind + i] && optind + i <= total_args) {
-					if ( memcmp(argv[optind + i], "entity=", 7) == 0 ) {
+					if ( strncmp(argv[optind + i], "entity=", 7) == 0 ) {
 						char* entity = argv[optind + i];
 						strsep(&entity,"=");
 						memcpy(&rating_entity, entity, 4);
 					}
-					if ( memcmp(argv[optind + i], "criteria=", 9) == 0 ) {
+					if ( strncmp(argv[optind + i], "criteria=", 9) == 0 ) {
 						char* criteria = argv[optind + i];
 						strsep(&criteria,"=");
 						memcpy(&rating_criteria, criteria, 4);
 					}
-					if (memcmp(argv[optind + i], "-", 1) == 0) break; //we've hit another cli argument
+					if (*argv[optind + i] == '-') break; //we've hit another cli argument
 				}
 			}
 
@@ -2375,17 +2375,17 @@ int real_main(int argc, char *argv[])
 
 			for (int i= 0; i < 4; i++) { //3 possible arguments for this tag (the first - which doesn't count - is the data for the tag itself)
 				if ( argv[optind + i] && optind + i <= total_args) {
-					if ( memcmp(argv[optind + i], "entity=", 7) == 0 ) {
+					if ( strncmp(argv[optind + i], "entity=", 7) == 0 ) {
 						char* cls_entity = argv[optind + i];
 						strsep(&cls_entity, "=");
 						memcpy(&classification_entity, cls_entity, 4);
 					}
-					if ( memcmp(argv[optind + i], "index=", 6) == 0 ) {
+					if ( strncmp(argv[optind + i], "index=", 6) == 0 ) {
 						char* cls_idx = argv[optind + i];
 						strsep(&cls_idx, "=");
 						sscanf(cls_idx, "%" SCNu16, &classification_index);
 					}
-					if (memcmp(argv[optind + i], "-", 1) == 0) break; //we've hit another cli argument
+					if (*argv[optind + i] == '-') break; //we've hit another cli argument
 				}
 			}
 
@@ -2497,7 +2497,7 @@ int real_main(int argc, char *argv[])
 
 			for (int i= 0; i <= 10; i++) { //9 possible arguments for this tag (the first - which doesn't count - is the data for the tag itself)
 				if ( argv[optind + i] && optind + i <= total_args) {
-					if ( memcmp(argv[optind + i], "longitude=", 10) == 0 ) {
+					if ( strncmp(argv[optind + i], "longitude=", 10) == 0 ) {
 						char* _long = argv[optind + i];
 						strsep(&_long,"=");
 						sscanf(_long, "%lf", &longitude);
@@ -2505,7 +2505,7 @@ int real_main(int argc, char *argv[])
 							longitude*=-1;
 						}
 					}
-					if ( memcmp(argv[optind + i], "latitude=", 9) == 0 ) {
+					if ( strncmp(argv[optind + i], "latitude=", 9) == 0 ) {
 						char* _latt = argv[optind + i];
 						strsep(&_latt,"=");
 						sscanf(_latt, "%lf", &latitude);
@@ -2513,7 +2513,7 @@ int real_main(int argc, char *argv[])
 							latitude*=-1;
 						}
 					}
-					if ( memcmp(argv[optind + i], "altitude=", 9) == 0 ) {
+					if ( strncmp(argv[optind + i], "altitude=", 9) == 0 ) {
 						char* _alti = argv[optind + i];
 						strsep(&_alti,"=");
 						sscanf(_alti, "%lf", &altitude);
@@ -2521,28 +2521,28 @@ int real_main(int argc, char *argv[])
 							altitude*=-1;
 						}
 					}
-					if ( memcmp(argv[optind + i], "role=", 5) == 0 ) {
+					if ( strncmp(argv[optind + i], "role=", 5) == 0 ) {
 						char* _role = argv[optind + i];
 						strsep(&_role,"=");
-						if (strncmp(_role, "shooting location", 17) == 0 || strncmp(_role, "shooting", 8) == 0) {
+						if (strcmp(_role, "shooting location") == 0 || strcmp(_role, "shooting") == 0) {
 							role = 0;
-						} else if (strncmp(_role, "real location", 13) == 0 || strncmp(_role, "real", 4) == 0) {
+						} else if (strcmp(_role, "real location") == 0 || strcmp(_role, "real") == 0) {
 							role = 1;
-						} else if (strncmp(_role, "fictional location", 18) == 0 || strncmp(_role, "fictional", 9) == 0) {
+						} else if (strcmp(_role, "fictional location") == 0 || strcmp(_role, "fictional") == 0) {
 							role = 2;
 						}
 					}
-					if ( memcmp(argv[optind + i], "body=", 5) == 0 ) {
+					if ( strncmp(argv[optind + i], "body=", 5) == 0 ) {
 						char* _astrobody = argv[optind + i];
 						strsep(&_astrobody,"=");
 						astronomical_body = _astrobody;
 					}
-					if ( memcmp(argv[optind + i], "notes=", 6) == 0 ) {
+					if ( strncmp(argv[optind + i], "notes=", 6) == 0 ) {
 						char* _add_notes = argv[optind + i];
 						strsep(&_add_notes,"=");
 						additional_notes = _add_notes;
 					}
-					if (memcmp(argv[optind + i], "-", 1) == 0) break; //we've hit another cli argument
+					if (*argv[optind + i] == '-') break; //we've hit another cli argument
 				}
 			}
 
@@ -2586,14 +2586,14 @@ int real_main(int argc, char *argv[])
 
 			for (int i= 0; i <= 5-1; i++) {
 				if ( argv[optind + i] && optind + i <= argc ) {
-					if ( memcmp(argv[optind + i], "name=", 5) == 0 ) {
+					if ( strncmp(argv[optind + i], "name=", 5) == 0 ) {
 						reverseDNS_atomname = argv[optind + i]+5;
-					} else if ( memcmp(argv[optind + i], "domain=", 7) == 0 ) {
+					} else if ( strncmp(argv[optind + i], "domain=", 7) == 0 ) {
 						reverseDNS_atomdomain = argv[optind + i]+7;
-					} else if ( memcmp(argv[optind + i], "datatype=", 9) == 0 ) {
+					} else if ( strncmp(argv[optind + i], "datatype=", 9) == 0 ) {
 						sscanf(argv[optind + i]+9, "%u", &rdns_atom_flags);
 					}
-					if (memcmp(argv[optind + i], "-", 1) == 0) {
+					if (*argv[optind + i] == '-') {
 						break; //we've hit another cli argument
 					}
 				}
@@ -2694,7 +2694,7 @@ int real_main(int argc, char *argv[])
 				if (TestCLI_for_FrameParams(frameType, 8)) {
 					id3args->dataArg = find_ID3_optarg(argv, optind, "data=");
 				}
-				if (memcmp("1", find_ID3_optarg(argv, optind, "compressed"), 1) == 0) {
+				if (*find_ID3_optarg(argv, optind, "compressed") == '1') {
 					id3args->zlibCompressed = true;
 				}
 
@@ -2711,7 +2711,7 @@ int real_main(int argc, char *argv[])
 			APar_OpenISOBaseMediaFile(ISObasemediafile, true); //if not already scanned, the whole tag for *this* ID32 atom needs to be read from file
 			AtomicInfo* id32_atom = APar_ID32_atom_Init(target_frame_ID, meta_container, id3args->targetLang, packed_lang);
 
-			if (memcmp(argv[optind + 0], "extract", 7) == 0 && (memcmp(target_frame_ID, "APIC", 4) == 0 || memcmp(target_frame_ID, "GEOB", 4) == 0)) {
+			if (strcmp(argv[optind + 0], "extract") == 0 && (strcmp(target_frame_ID, "APIC") == 0 || strcmp(target_frame_ID, "GEOB") == 0)) {
 				if (id32_atom != NULL) {
 					APar_Extract_ID3v2_file(id32_atom, target_frame_ID, ISObasemediafile, NULL, id3args);
 					APar_OpenISOBaseMediaFile(ISObasemediafile, false);
@@ -2862,8 +2862,7 @@ int wmain( int argc, wchar_t *arguments[])
 {
 	int return_val=0;
 	uint16_t name_len = wcslen(arguments[0]);
-	if (wmemcmp(arguments[0] + (name_len-9), L"-utf8.exe", 9) == 0 ||
-			wmemcmp(arguments[0] + (name_len-9), L"-UTF8.exe", 9) == 0) {
+	if (name_len >= 9 && _wcsicmp(arguments[0] + (name_len-9), L"-utf8.exe") == 0) {
 		UnicodeOutputStatus = UNIVERSAL_UTF8;
 	} else {
 		UnicodeOutputStatus = WIN32_UTF16;

@@ -395,7 +395,7 @@ uint16_t OSX_ProbeTargetDrive(const char* id3args_drive, char* mcdi_data) {
 	uint16_t mcdi_data_len = 0;
 	io_object_t	cdobject = MACH_PORT_NULL;
 	
-	if (memcmp(id3args_drive, "disk", 4) != 0) {
+	if (strncmp(id3args_drive, "disk", 4) != 0) {
 		OSX_ScanForCDDrive();
 		exit(0);
 	}

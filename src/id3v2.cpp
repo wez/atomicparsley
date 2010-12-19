@@ -419,10 +419,9 @@ void List_imagtype_strings() {
 const char* ConvertCLIFrameStr_TO_frameID(const char* frame_str) {
 	const char* discovered_frameID = NULL;
 	uint16_t total_known_frames = (uint16_t)(sizeof(KnownFrames)/sizeof(*KnownFrames));
-	uint8_t frame_str_len = strlen(frame_str) + 1;
 	
 	for (uint16_t i = 0; i < total_known_frames; i++) {
-		if (memcmp(KnownFrames[i].CLI_frameIDpreset, frame_str, frame_str_len) == 0) {
+		if (strcmp(KnownFrames[i].CLI_frameIDpreset, frame_str) == 0) {
 			if (AtomicParsley_ID3v2Tag_MajorVersion == 2) discovered_frameID = KnownFrames[i].ID3V2p2_FrameID;
 			if (AtomicParsley_ID3v2Tag_MajorVersion == 3) discovered_frameID = KnownFrames[i].ID3V2p3_FrameID;
 			if (AtomicParsley_ID3v2Tag_MajorVersion == 4) discovered_frameID = KnownFrames[i].ID3V2p4_FrameID;
@@ -511,14 +510,13 @@ int FrameStr_TO_FrameType(const char* frame_str) {
 	const char* eval_framestr = NULL;
 	int frame_type = 0;
 	uint16_t total_known_frames = (uint16_t)(sizeof(KnownFrames)/sizeof(*KnownFrames));
-	uint8_t frame_str_len = strlen(frame_str) + 1;
 	
 	for (uint16_t i = 0; i < total_known_frames; i++) {
 		if (AtomicParsley_ID3v2Tag_MajorVersion == 2) eval_framestr = KnownFrames[i].ID3V2p2_FrameID;
 		if (AtomicParsley_ID3v2Tag_MajorVersion == 3) eval_framestr = KnownFrames[i].ID3V2p3_FrameID;
 		if (AtomicParsley_ID3v2Tag_MajorVersion == 4) eval_framestr = KnownFrames[i].ID3V2p4_FrameID;
 			
-		if (memcmp(frame_str, eval_framestr, frame_str_len) == 0) {
+		if (strcmp(frame_str, eval_framestr) == 0) {
 			frame_type = KnownFrames[i].ID3v2_FrameType;
 			break;
 		}
@@ -1761,7 +1759,7 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 
 			memset(play_count_syncsafe, 0, sizeof(play_count_syncsafe));
 
-			if (memcmp(frame_payload, "+1", 3) == 0) {
+			if (strcmp(frame_payload, "+1") == 0) {
 				if (thisFrame->ID3v2_Frame_Length == 4) {
 					playcount = (uint64_t)syncsafe32_to_UInt32(thisFrame->ID3v2_Frame_Fields->field_string) + 1;
 				} else if (thisFrame->ID3v2_Frame_Length > 4) {
@@ -1846,7 +1844,7 @@ void APar_EmbeddedFileTests(const char* filepath, int frameType, AdjunctArgs* ad
 			} else {
 				img_comparison_str = ImageTypeList[itest].imagetype_str;
 			}
-			if (memcmp(adjunct_payloads->pictypeArg, img_comparison_str, img_typlen) == 0) {
+			if (strcmp(adjunct_payloads->pictypeArg, img_comparison_str) == 0) {
 				adjunct_payloads->pictype_uint8 = ImageTypeList[itest].hexcode;
 			}
 		}
@@ -1974,7 +1972,7 @@ ID3v2Frame* APar_FindFrame(ID3v2Tag* id3v2tag, const char* frame_str, int frameI
 			if (supplemental_matching && 0x01 && evalframe->ID3v2_Frame_ID == frameID) {
 				char* utf8_descrip = APar_ConvertField_to_UTF8(evalframe, ID3_DESCRIPTION_FIELD);
 				if (utf8_descrip != NULL) {
-					if (memcmp(adjunct_payloads->descripArg, utf8_descrip, strlen(adjunct_payloads->descripArg)) == 0) {
+					if (strcmp(adjunct_payloads->descripArg, utf8_descrip) == 0) {
 						returnframe = evalframe;
 						free(utf8_descrip);
 						break;
