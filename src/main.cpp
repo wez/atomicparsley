@@ -68,6 +68,7 @@
 #define Meta_PurchaseDate        'D'
 #define Meta_apID                'Y'
 #define Meta_cnID                0xC0
+#define Meta_xID                 0xC3
 #define Meta_EncodingTool        0xB7
 #define Meta_EncodedBy           0xC1
 #define Meta_PlayGapless         0xBA
@@ -183,6 +184,7 @@ static const char* shortHelp_text =
 "  --encodedBy    (string)     Set the name of the Person/company who encoded the file\n"
 "  --apID         (string)     Set the Account Name\n"
 "  --cnID         (number)     Set the iTunes Catalog ID (see --longhelp)\n"
+"  --xid          (string)     Set the vendor-supplied iTunes xID (see --longhelp)\n"
 "  --gapless      (boolean)    Set the gapless playback flag\n"
 "  --contentRating (string*)   Set tv/mpaa rating (see -rDNS-help)\n"
 "\n"
@@ -272,7 +274,10 @@ static const char* longHelp_text =
 "  --cnID             ,       (num)    Set iTunes Catalog ID, used for combining SD and HD encodes in iTunes on the \"cnID\" atom\n"
 "                                       (To combine you must set \"hdvd\" atom on one file and must have same \"stik\" on both file)\n"
 "                                       (Must not use \"stik\" of value Movie(0), use Short Film(9))\n"
-"                                       (A good idea for numbers is from http://www.imdb.com/ listings)\n"
+"                                       (A bad idea for numbers is from http://www.imdb.com/ listings)\n"
+"                                       (A better idea for numbers is from the iTunes Store URL)\n"
+"  --xid              ,       (str)    Set iTunes vendor-supplied xID, used to allow iTunes LPs and iTunes Extras to interact \n"
+"                                            with other content in your iTunes Library\n"
 "  --gapless          ,       (bool)   Sets the gapless playback flag for a track in a gapless album\n"
 
 "  --sortOrder    (type)      (str)    Sets the sort order string for that type of tag.\n"
@@ -1610,8 +1615,21 @@ int real_main(int argc, char *argv[])
             sscanf(optarg, "%" SCNu32, &data_value );
 
             AtomicInfo* cnIDData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.cnID.data", optarg, AtomFlags_Data_UInt);
-            //episodenumber is [0, 0, 0, 0,   0, 0, 0, data_value]; BUT that first uint32_t is already accounted for in APar_MetaData_atom_Init
             APar_Unified_atom_Put(cnIDData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, data_value, 32);
+            break;
+        }
+
+        case Meta_xID : { // the vendor-supplied iTunes xID
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "iTunes xID") ) {
+                break;
+            }
+
+            uint32_t data_value = 0;
+            sscanf(optarg, "%" SCNu32, &data_value );
+
+            AtomicInfo* xIDData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.xid .data", optarg, AtomFlags_Data_UInt);
+            APar_Unified_atom_Put(xIDData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, data_value, 32);
             break;
         }
 
