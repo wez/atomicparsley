@@ -226,14 +226,11 @@ void APar_Extract_uuid_binary_file(AtomicInfo* uuid_atom, const char* originatin
 
 void APar_ExtractAAC_Artwork(short this_atom_num, char* pic_output_path, short artwork_count) {
 	char *base_outpath=(char *)malloc(sizeof(char)*MAXPATHLEN+1);
-	memset(base_outpath, 0, MAXPATHLEN +1);
 	
-	if (strlen(pic_output_path) >= sizeof base_outpath)
-		return;  //catch buffer overrun
-
-	strcpy(base_outpath, pic_output_path);
-	strcat(base_outpath, "_artwork");
-	sprintf(base_outpath, "%s_%d", base_outpath, artwork_count);
+	if (snprintf(base_outpath, MAXPATHLEN+1, "%s_artwork_%d", pic_output_path, artwork_count) > MAXPATHLEN) {
+		free(base_outpath);
+		return;
+	}
 	
 	char* art_payload = (char*)malloc( sizeof(char) * (parsedAtoms[this_atom_num].AtomicLength-16) +1 );	
 	memset(art_payload, 0, (parsedAtoms[this_atom_num].AtomicLength-16) +1 );
@@ -261,6 +258,7 @@ void APar_ExtractAAC_Artwork(short this_atom_num, char* pic_output_path, short a
 	}
 	free(base_outpath);
 	free(art_payload);
+	free(suffix);
   return;
 }
 
