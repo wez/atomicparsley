@@ -1,0 +1,45 @@
+AtomicParsley is GPL software; you can freely distribute,
+redistribute, modify & use under the terms of the GNU General
+Public License; either version 2 or its successor.
+
+AtomicParsley is distributed under the GPL "AS IS", without
+any warranty; without the implied warranty of merchantability
+or fitness for either an expressed or implied particular purpose.
+
+Please see the included GNU General Public License (GPL) for
+your rights and further details; see the file COPYING. If you
+cannot, write to the Free Software Foundation, 59 Temple Place
+Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
+
+Copyright (C) 2005-2007, puck_lock
+Copyright (C) 2009-2011, Wez Furlong
+Copyright (C) 2009, Josh Aune
+Copyright (C) 2009, holyroses
+Copyright (C) 2009, Santino Fuentes
+
+Miscellaneous Contributions made at unknown (to the current maintainers) times,
+except that the changes are presumably circa 2005-2007:
+
+ * Mellow_Flow
+ * Mike Brancato
+ * Brian Story
+ * Lowell Stewart
+ * SLarew
+
+Contains code derived from code that is:
+
+Copyright (C) 1998-2003 Daniel Veillard.  All Rights Reserved.
+(See iconv.cpp for license)
+Original code for IsoLatin1 and UTF-16 by "Martin J. Duerst" <duerst@w3.org>
+
+Copyright (C) 2000, 2001, 2003, 2004, 2005 Free Software Foundation, Inc.
+Authors: Scott G. Miller, Robert Klep <robert@ilse.nl>
+(See sha1.cpp)
+
+Copyright (c) 1990- 1993, 1996 Open Software Foundation, Inc.
+Copyright (c) 1989 by Hewlett-Packard Company, Palo Alto, Ca. &
+Digital Equipment Corporation, Maynard, Mass.
+Copyright (c) 1998 Microsoft.
+(See uuid.cpp)
+
+
