@@ -183,7 +183,7 @@ void APar_FreeMemory();
 short APar_FindParentAtom(int order_in_tree, uint8_t this_atom_level);
 
 AtomicInfo* APar_FindAtomInTrack(uint8_t &total_tracks, uint8_t &track_num,
-  char* search_atom_str);
+  const char* search_atom_str);
 
 AtomicInfo* APar_FindAtom(const char* atom_name, bool createMissing,
   uint8_t atom_type, uint16_t atom_lang, bool match_full_uuids = false,

@@ -289,7 +289,7 @@ PicPrefs APar_ExtractPicPrefs(char* env_PicOptions) {
 //                            Locating/Finding Atoms                                 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-AtomicInfo* APar_FindAtomInTrack(uint8_t &total_tracks, uint8_t &track_num, char* search_atom_str) {
+AtomicInfo* APar_FindAtomInTrack(uint8_t &total_tracks, uint8_t &track_num, const char* search_atom_str) {
 	uint8_t track_tally = 0;
 	short iter = 0;
 
