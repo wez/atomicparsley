@@ -69,7 +69,7 @@ void APar_unicode_win32Printout(wchar_t* unicode_out, char* utf8_out) { //based 
 	HANDLE outHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	// ThreadLocale adjustment, resource loading, etc. is skipped
 	if ( (GetFileType(outHandle) & FILE_TYPE_CHAR) && GetConsoleMode( outHandle, &fdwMode) ) {
-		if ( wmemcmp(unicode_out, L"\xEF\xBB\xBF", 3) != 0 ) { //skip BOM when writing directly to the console
+		if ( wcsncmp(unicode_out, L"\xEF\xBB\xBF", 3) != 0 ) { //skip BOM when writing directly to the console
 			WriteConsoleW( outHandle, unicode_out, wcslen(unicode_out), &dwBytesWritten, 0);
 		}
 	} else {
@@ -117,7 +117,7 @@ void APar_Mark_UserData_area(uint8_t track_num, short userdata_atom, bool quantu
 //and slight output formatting differences
 
 void APar_SimplePrintUnicodeAssest(char* unicode_string, int asset_length, bool print_encoding) { //3gp files
-	if (memcmp(unicode_string, "\xFE\xFF", 2) == 0 ) { //utf16
+	if (strncmp(unicode_string, "\xFE\xFF", 2) == 0 ) { //utf16
 		if (print_encoding) {
 			fprintf(stdout, " (utf16): ");
 		}
@@ -227,14 +227,11 @@ void APar_Extract_uuid_binary_file(AtomicInfo* uuid_atom, const char* originatin
 
 void APar_ExtractAAC_Artwork(short this_atom_num, char* pic_output_path, short artwork_count) {
 	char *base_outpath=(char *)malloc(sizeof(char)*MAXPATHLEN+1);
-	memset(base_outpath, 0, MAXPATHLEN +1);
 	
-	if (strlen(pic_output_path) >= sizeof base_outpath)
-		return;  //catch buffer overrun
-
-	strcpy(base_outpath, pic_output_path);
-	strcat(base_outpath, "_artwork");
-	sprintf(base_outpath, "%s_%d", base_outpath, artwork_count);
+	if (snprintf(base_outpath, MAXPATHLEN+1, "%s_artwork_%d", pic_output_path, artwork_count) > MAXPATHLEN) {
+		free(base_outpath);
+		return;
+	}
 	
 	char* art_payload = (char*)malloc( sizeof(char) * (parsedAtoms[this_atom_num].AtomicLength-16) +1 );	
 	memset(art_payload, 0, (parsedAtoms[this_atom_num].AtomicLength-16) +1 );
@@ -262,6 +259,7 @@ void APar_ExtractAAC_Artwork(short this_atom_num, char* pic_output_path, short a
 	}
 	free(base_outpath);
 	free(art_payload);
+	free(suffix);
   return;
 }
 
@@ -718,7 +716,7 @@ void APar_Print_APuuid_atoms(const char *path, char* output_path, uint8_t target
 ///////////////////////////////////////////////////////////////////////////////////////
 
 void APar_PrintUnicodeAssest(char* unicode_string, int asset_length) { //3gp files
-	if (memcmp(unicode_string, "\xFE\xFF", 2) == 0 ) { //utf16
+	if (strncmp(unicode_string, "\xFE\xFF", 2) == 0 ) { //utf16
 		fprintf(stdout, " (utf16)] : ");
 		
 		unsigned char* utf8_data = Convert_multibyteUTF16_to_UTF8(unicode_string, (asset_length-13) * 6, asset_length-14);
@@ -892,7 +890,7 @@ void APar_Print_single_userdata_atomcontents(uint8_t track_num, short userdata_a
 			
 			//the length of the location string is unknown (max is box lenth), but the long/lat/alt/body/notes needs to be retrieved.
 			//test if the location string is utf16; if so search for 0x0000 (or if utf8, find the first NULL).
-			if ( memcmp(box_data, "\xFE\xFF", 2) == 0 ) {
+			if ( strncmp(box_data, "\xFE\xFF", 2) == 0 ) {
 				box_offset+= 2 * widechar_len(box_data, box_length) + 2; //*2 for utf16 (double-byte); +2 for the terminating NULL
 				fprintf(stdout, "(utf16) ");
 			} else {
@@ -938,7 +936,7 @@ void APar_Print_single_userdata_atomcontents(uint8_t track_num, short userdata_a
 			if (box_offset < box_length) {
 				fprintf(stdout, " Body: ");
 				APar_SimplePrintUnicodeAssest(box_data+box_offset-14, box_length-box_offset, false);
-				if ( memcmp(box_data+box_offset-14, "\xFE\xFF", 2) == 0 ) {
+				if ( strncmp(box_data+box_offset-14, "\xFE\xFF", 2) == 0 ) {
 					box_offset+= 2 * widechar_len(box_data+box_offset-14, box_length-box_offset) + 2; //*2 for utf16 (double-byte); +2 for the terminating NULL
 				} else {
 					box_offset+= strlen(box_data+box_offset-14) + 1; //+1 for the terminating NULL
@@ -1011,7 +1009,7 @@ void APar_Print_ID3TextField(ID3v2Frame* textframe, ID3v2Fields* textfield, bool
 	} else if (textframe->ID3v2_Frame_Fields->field_string[0] == TE_UTF16LE_WITH_BOM) { //technically AP *writes* uff16LE here, but based on BOM, it could be utf16BE
 		if (textfield->field_length > 2) {
 			char* conv_buffer = (char*)calloc(1, sizeof(char*)*(textfield->field_length *2) +2);
-			if (memcmp(textfield->field_string, "\xFF\xFE", 2) == 0) {
+			if (strncmp(textfield->field_string, "\xFF\xFE", 2) == 0) {
 				UTF16LEToUTF8((unsigned char*)conv_buffer, sizeof(char*)*(textfield->field_length *4) +2, (unsigned char*)textfield->field_string+2, textfield->field_length);
 				fprintf(stdout, "%s", conv_buffer);
 			} else {
@@ -1043,9 +1041,9 @@ const char* APar_GetTextEncoding(ID3v2Frame* aframe, ID3v2Fields* textfield) {
 	const char* text_encoding = NULL;
 	if (aframe->ID3v2_Frame_Fields->field_string[0] == TE_LATIN1) text_encoding = "latin1";
 	if (aframe->ID3v2_Frame_Fields->field_string[0] == TE_UTF16BE_NO_BOM) {
-		if (memcmp(textfield->field_string, "\xFF\xFE", 2) == 0) {
+		if (strncmp(textfield->field_string, "\xFF\xFE", 2) == 0) {
 			text_encoding = "utf16le";
-		} else if (memcmp(textfield->field_string, "\xFE\xFF", 2) == 0) {
+		} else if (strncmp(textfield->field_string, "\xFE\xFF", 2) == 0) {
 			text_encoding = "utf16be";
 		}			
 	}
