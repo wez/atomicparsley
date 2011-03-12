@@ -616,10 +616,9 @@ char* GenreIntToString(int genre) {
 uint8_t StringGenreToInt(const char* genre_string) {
 	uint8_t return_genre = 0;
 	uint8_t total_genres = (uint8_t)(sizeof(ID3v1GenreList)/sizeof(*ID3v1GenreList));
-	uint8_t genre_length = strlen(genre_string)+1;
 
 	for(uint8_t i = 0; i < total_genres; i++) {
-		if ( memcmp(genre_string, ID3v1GenreList[i], strlen(ID3v1GenreList[i])+1 > genre_length ? strlen(ID3v1GenreList[i])+1 : genre_length ) == 0) {
+		if ( strcmp(genre_string, ID3v1GenreList[i]) == 0) {
 			return_genre = i+1; //the list starts at 0; the embedded genres start at 1
 			//fprintf(stdout, "Genre %s is %i\n", ID3v1GenreList[i], return_genre);
 			break;
@@ -644,11 +643,9 @@ void ListGenresValues() {
 stiks* MatchStikString(const char* in_stik_string) {
 	stiks* matching_stik = NULL;
 	uint8_t total_known_stiks = (sizeof(stikArray)/sizeof(*stikArray));
-	uint8_t stik_str_length = strlen(in_stik_string) +1;
 	
 	for (uint8_t i = 0; i < total_known_stiks; i++) {
-		if ( memcmp(in_stik_string, stikArray[i].stik_string, 
-		                         strlen(stikArray[i].stik_string)+1 > stik_str_length ? strlen(stikArray[i].stik_string)+1 : stik_str_length ) == 0) {
+		if ( strcmp(in_stik_string, stikArray[i].stik_string) == 0) {
 			matching_stik = &stikArray[i];
 			break;
 		}
@@ -697,12 +694,12 @@ bool MatchLanguageCode(const char* in_code) {
 	uint16_t total_known_langs = (uint16_t)(sizeof(known_languages)/sizeof(*known_languages));
 	
 	for (uint16_t i = 0; i < total_known_langs; i++) {
-		if (memcmp(in_code, known_languages[i].iso639_2_code, 3) == 0) {
+		if (strncmp(in_code, known_languages[i].iso639_2_code, 3) == 0) {
 			matching_lang = true;
 			break;
 		}
 		if (strlen(known_languages[i].iso639_2_code) > 3) {
-			if (memcmp(in_code, known_languages[i].iso639_2_code+4, 3) == 0) {
+			if (strncmp(in_code, known_languages[i].iso639_2_code+4, 3) == 0) {
 				matching_lang = true;
 				break;
 			}
@@ -758,10 +755,9 @@ char* ID3GenreIntToString(int genre) {
 uint8_t ID3StringGenreToInt(const char* genre_string) {
 	uint8_t return_genre = 0xFF;
 	uint8_t total_genres = 80;
-	uint8_t genre_length = strlen(genre_string)+1;
 
 	for(uint8_t i = 0; i < total_genres; i++) {
-		if ( memcmp(genre_string, ID3v1GenreList[i], strlen(ID3v1GenreList[i])+1 > genre_length ? strlen(ID3v1GenreList[i])+1 : genre_length ) == 0) {
+		if ( strcmp(genre_string, ID3v1GenreList[i]) == 0) {
 			return i;
 		}
 	}

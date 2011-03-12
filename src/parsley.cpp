@@ -225,53 +225,53 @@ PicPrefs APar_ExtractPicPrefs(char* env_PicOptions) {
 		if (env_PicOptions == NULL) return myPicturePrefs;
 
 		while (unparsed_opts[0] != 0) {
-			if (memcmp(unparsed_opts,"MaxDimensions=",14) == 0) {
+			if (strncmp(unparsed_opts,"MaxDimensions=",14) == 0) {
 				unparsed_opts+=14;
 				myPicturePrefs.max_dimension = (int)strtol(unparsed_opts, NULL, 10);
 
-			} else if (memcmp(unparsed_opts,"DPI=",4) == 0) {
+			} else if (strncmp(unparsed_opts,"DPI=",4) == 0) {
 				unparsed_opts+=4;
 				myPicturePrefs.dpi = (int)strtol(unparsed_opts, NULL, 10);
 
-			} else if (memcmp(unparsed_opts,"MaxKBytes=",10) == 0) {
+			} else if (strncmp(unparsed_opts,"MaxKBytes=",10) == 0) {
 				unparsed_opts+=10;
 				myPicturePrefs.max_Kbytes = (int)strtol(unparsed_opts, NULL, 10)*1024;
 
-			} else if (memcmp(unparsed_opts,"AllPixJPEG=",11) == 0) {
+			} else if (strncmp(unparsed_opts,"AllPixJPEG=",11) == 0) {
 				unparsed_opts+=11;
-				if (memcmp(unparsed_opts, "true", 4) == 0) {
+				if (strcmp(unparsed_opts, "true") == 0) {
 					myPicturePrefs.allJPEG = true;
 				}
 
-			} else if (memcmp(unparsed_opts,"AllPixPNG=",10) == 0) {
+			} else if (strncmp(unparsed_opts,"AllPixPNG=",10) == 0) {
 				unparsed_opts+=10;
-				if (memcmp(unparsed_opts, "true", 4) == 0) {
+				if (strcmp(unparsed_opts, "true") == 0) {
 					myPicturePrefs.allPNG = true;
 				}
 
-			} else if (memcmp(unparsed_opts,"AddBothPix=",11) == 0) {
+			} else if (strncmp(unparsed_opts,"AddBothPix=",11) == 0) {
 				unparsed_opts+=11;
-				if (memcmp(unparsed_opts, "true", 4) == 0) {
+				if (strcmp(unparsed_opts, "true") == 0) {
 					myPicturePrefs.addBOTHpix = true;
 				}
 
-			} else if (memcmp(unparsed_opts,"SquareUp",7) == 0) {
+			} else if (strcmp(unparsed_opts,"SquareUp") == 0) {
 				unparsed_opts+=7;
 				myPicturePrefs.squareUp = true;
 
-			} else if (strncmp(unparsed_opts,"removeTempPix",13) == 0) {
+			} else if (strcmp(unparsed_opts,"removeTempPix") == 0) {
 				unparsed_opts+=13;
 				myPicturePrefs.removeTempPix = true;
 
-			} else if (memcmp(unparsed_opts,"keepTempPix",11) == 0) { //NEW
+			} else if (strcmp(unparsed_opts,"keepTempPix") == 0) { //NEW
 				unparsed_opts+=11;
 				myPicturePrefs.removeTempPix = false;
 
-			} else if (memcmp(unparsed_opts,"ForceHeight=",12) == 0) {
+			} else if (strncmp(unparsed_opts,"ForceHeight=",12) == 0) {
 				unparsed_opts+=12;
 				myPicturePrefs.force_height = strtol(unparsed_opts, NULL, 10);
 
-			} else if (memcmp(unparsed_opts,"ForceWidth=",11) == 0) {
+			} else if (strncmp(unparsed_opts,"ForceWidth=",11) == 0) {
 				unparsed_opts+=11;
 				myPicturePrefs.force_width = strtol(unparsed_opts, NULL, 10);
 
@@ -560,10 +560,7 @@ AtomicInfo* APar_AtomicComparison(AtomicInfo* proto_atom, short test_atom, bool 
 
 		} else if (proto_atom->ReverseDNSname != NULL && parsedAtoms[test_atom].ReverseDNSname != NULL) {
 			//match on moov.udta.meta.ilst.----.name:[something] (reverse DNS atom)
-			size_t proto_rdns_len = strlen(proto_atom->ReverseDNSname) + 1;
-			size_t test_rdns_len = strlen(parsedAtoms[test_atom].ReverseDNSname) + 1;
-			size_t rdns_strlen = (proto_rdns_len > test_rdns_len? proto_rdns_len : test_rdns_len);
-			if (memcmp(proto_atom->ReverseDNSname, parsedAtoms[test_atom].ReverseDNSname, rdns_strlen) == 0) {
+			if (strcmp(proto_atom->ReverseDNSname, parsedAtoms[test_atom].ReverseDNSname) == 0) {
 				if (reverseDNSdomain == NULL) { //lock onto the first reverseDNS form irrespective of domain (TODO: manualAtomRemove will cause this to be NULL)
 					return_atom = &parsedAtoms[test_atom];
 				} else {
@@ -571,7 +568,7 @@ AtomicInfo* APar_AtomicComparison(AtomicInfo* proto_atom, short test_atom, bool 
 					fprintf(stdout, "AP_AtomicComparison   testing wanted rDNS %s domain against atom '%s' %s rDNS domain\n", reverseDNSdomain, parsedAtoms[test_atom].AtomicName,
 					                                                              parsedAtoms[APar_FindPrecedingAtom(test_atom)].ReverseDNSdomain);
 #endif
-					if ( memcmp(reverseDNSdomain, parsedAtoms[APar_FindPrecedingAtom(test_atom)].ReverseDNSdomain, strlen(reverseDNSdomain)+1) == 0 ) {
+					if ( strcmp(reverseDNSdomain, parsedAtoms[APar_FindPrecedingAtom(test_atom)].ReverseDNSdomain) == 0 ) {
 						return_atom = &parsedAtoms[test_atom];
 					}
 				}
@@ -693,7 +690,7 @@ AtomicInfo* APar_FindAtom(const char* atom_name, bool createMissing, uint8_t ato
 	while (search_atom_name != NULL) {
 		desired_index = 1; //reset the index
 
-		if (atom_type == EXTENDED_ATOM && memcmp(search_atom_name, "uuid=", 5) == 0 ) {
+		if (atom_type == EXTENDED_ATOM && strncmp(search_atom_name, "uuid=", 5) == 0 ) {
 			search_atom_name+=5;
 			search_atom_type = atom_type;
  		}
@@ -703,12 +700,12 @@ AtomicInfo* APar_FindAtom(const char* atom_name, bool createMissing, uint8_t ato
 #endif
 
 		size_t portion_len = strlen(search_atom_name);
-		if (memcmp(search_atom_name+4, ":[", 2) == 0 && memcmp(search_atom_name + portion_len -1, "]", 1) == 0) {
+		if (strncmp(search_atom_name+4, ":[", 2) == 0 && search_atom_name[portion_len-1] == ']') {
 			reverse_dns_name = search_atom_name + 4+2; //4bytes atom name 2bytes ":["
 			revdns_name_len = portion_len-7; //4bytes atom name, 2 bytes ":[", 1 byte "]"
 			search_atom_type = atom_type;
 
-		} else if (memcmp(search_atom_name+4, "[", 1) == 0) {
+		} else if (search_atom_name[4] == '[') {
 			long sa_length=0;
 			char sa_at_5=NULL;
 			sa_length=strlen(search_atom_name);
@@ -824,7 +821,7 @@ AtomicInfo* APar_FindAtom(const char* atom_name, bool createMissing, uint8_t ato
 				if (search_atom_name[0] == 0) {
 					search_atom_name = NULL;
 					break;
-				} else if (memcmp(search_atom_name, ".", 1) == 0 && periodicity > 3) {
+				} else if (search_atom_name[0] == '.' && periodicity > 3) {
 					search_atom_name++;
 					periodicity++;
 					break;
@@ -1122,7 +1119,7 @@ int APar_MatchToKnownAtom(const char* atom_name, const char* atom_container, boo
 
 	//if this atom is "data" get the full path to it; we will take any atom under 'ilst' and consider it an iTunes metadata parent atom
 	} else if (memcmp(atom_name, "data", 4) == 0 && find_atom_path != NULL) {
-		if (memcmp(find_atom_path, "moov.udta.meta.ilst.", 20) == 0) {
+		if (strncmp(find_atom_path, "moov.udta.meta.ilst.", 20) == 0) {
 			return_known_atom = total_known_atoms-1; //last KnowAtoms is a generic placeholder iTunes-data atom
 			//fprintf(stdout, "found iTunes data child\n");
 		}
@@ -1138,7 +1135,7 @@ int APar_MatchToKnownAtom(const char* atom_name, const char* atom_container, boo
 		}
 
 		//fprintf(stdout, "APar_ProvideAtomPath gives %s (%s-%s)\n", fullpath, atom_name, atom_container);
-		if (memcmp(fullpath, "moov.udta.meta.ilst.", 20) == 0) {
+		if (strncmp(fullpath, "moov.udta.meta.ilst.", 20) == 0) {
 			return_known_atom = total_known_atoms-1; //last KnowAtoms is a generic placeholder iTunes-data atom
 			//fprintf(stdout, "found iTunes data child\n");
 		}
@@ -1152,7 +1149,7 @@ int APar_MatchToKnownAtom(const char* atom_name, const char* atom_container, boo
 
 		APar_ProvideAtomPath(parsedAtoms[atom_number-1].AtomicNumber, fullpath, fromFile);
 
-		if (memcmp(fullpath, "moov.trak.mdia.minf.stbl.stsd.", 30) == 0) {
+		if (strncmp(fullpath, "moov.trak.mdia.minf.stbl.stsd.", 30) == 0) {
 			return_known_atom = total_known_atoms-3; //manually return the esds atom
 		}
 		free(fullpath);
@@ -1164,7 +1161,7 @@ int APar_MatchToKnownAtom(const char* atom_name, const char* atom_container, boo
 		for(uint32_t i = 1; i < total_known_atoms; i++) {
 			if (memcmp(atom_name, KnownAtoms[i].known_atom_name, 4) == 0) {
 				//name matches, now see if the container atom matches any known container for that atom
-				if ( memcmp(KnownAtoms[i].known_parent_atoms[0], "_ANY_LEVEL", 10) == 0 ) {
+				if ( strncmp(KnownAtoms[i].known_parent_atoms[0], "_ANY_LEVEL", 10) == 0 ) {
 					return_known_atom = i; //the list starts at 0; the unknown atom is at 0; first known atom (ftyp) is at 1
 					break;
 
@@ -1172,7 +1169,7 @@ int APar_MatchToKnownAtom(const char* atom_name, const char* atom_container, boo
 					uint8_t total_known_containers = (uint8_t)(sizeof(KnownAtoms[i].known_parent_atoms)/sizeof(*KnownAtoms[i].known_parent_atoms)); //always 5
 					for (uint8_t iii = 0; iii < total_known_containers; iii++) {
 						if (KnownAtoms[i].known_parent_atoms[iii] != NULL) {
-							if ( memcmp(atom_container, KnownAtoms[i].known_parent_atoms[iii], strlen(atom_container) ) == 0) { //strlen(atom_container)
+							if ( strncmp(atom_container, KnownAtoms[i].known_parent_atoms[iii], strlen(atom_container) ) == 0) { //strlen(atom_container)
 								return_known_atom = i; //the list starts at 0; the unknown atom is at 0; first known atom (ftyp) is at 1
 								break;
 							}
@@ -2271,7 +2268,7 @@ APar_MetaData_atomArtwork_Set
 void APar_MetaData_atomArtwork_Set(const char* artworkPath, char* env_PicOptions) {
 	if (metadata_style == ITUNES_STYLE) {
 		const char* artwork_atom = "moov.udta.meta.ilst.covr";
-		if (memcmp(artworkPath, "REMOVE_ALL", 10) == 0) {
+		if (strcmp(artworkPath, "REMOVE_ALL") == 0) {
 			APar_RemoveAtom(artwork_atom, SIMPLE_ATOM, 0);
 
 		} else {
@@ -2668,7 +2665,7 @@ AtomicInfo* APar_reverseDNS_atom_Init(const char* rDNS_atom_name, const char* rD
 		desiredAtom = APar_CreateSparseAtom(&proto_rDNS_data_atom, ilst_atom, rDNS_name_atom);
 		APar_MetaData_atom_QuickInit(desiredAtom->AtomicNumber, *atomFlags, 0, MAXDATA_PAYLOAD);
 	}	else {
-		if (memcmp(rDNS_domain, "com.apple.iTunes", 17) == 0) { //for the iTunes domain, only support 1 'data' entry
+		if (strcmp(rDNS_domain, "com.apple.iTunes") == 0) { //for the iTunes domain, only support 1 'data' entry
 			APar_MetaData_atom_QuickInit(desiredAtom->NextAtomNumber, *atomFlags, 0, MAXDATA_PAYLOAD);
 			desiredAtom = &parsedAtoms[desiredAtom->NextAtomNumber];
 
@@ -4804,7 +4801,7 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 	} else {
 		//case-sensitive compare means "The.m4a" is different from "THe.m4a"; on certiain Mac OS X filesystems a case-preservative but case-insensitive FS exists &
 		//AP probably will have a problem there. Output to a uniquely named file as I'm not going to poll the OS for the type of FS employed on the target drive.
-		if (strncmp(ISObasemediafile,outfile,strlen(outfile)) == 0 && (strlen(outfile) == strlen(ISObasemediafile)) ) {
+		if (strcmp(ISObasemediafile,outfile) == 0) {
 			//er, nice try but you were trying to ouput to the exactly named file of the original. Y'all ain't so slick
 			APar_DeriveNewPath(ISObasemediafile, temp_file_name, 0, "-temp-", NULL);
 			temp_file = APar_OpenFile(temp_file_name, "wb");
