@@ -198,6 +198,7 @@ static const char* shortHelp_text =
 "For file-level options & padding info: see --file-help\n"
 "Setting custom private tag extensions: see --uuid-help\n"
 "Setting ID3 tags onto mpeg-4 files: see --ID3-help\n"
+"\n"
 "----------------------------------------------------------------------"
 ;
 
@@ -899,19 +900,29 @@ const char* find_ID3_optarg(char *argv[], int start_optargs, const char* arg_str
 
 //***********************************************
 
+static void show_short_help(void)
+{
+	printf("%s\n", shortHelp_text);
+	ShowVersionInfo();
+	printf("\nReport issues at %s\n", PACKAGE_BUGREPORT);
+}
+
 int real_main(int argc, char *argv[])
 {
 	if (argc == 1) {
-		fprintf (stdout,"%s\n", shortHelp_text); exit(0);
+		show_short_help();
+		exit(0);
 	} else if (argc == 2 && ((strncmp(argv[1],"-v",2) == 0) || (strncmp(argv[1],"-version",2) == 0)) ) {
 
 		ShowVersionInfo();
 		exit(0);
 
 	} else if (argc == 2) {
-		if ( (strncmp(argv[1],"-help",5) == 0) || (strncmp(argv[1],"--help",6) == 0) || (strncmp(argv[1],"-h",5) == 0 ) ) {
-			fprintf(stdout, "%s\n", shortHelp_text); exit(0);
-
+		if ((strncmp(argv[1],"-help",5) == 0) ||
+				(strncmp(argv[1],"--help",6) == 0) ||
+				(strncmp(argv[1],"-h",5) == 0 ) ) {
+			show_short_help();
+			exit(0);
 		} else if ( (strncmp(argv[1],"--longhelp", 10) == 0) || (strncmp(argv[1],"-longhelp", 9) == 0) || (strncmp(argv[1],"-Lh", 3) == 0) ) {
 #if defined (_WIN32)
 			if (UnicodeOutputStatus == WIN32_UTF16) { //convert the helptext to utf16 to preserve © characters
