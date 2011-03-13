@@ -1056,6 +1056,7 @@ int real_main(int argc, char *argv[])
         { "encodedBy",        required_argument,  NULL,           Meta_EncodedBy },
         { "apID",             required_argument,  NULL,           Meta_apID },
         { "cnID",             required_argument,  NULL,           Meta_cnID },
+        { "xID",              required_argument,  NULL,           Meta_xID },
         { "gapless",          required_argument,  NULL,           Meta_PlayGapless },
         { "sortOrder",        required_argument,  NULL,           Meta_SortOrder } ,
 
@@ -1638,11 +1639,8 @@ int real_main(int argc, char *argv[])
                 break;
             }
 
-            uint32_t data_value = 0;
-            sscanf(optarg, "%" SCNu32, &data_value );
-
-            AtomicInfo* xIDData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.xid .data", optarg, AtomFlags_Data_UInt);
-            APar_Unified_atom_Put(xIDData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, data_value, 32);
+            AtomicInfo* xIDData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.xid .data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(xIDData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
             break;
         }
 
