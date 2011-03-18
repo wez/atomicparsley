@@ -185,7 +185,7 @@ static const char* shortHelp_text =
 "  --encodedBy    (string)     Set the name of the Person/company who encoded the file\n"
 "  --apID         (string)     Set the Account Name\n"
 "  --cnID         (number)     Set the iTunes Catalog ID (see --longhelp)\n"
-"  --xid          (string)     Set the vendor-supplied iTunes xID (see --longhelp)\n"
+"  --xID          (string)     Set the vendor-supplied iTunes xID (see --longhelp)\n"
 "  --gapless      (boolean)    Set the gapless playback flag\n"
 "  --contentRating (string*)   Set tv/mpaa rating (see -rDNS-help)\n"
 "\n"
@@ -278,7 +278,7 @@ static const char* longHelp_text =
 "                                       (Must not use \"stik\" of value Movie(0), use Short Film(9))\n"
 "                                       (A bad idea for numbers is from http://www.imdb.com/ listings)\n"
 "                                       (A better idea for numbers is from the iTunes Store URL)\n"
-"  --xid              ,       (str)    Set iTunes vendor-supplied xID, used to allow iTunes LPs and iTunes Extras to interact \n"
+"  --xID              ,       (str)    Set iTunes vendor-supplied xID, used to allow iTunes LPs and iTunes Extras to interact \n"
 "                                            with other content in your iTunes Library\n"
 "  --gapless          ,       (bool)   Sets the gapless playback flag for a track in a gapless album\n"
 
