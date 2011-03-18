@@ -77,9 +77,9 @@ stiks stikArray[] = {
 
 geIDMovie genreidmovie[] = {
 	{ "Action & Adventure", 4401 },
-	{ "Anime", 4402},
-	{ "Classics", 4403},
-	{ "Comedy", 4404},
+	{ "Anime", 4402 },
+	{ "Classics", 4403 },
+	{ "Comedy", 4404 },
 	{ "Documentary", 4405 },
 	{ "Drama", 4406 },
 	{ "Foreign", 4407 },
@@ -108,9 +108,9 @@ geIDMovie genreidmovie[] = {
 
 geIDTV genreidtv[] = {
 	{ "Comedy", 4000 },
-	{ "Drama", 4001},
-	{ "Animation", 4002},
-	{ "Action & Adventure", 4003},
+	{ "Drama", 4001 },
+	{ "Animation", 4002 },
+	{ "Action & Adventure", 4003 },
 	{ "Classic", 4004 },
 	{ "Kids", 4005 },
 	{ "Nonfiction", 4005 },
