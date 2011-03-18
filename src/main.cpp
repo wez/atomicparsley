@@ -69,6 +69,7 @@
 #define Meta_PurchaseDate        'D'
 #define Meta_apID                'Y'
 #define Meta_cnID                0xC0
+#define Meta_geID                0xC2
 #define Meta_xID                 0xC3
 #define Meta_EncodingTool        0xB7
 #define Meta_EncodedBy           0xC1
@@ -185,6 +186,7 @@ static const char* shortHelp_text =
 "  --encodedBy    (string)     Set the name of the Person/company who encoded the file\n"
 "  --apID         (string)     Set the Account Name\n"
 "  --cnID         (number)     Set the iTunes Catalog ID (see --longhelp)\n"
+"  --geID         (number)     Set the iTunes Genre ID (see --longhelp)\n"
 "  --xID          (string)     Set the vendor-supplied iTunes xID (see --longhelp)\n"
 "  --gapless      (boolean)    Set the gapless playback flag\n"
 "  --contentRating (string*)   Set tv/mpaa rating (see -rDNS-help)\n"
@@ -274,10 +276,23 @@ static const char* longHelp_text =
 "  --encodedBy        ,       (str)    Set the name of the Person/company who encoded the file on the \"\302©enc\" atom\n"
 "  --apID             ,  -Y   (str)    Set the name of the Account Name on the \"apID\" atom\n"
 "  --cnID             ,       (num)    Set iTunes Catalog ID, used for combining SD and HD encodes in iTunes on the \"cnID\" atom\n"
-"                                       (To combine you must set \"hdvd\" atom on one file and must have same \"stik\" on both file)\n"
-"                                       (Must not use \"stik\" of value Movie(0), use Short Film(9))\n"
-"                                       (A bad idea for numbers is from http://www.imdb.com/ listings)\n"
-"                                       (A better idea for numbers is from the iTunes Store URL)\n"
+"\n"
+"                                      To combine you must set \"hdvd\" atom on one file and must have same \"stik\" on both file\n"
+"                                      Must not use \"stik\" of value Movie(0), use Short Film(9)\n"
+"\n"
+"                                      iTunes Catalog numbers can be obtained by finding the item in the iTunes Store.  Once item\n"
+"                                      is found in the iTunes Store right click on picture of item and select copy link.  Paste this link\n"
+"                                      into a document or web browser to display the catalog number ID.\n"
+"\n"
+"                                      An example link for the video Street Kings is:\n"
+"                                      http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewMovie?id=278743714&s=143441\n"
+"                                      Here you can see the cnID is 278743714\n"
+"\n"
+"                                      Alternatively you can use iMDB numbers, however these will not match the iTunes catalog.\n"
+"\n"
+"  --geID             ,       (num)    Set iTunes Genre ID.  This does not necessarily have to match genre.\n"
+"                                      See --genre-movie-id-list and --genre-tv-id-list\n"
+"\n"
 "  --xID              ,       (str)    Set iTunes vendor-supplied xID, used to allow iTunes LPs and iTunes Extras to interact \n"
 "                                            with other content in your iTunes Library\n"
 "  --gapless          ,       (bool)   Sets the gapless playback flag for a track in a gapless album\n"
@@ -980,6 +995,12 @@ int real_main(int argc, char *argv[])
         } else if (strcmp(argv[1], "--ratings-list") == 0) {
             ListMediaRatings(); exit(0);
 
+        } else if (strcmp(argv[1], "--genre-movie-id-list") == 0) {
+            ListMovieGenreIDValues(); exit(0);
+
+        } else if (strcmp(argv[1], "--genre-tv-id-list") == 0) {
+            ListTVGenreIDValues(); exit(0);
+
         } else if (strcmp(argv[1], "--ID3frames-list") == 0) {
             ListID3FrameIDstrings(); exit(0);
 
@@ -1056,6 +1077,7 @@ int real_main(int argc, char *argv[])
         { "encodedBy",        required_argument,  NULL,           Meta_EncodedBy },
         { "apID",             required_argument,  NULL,           Meta_apID },
         { "cnID",             required_argument,  NULL,           Meta_cnID },
+        { "geID",             required_argument,  NULL,           Meta_geID },
         { "xID",              required_argument,  NULL,           Meta_xID },
         { "gapless",          required_argument,  NULL,           Meta_PlayGapless },
         { "sortOrder",        required_argument,  NULL,           Meta_SortOrder } ,
@@ -1630,6 +1652,20 @@ int real_main(int argc, char *argv[])
 
             AtomicInfo* cnIDData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.cnID.data", optarg, AtomFlags_Data_UInt);
             APar_Unified_atom_Put(cnIDData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, data_value, 32);
+            break;
+        }
+
+        case Meta_geID : { // the iTunes Genre ID
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "iTunes Genre ID") ) {
+                break;
+            }
+
+            uint32_t data_value = 0;
+            sscanf(optarg, "%" SCNu32, &data_value );
+
+            AtomicInfo* geIDData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.geID.data", optarg, AtomFlags_Data_UInt);
+            APar_Unified_atom_Put(geIDData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, data_value, 32);
             break;
         }
 

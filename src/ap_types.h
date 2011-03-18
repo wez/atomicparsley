@@ -203,6 +203,16 @@ typedef struct {
   const char* media_rating_cli_str;
 } m_ratings;
 
+typedef struct {
+  const char* genre_id_movie_string;
+  uint16_t genre_id_movie_value;
+} geIDMovie;
+
+typedef struct {
+  const char* genre_id_tv_string;
+  uint16_t genre_id_tv_value;
+} geIDTV;
+
 enum {
   UNIVERSAL_UTF8,
   WIN32_UTF16
