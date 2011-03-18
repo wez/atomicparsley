@@ -75,6 +75,52 @@ stiks stikArray[] = {
 	{ "Booklet", 11 }
 };
 
+geIDMovie genreidmovie[] = {
+	{ "Action & Adventure", 4401 },
+	{ "Anime", 4402},
+	{ "Classics", 4403},
+	{ "Comedy", 4404},
+	{ "Documentary", 4405 },
+	{ "Drama", 4406 },
+	{ "Foreign", 4407 },
+	{ "Horror", 4408 },
+	{ "Independent", 4409 },
+	{ "Kids & Family", 4410 },
+	{ "Musicals", 4411 },
+	{ "Romance", 4412 },
+	{ "Sci-Fi & Fantasy", 4413 },
+	{ "Short Films", 4414 },
+	{ "Special Interest", 4415 },
+	{ "Thriller", 4416 },
+	{ "Sports", 4417 },
+	{ "Western", 4418 },
+	{ "Urban", 4419 },
+	{ "Holiday", 4420 },
+	{ "Made for TV", 4421 },
+	{ "Concert Films", 4422 },
+	{ "Music Documentaries", 4423 },
+	{ "Music Feature Films", 4424 },
+	{ "Japanese Cinema", 4425 },
+	{ "Jidaigeki", 4426 },
+	{ "Tokusatsu", 4427 },
+	{ "Korean Cinema", 4428 }
+};
+
+geIDTV genreidtv[] = {
+	{ "Comedy", 4000 },
+	{ "Drama", 4001},
+	{ "Animation", 4002},
+	{ "Action & Adventure", 4003},
+	{ "Classic", 4004 },
+	{ "Kids", 4005 },
+	{ "Nonfiction", 4005 },
+	{ "Reality TV", 4007 },
+	{ "Sci-Fi & Fantasy", 4008 },
+	{ "Sports", 4009 },
+	{ "Teens", 4010 },
+	{ "Latino TV", 4011 }
+};
+
 // from William Herrera: http://search.cpan.org/src/BILLH/LWP-UserAgent-iTMS_Client-0.16/lib/LWP/UserAgent/iTMS_Client.pm
 sfIDs storefronts[] = {
 	{ "United States",	143441 },
@@ -725,6 +771,26 @@ void ListMediaRatings() {
 
 	for (uint16_t i = 0; i < total_known_ratings; i++) {
 		fprintf(stdout, " %s\n", known_ratings[i].media_rating_cli_str);
+	}
+	return;
+}
+
+void ListTVGenreIDValues() {
+	uint16_t total_genreidtv = (uint16_t)(sizeof(genreidtv)/sizeof(*genreidtv));
+	fprintf(stdout, "\tAvailable iTunes TV Genre IDs:\n");
+
+	for (uint16_t i = 0; i < total_genreidtv; i++) {
+		fprintf(stdout, "(%u) %s\n", genreidtv[i].genre_id_tv_value, genreidtv[i].genre_id_tv_string);
+	}
+	return;
+}
+
+void ListMovieGenreIDValues() {
+	uint16_t total_genreidmovie = (uint16_t)(sizeof(genreidmovie)/sizeof(*genreidmovie));
+	fprintf(stdout, "\tAvailable iTunes Movie Genre IDs:\n");
+
+	for (uint16_t i = 0; i < total_genreidmovie; i++) {
+		fprintf(stdout, "(%u) %s\n", genreidmovie[i].genre_id_movie_value, genreidmovie[i].genre_id_movie_string);
 	}
 	return;
 }

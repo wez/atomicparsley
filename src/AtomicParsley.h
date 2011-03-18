@@ -399,6 +399,8 @@ bool MatchLanguageCode(const char* in_code);
 void ListLanguageCodes();
 
 void ListMediaRatings();
+void ListTVGenreIDValues();
+void ListMovieGenreIDValues();
 const char* Expand_cli_mediastring(const char* cli_rating);
 
 char* ID3GenreIntToString(int genre);
