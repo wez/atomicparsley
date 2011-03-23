@@ -23,6 +23,10 @@
                                                                    */
 //==================================================================//
 
+#if defined HAVE_WINDOWS_H && !defined _WIN32
+#define _WIN32
+#endif
+
 #ifdef _WIN32
 #ifndef _UNICODE
 #define _UNICODE

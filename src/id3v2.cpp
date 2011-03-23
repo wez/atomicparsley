@@ -376,7 +376,7 @@ void ListID3FrameIDstrings() {
 #elif defined (HAVE_LINUX_CDROM_H)
 "  AudioCD ID frame :           (/path)\n"
 #elif defined (_WIN32)
-"  AudioCD ID frame :           (num)\n"
+"  AudioCD ID frame :           (letter)\n"
 #endif
 "  described text frame :       (str) [desc=(str)] [encoding]\n"
 "  picture frame :              (/path) [desc=(str)] [mimetype=(str)] [imagetype=(hex)] [encoding]\n"
@@ -1700,6 +1700,12 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 				const char* derived_filename = NULL;
 #if defined (_WIN32)
 				derived_filename = strrchr(frame_payload, '\\');
+#if defined (__CYGWIN__)
+				const char* derived_filename2 = strrchr(frame_payload, '/');
+				if (derived_filename2 > derived_filename) {
+					derived_filename = derived_filename2;
+				}
+#endif
 #else
 				derived_filename = strrchr(frame_payload, '/');
 #endif

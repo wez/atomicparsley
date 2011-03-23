@@ -151,7 +151,7 @@ uint8_t APar_uuid_scanf(char* in_formed_uuid, const char* raw_uuid_in) {
 	char *uuid_str, *end_uuid_str, *uuid_byte;
 	uint8_t uuid_pos, uuid_len;
 	uint8_t keeprap = 0;
-#if defined (_WIN32)
+#if defined (_WIN32) && !defined (__CYGWIN__)
 	char *raw_uuid = _strdup(raw_uuid_in);
 #else
 	char *raw_uuid = strdup(raw_uuid_in);

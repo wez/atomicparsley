@@ -42,7 +42,7 @@ findFileSize
 		(native-endian) filepath & pass that to a wide stat. Or stat it with a utf8 filepath on Unixen & win32 (stripped utf8).
 ----------------------*/
 off_t findFileSize(const char *utf8_filepath) {
-#if defined (_WIN32)
+#if defined (_WIN32) && !defined (__CYGWIN__)
 	if ( IsUnicodeWinOS() && UnicodeOutputStatus == WIN32_UTF16) {
 		wchar_t* utf16_filepath = Convert_multibyteUTF8_to_wchar(utf8_filepath);
 		
@@ -73,7 +73,7 @@ APar_OpenFile
 ----------------------*/
 FILE* APar_OpenFile(const char* utf8_filepath, const char* file_flags) {
 	FILE* aFile = NULL;
-#if defined (_WIN32)
+#if defined (_WIN32) && !defined (__CYGWIN__)
 	if ( IsUnicodeWinOS() && UnicodeOutputStatus == WIN32_UTF16) {
 		wchar_t* Lfile_flags = (wchar_t *)malloc(sizeof(wchar_t)*4);
 		memset(Lfile_flags, 0, sizeof(wchar_t)*4);
@@ -140,6 +140,8 @@ void TestFileExistence(const char *filePath, bool errorOut) {
 //                                Win32 functions                                    //
 ///////////////////////////////////////////////////////////////////////////////////////
 
+#ifndef HAVE_FSEEKO
+
 int fseeko(FILE *stream, uint64_t pos, int whence) { //only using SEEK_SET here
 	if (whence == SEEK_SET) {
 		fpos_t fpos = pos;
@@ -149,6 +151,8 @@ int fseeko(FILE *stream, uint64_t pos, int whence) { //only using SEEK_SET here
 	}
 	return -1;
 }
+
+#endif
 
 /*----------------------
 APar_OpenFileWin32
@@ -491,7 +495,7 @@ char* APar_extract_UTC(uint64_t total_secs) {
 }
 
 uint32_t APar_get_mpeg4_time() {
-#if defined (_WIN32)
+#if defined (_WIN32) && !defined (__CYGWIN__)
 	FILETIME  file_time;
 	uint64_t wintime = 0;
 	GetSystemTimeAsFileTime (&file_time);

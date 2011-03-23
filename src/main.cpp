@@ -350,9 +350,14 @@ static const char* longHelp_text =
 static const char* fileLevelHelp_text =
 "AtomicParsley help page for general & file level options.\n"
 #if defined (_WIN32)
+#ifndef __CYGWIN__
 "  Note: you can change the input/output behavior to raw 8-bit utf8 if the program name\n"
 "        is appended with \"-utf8\". AtomicParsley-utf8.exe will have problems with files/\n"
 "        folders with unicode characters in given paths.\n"
+#else
+"  Note: you can change the input/output behavior for MCDI functions to raw 8-bit utf8\n"
+"        if the program name is appended with \"-utf8\".\n"
+#endif
 "\n"
 #endif
 "------------------------------------------------------------------------------------------------\n"
@@ -442,7 +447,7 @@ static const char* fileLevelHelp_text =
 "  rewrite of the original file. Another case where a full rewrite will occur is when the original file\n"
 "  is not optimized and has 'mdat' preceding 'moov'.\n"
 "\n"
-#if defined (_WIN32)
+#if defined (_WIN32) && !defined (__CYGWIN__)
 "Examples:\n"
 "   c:> SET AP_PADDING=\"DEFAULT_PAD=0\"      or    c:> SET AP_PADDING=\"DEFAULT_PAD=3128\"\n"
 "   c:> SET AP_PADDING=\"DEFAULT_PAD=5128:MIN_PAD=200:MAX_PAD=6049\"\n"
@@ -464,7 +469,7 @@ static const char* fileLevelHelp_text =
 " is to preserve it - if it is present at all. You can choose to eliminate it by setting the environ-\n"
 " mental preference for AP_PADDING to have DEFAULT_PAD=0\n"
 "\n"
-#if defined (_WIN32)
+#if defined (_WIN32) && !defined (__CYGWIN__)
 "Example:\n"
 "   c:> SET AP_PADDING=\"DEFAULT_PAD=0\"\n"
 #else
@@ -946,7 +951,7 @@ int real_main(int argc, char *argv[])
             show_short_help();
             exit(0);
         } else if ( (strcmp(argv[1],"--longhelp") == 0) || (strcmp(argv[1],"-longhelp") == 0) || (strcmp(argv[1],"-Lh") == 0) ) {
-#if defined (_WIN32)
+#if defined (_WIN32) && !defined (__CYGWIN__)
             if (UnicodeOutputStatus == WIN32_UTF16) { //convert the helptext to utf16 to preserve © characters
                 int help_len = strlen(longHelp_text)+1;
                 wchar_t* Lhelp_text = (wchar_t *)malloc(sizeof(wchar_t)*help_len);
@@ -2923,6 +2928,8 @@ int real_main(int argc, char *argv[])
 
 #if defined (_WIN32)
 
+#if !defined (__CYGWIN__)
+
 int wmain( int argc, wchar_t *arguments[])
 {
     int return_val=0;
@@ -2975,6 +2982,23 @@ int main()
     int argc;
     wchar_t **argv = CommandLineToArgvW(GetCommandLineW(), &argc);
     return wmain(argc, argv);
+}
+
+#endif
+
+#else // defined __CYGWIN__
+
+int main( int argc, char *argv[])
+{
+    size_t name_len = strlen(argv[0]);
+    if (name_len >= 5 &&
+        (strcmp(argv[0] + (name_len-5), "-utf8") == 0 ||
+         strcmp(argv[0] + (name_len-5), "-UTF8") == 0)) {
+        UnicodeOutputStatus = UNIVERSAL_UTF8;
+    } else {
+        UnicodeOutputStatus = WIN32_UTF16;
+    }
+    return real_main(argc, argv);
 }
 
 #endif

@@ -46,7 +46,9 @@ FILE* APar_OpenISOBaseMediaFile(const char* file, bool open); //openSomeFile
 void TestFileExistence(const char *filePath, bool errorOut);
 
 #if defined (_WIN32)
+#ifndef HAVE_FSEEKO
 int fseeko(FILE *stream, uint64_t pos, int whence);
+#endif
 HANDLE APar_OpenFileWin32(const char* utf8_filepath, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
 #endif
 bool IsUnicodeWinOS();
