@@ -1,4 +1,4 @@
-/* sha1.c - Functions to compute SHA1 message digest of files or
+/* sha1.cpp - Functions to compute SHA1 message digest of files or
    memory blocks according to the NIST specification FIPS-180-1.
 
    Copyright (C) 2000, 2001, 2003, 2004, 2005 Free Software Foundation, Inc.
@@ -27,7 +27,7 @@
 	Modifications are : endian detection change
                       a cast for compiling under g++
                       file renaming
-                      eliminated SWAP in favor of swap32 & swap16 in APar_Common.h
+                      eliminated SWAP in favor of swap32 & swap16 in util.h
                       alignment macros (for msvc)
 */
 

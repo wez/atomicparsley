@@ -1,6 +1,6 @@
 //==================================================================//
 /*
-    AtomicParsley - APar_uuid.cpp
+    AtomicParsley - uuid.cpp
 
     AtomicParsley is GPL software; you can freely distribute, 
     redistribute, modify & use under the terms of the GNU General

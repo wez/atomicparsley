@@ -1,6 +1,6 @@
 //==================================================================//
 /*
-    AtomicParsley - AP_ID3v2_tags.h
+    AtomicParsley - id3v2.h
 
     AtomicParsley is GPL software; you can freely distribute, 
     redistribute, modify & use under the terms of the GNU General

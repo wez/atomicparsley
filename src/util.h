@@ -1,6 +1,6 @@
 //==================================================================//
 /*
-    AtomicParsley - AP_commons.h
+    AtomicParsley - util.h
 
     AtomicParsley is GPL software; you can freely distribute,
     redistribute, modify & use under the terms of the GNU General
