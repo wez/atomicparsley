@@ -71,6 +71,7 @@
 #define Meta_cnID                0xC0
 #define Meta_geID                0xC2
 #define Meta_xID                 0xC3
+#define Meta_storedescription    0xC4
 #define Meta_EncodingTool        0xB7
 #define Meta_EncodedBy           0xC1
 #define Meta_PlayGapless         0xBA
@@ -171,6 +172,7 @@ static const char* shortHelp_text =
 "  --stik         (string*)    Sets the iTunes \"stik\" atom (see --longhelp)\n"
 "  --description  (string)     Set the description tag\n"
 "  --longdesc     (string)     Set the long description tag\n"
+"  --storedesc    (string)     Set the store description tag\n"
 "  --TVNetwork    (string)     Set the TV Network name\n"
 "  --TVShowName   (string)     Set the TV Show name\n"
 "  --TVEpisode    (string)     Set the TV episode/production code\n"
@@ -259,6 +261,7 @@ static const char* longHelp_text =
 "  --description      ,  -p   (str)    Sets the description on the \"desc\" atom\n"
 "  --Rating           ,       (str)    Sets the Rating on the \"rate\" atom\n"
 "  --longdesc         ,  -j   (str)    Sets the long description on the \"ldes\" atom\n"
+"  --storedesc        ,       (str)    Sets the iTunes store description on the \"sdes\" atom\n"
 "  --TVNetwork        ,  -n   (str)    Sets the TV Network name on the \"tvnn\" atom\n"
 "  --TVShowName       ,  -H   (str)    Sets the TV Show name on the \"tvsh\" atom\n"
 "  --TVEpisode        ,  -I   (str)    Sets the TV Episode on \"tven\":\"209\", but its a string: \"209 Part 1\"\n"
@@ -1066,6 +1069,7 @@ int real_main(int argc, char *argv[])
         { "stik",             required_argument,  NULL,           Meta_stik },
         { "description",      required_argument,  NULL,           Meta_description },
         { "longdesc",         required_argument,  NULL,           Meta_longdescription },
+        { "storedesc",        required_argument,  NULL,           Meta_storedescription },
         { "Rating",           required_argument,  NULL,           Meta_Rating },
         { "TVNetwork",        required_argument,  NULL,           Meta_TV_Network },
         { "TVShowName",       required_argument,  NULL,           Meta_TV_ShowName },
@@ -1566,6 +1570,17 @@ int real_main(int argc, char *argv[])
             }
 
             AtomicInfo* descriptionData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.ldes.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(descriptionData_atom, optarg, UTF8_iTunesStyle_Unlimited, 0, 0);
+            break;
+        }
+
+        case Meta_storedescription : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "storedesc") ) {
+                break;
+            }
+
+            AtomicInfo* descriptionData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.sdes.data", optarg, AtomFlags_Data_Text);
             APar_Unified_atom_Put(descriptionData_atom, optarg, UTF8_iTunesStyle_Unlimited, 0, 0);
             break;
         }
