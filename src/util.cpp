@@ -571,7 +571,7 @@ wchar_t* Convert_multibyteUTF8_to_wchar(const char* input_utf8) { //TODO: is thi
 	unsigned char* utf16_conversion = (unsigned char*)malloc( sizeof(unsigned char)* string_length * 2 );
 	memset(utf16_conversion, 0, string_length * 2 );
 			
-	int utf_16_glyphs = UTF8ToUTF16BE(utf16_conversion, char_glyphs * 2, (unsigned char*)input_utf8, string_length);
+	int utf_16_glyphs = UTF8ToUTF16BE(utf16_conversion, char_glyphs * 2, (unsigned char*)input_utf8, string_length) / 2; //returned value is in bytes
 	return_val = Convert_multibyteUTF16_to_wchar((char*)utf16_conversion, (size_t)utf_16_glyphs, false );
 	free(utf16_conversion); utf16_conversion=NULL;
 	return (return_val);
