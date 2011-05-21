@@ -214,6 +214,7 @@ void APar_MetaData_atomArtwork_Set(const char* artworkPath,
   char* env_PicOptions);
 
 void APar_MetaData_atomGenre_Set(const char* atomPayload);
+void APar_MetaData_atomLyrics_Set(const char* lyricsPath);
 void APar_MetaData_atom_QuickInit(short atom_num, const uint32_t atomFlags,
   uint32_t supplemental_length, uint32_t allotment = MAXDATA_PAYLOAD + 1);
 

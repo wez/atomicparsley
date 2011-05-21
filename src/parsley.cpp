@@ -2241,6 +2241,41 @@ void APar_MetaData_atomGenre_Set(const char* atomPayload) {
 }
 
 /*----------------------
+APar_MetaData_atomLyrics_Set
+	lyricsPath - the path that was provided to a (hopefully) existent txt file
+
+	lyrics will be read from a file because they can contain multiple lines. Lines are stored with old Mac-style line endings (single carriage return).
+----------------------*/
+void APar_MetaData_atomLyrics_Set(const char* lyricsPath) {
+	if (metadata_style == ITUNES_STYLE) {
+		TestFileExistence(lyricsPath, true);
+		off_t file_len = findFileSize(lyricsPath);
+
+		APar_Verify__udta_meta_hdlr__atom();
+		modified_atoms = true;
+
+		AtomicInfo* lyricsData_atom = APar_FindAtom("moov.udta.meta.ilst.©lyr.data", true, VERSIONED_ATOM, 0);
+		APar_MetaData_atom_QuickInit(lyricsData_atom->AtomicNumber, AtomFlags_Data_Text, 0, file_len + 1);
+
+		FILE* lyrics_file = APar_OpenFile(lyricsPath, "r");
+		off_t chars_read = 0;
+		char* dest = lyricsData_atom->AtomicData + 4;
+		while (!feof(lyrics_file) && !ferror(lyrics_file) && chars_read < file_len) {
+			fgets(dest, file_len + 1 - chars_read, lyrics_file);
+			size_t new_chars = strlen(dest); //NUL bytes in the file will cause parts of the text to be skipped
+			chars_read += new_chars;
+			dest += new_chars;
+			if (dest[-1] == '\n') dest[-1] = '\r';
+		}
+		lyricsData_atom->AtomicLength += chars_read;
+		fclose(lyrics_file);
+
+		APar_FlagMovieHeader();
+	} //end if (metadata_style == ITUNES_STYLE)
+	return;
+}
+
+/*----------------------
 APar_MetaData_atomArtwork_Init
 	atom_num - the AtomicNumber of the atom in the parsedAtoms array (probably newly created)
 	artworkPath - the path that was provided on a (hopefully) existant jpg/png file

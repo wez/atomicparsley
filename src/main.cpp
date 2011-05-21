@@ -43,6 +43,7 @@
 #define Meta_comment             'c'
 #define Meta_year                'y'
 #define Meta_lyrics              'l'
+#define Meta_lyrics_file         0xC7
 #define Meta_composer            'w'
 #define Meta_copyright           'x'
 #define Meta_grouping            'G'
@@ -160,6 +161,7 @@ static const char* shortHelp_text =
 "  --comment      (string)     Set the comment tag\n"
 "  --year         (num|UTC)    Year tag (see --longhelp for \"Release Date\")\n"
 "  --lyrics       (string)     Set lyrics (not subject to 256 byte limit)\n"
+"  --lyricsFile   (/path)      Set lyrics to the content of a file\n"
 "  --composer     (string)     Set the composer tag\n"
 "  --copyright    (string)     Set the copyright tag\n"
 "  --grouping     (string)     Set the grouping tag\n"
@@ -243,6 +245,7 @@ static const char* longHelp_text =
 "  --year             ,  -y   (num|UTC)    Set the year tag: \"moov.udta.meta.ilst.\302©day.data\"\n"
 "                                          set with UTC \"2006-09-11T09:00:00Z\" for Release Date\n"
 "  --lyrics           ,  -l   (str)    Set the lyrics tag: \"moov.udta.meta.ilst.\302©lyr.data\"\n"
+"  --lyricsFiles      ,       (/path)  Set the lyrics tag to the content of a file\n"
 "  --composer         ,  -w   (str)    Set the composer tag: \"moov.udta.meta.ilst.\302©wrt.data\"\n"
 "  --copyright        ,  -x   (str)    Set the copyright tag: \"moov.udta.meta.ilst.cprt.data\"\n"
 "  --grouping         ,  -G   (str)    Set the grouping tag: \"moov.udta.meta.ilst.\302©grp.data\"\n"
@@ -1057,6 +1060,7 @@ int real_main(int argc, char *argv[])
         { "comment",          required_argument,  NULL,           Meta_comment },
         { "year",             required_argument,  NULL,           Meta_year },
         { "lyrics",           required_argument,  NULL,           Meta_lyrics },
+        { "lyricsFile",       required_argument,  NULL,           Meta_lyrics_file },
         { "composer",         required_argument,  NULL,           Meta_composer },
         { "copyright",        required_argument,  NULL,           Meta_copyright },
         { "grouping",         required_argument,  NULL,           Meta_grouping },
@@ -1369,6 +1373,16 @@ int real_main(int argc, char *argv[])
 
             AtomicInfo* lyricsData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©lyr.data", optarg, AtomFlags_Data_Text);
             APar_Unified_atom_Put(lyricsData_atom, optarg, UTF8_iTunesStyle_Unlimited, 0, 0);
+            break;
+        }
+
+        case Meta_lyrics_file : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "lyrics") ) {
+                break;
+            }
+
+            APar_MetaData_atomLyrics_Set(optarg);
             break;
         }
 
