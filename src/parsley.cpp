@@ -2257,17 +2257,21 @@ void APar_MetaData_atomLyrics_Set(const char* lyricsPath) {
 		AtomicInfo* lyricsData_atom = APar_FindAtom("moov.udta.meta.ilst.©lyr.data", true, VERSIONED_ATOM, 0);
 		APar_MetaData_atom_QuickInit(lyricsData_atom->AtomicNumber, AtomFlags_Data_Text, 0, file_len + 1);
 
-		FILE* lyrics_file = APar_OpenFile(lyricsPath, "r");
-		off_t chars_read = 0;
+		FILE* lyrics_file = APar_OpenFile(lyricsPath, "rb");
+		off_t remaining = file_len;
 		char* dest = lyricsData_atom->AtomicData + 4;
-		while (!feof(lyrics_file) && !ferror(lyrics_file) && chars_read < file_len) {
-			fgets(dest, file_len + 1 - chars_read, lyrics_file);
-			size_t new_chars = strlen(dest); //NUL bytes in the file will cause parts of the text to be skipped
-			chars_read += new_chars;
-			dest += new_chars;
-			if (dest[-1] == '\n') dest[-1] = '\r';
+		char* sol;
+		while (remaining && (sol = fgets(dest, remaining + 1, lyrics_file))) {
+			size_t len = strlen(sol); //NUL bytes in the file will cause parts of the text to be skipped
+			//normalize different EOL styles to carriage returns
+			if (sol[len-1] == '\n') {
+				if (sol[len-2] == '\r') sol[--len] = '\0';
+				else sol[len-1] = '\r';
+			}
+			remaining -= len;
+			dest += len;
 		}
-		lyricsData_atom->AtomicLength += chars_read;
+		lyricsData_atom->AtomicLength += dest - (lyricsData_atom->AtomicData + 4);
 		fclose(lyrics_file);
 
 		APar_FlagMovieHeader();
