@@ -542,8 +542,8 @@ wchar_t* Convert_multibyteUTF16_to_wchar(char* input_unicode, size_t glyph_lengt
 		BOM_mark_bytes = 2;
 	}
 	
-	wchar_t* utf16_data = (wchar_t*)malloc( sizeof(wchar_t)* glyph_length ); //just to be sure there will be a trailing NULL
-	wmemset(utf16_data, 0, glyph_length);
+	wchar_t* utf16_data = (wchar_t*)malloc( sizeof(wchar_t)* (glyph_length+1) ); //just to be sure there will be a trailing NULL
+	wmemset(utf16_data, 0, glyph_length + 1);
 						
 	for(size_t i = 0; i < glyph_length; i++) {
 #if defined (__ppc__) || defined (__ppc64__)
