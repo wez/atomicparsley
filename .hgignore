@@ -24,3 +24,5 @@ src/.deps
 config.guess
 config.sub
 src/stamp-h1
+a.out.dSYM
+a.out
