@@ -22,6 +22,7 @@ case $host in
   *darwin*)
 
     AP_NATIVE_ARCH=`arch`
+    AP_64_ARCH="x86_64"
     case $AP_NATIVE_ARCH in
       ppc*)
         AP_CROSS_ARCH="i386"
@@ -32,14 +33,15 @@ case $host in
     esac
     AC_SUBST(AP_CROSS_ARCH)
     AC_SUBST(AP_NATIVE_ARCH)
+    AC_SUBST(AP_64_ARCH)
 
     HAVE_DARWIN_PLATFORM="true"
     AC_SUBST(HAVE_DARWIN_PLATFORM)
 
     AC_MSG_CHECKING([if we are os/x universal])
     if test "$universal" = "yes" ; then
-      AC_MSG_RESULT([building for $AP_NATIVE_ARCH and $AP_CROSS_ARCH])
-      UNIVERSAL_FLAGS="-arch $AP_NATIVE_ARCH -arch $AP_CROSS_ARCH"
+      AC_MSG_RESULT([building for $AP_NATIVE_ARCH, $AP_CROSS_ARCH, and $AP_64_ARCH])
+      UNIVERSAL_FLAGS="-arch $AP_NATIVE_ARCH -arch $AP_CROSS_ARCH -arch $AP_64_ARCH"
       AC_SUBST(UNIVERSAL_FLAGS)
     fi
     AC_MSG_RESULT([no])
