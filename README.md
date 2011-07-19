@@ -26,7 +26,7 @@ The default is to build a universal binary.
 switching between a universal build and a platform dependent build should be
 accompanied by a "make maintainter-clean" and a ./configure between builds.
 
-To *not* building a Mac OS X universal binary:
+To *not* build a Mac OS X universal binary:
 
       % make maintainer-clean
       % ./configure --disable-universal
