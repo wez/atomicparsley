@@ -36,6 +36,7 @@
 #define OPT_ExtractPixToPath     'e'
 #define Meta_artist              'a'
 #define Meta_songtitle           's'
+#define Meta_subtitle            0xC5
 #define Meta_album               'b'
 #define Meta_tracknum            'k'
 #define Meta_disknum             'd'
@@ -1053,6 +1054,7 @@ int real_main(int argc, char *argv[])
         { "extractPixToPath", required_argument,  NULL,           OPT_ExtractPixToPath },
         { "artist",           required_argument,  NULL,           Meta_artist },
         { "title",            required_argument,  NULL,           Meta_songtitle },
+        { "subtitle",         required_argument,  NULL,           Meta_subtitle },
         { "album",            required_argument,  NULL,           Meta_album },
         { "genre",            required_argument,  NULL,           Meta_genre },
         { "tracknum",         required_argument,  NULL,           Meta_tracknum },
@@ -1262,6 +1264,17 @@ int real_main(int argc, char *argv[])
             }
 
             AtomicInfo* titleData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©nam.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(titleData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_subtitle : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "subtitle") ) {
+                break;
+            }
+
+            AtomicInfo* titleData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©st3.data", optarg, AtomFlags_Data_Text);
             APar_Unified_atom_Put(titleData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
             break;
         }
