@@ -1073,6 +1073,7 @@ int real_main(int argc, char *argv[])
         { "producer",         required_argument,  NULL,           Meta_producer },
 //        { "performer",        required_argument,  NULL,           Meta_performer },
         { "soundEngineer",    required_argument,  NULL,           Meta_soundEngineer },
+        { "soloist",          required_argument,  NULL,           Meta_soloist },
         { "executiveProducer",required_argument,  NULL,           Meta_executiveProducer },
         { "title",            required_argument,  NULL,           Meta_songtitle },
         { "subtitle",         required_argument,  NULL,           Meta_subtitle },
