@@ -35,6 +35,17 @@
 #define OPT_ExtractPix           'E'
 #define OPT_ExtractPixToPath     'e'
 #define Meta_artist              'a'
+#define Meta_artDirector         0xC6
+#define Meta_arranger            0xC8
+#define Meta_author              0xC9
+#define Meta_conductor           0xD0
+#define Meta_director            0xD1
+#define Meta_originalArtist      0xD2
+#define Meta_producer            0xD3
+//#define Meta_performer           0xD4
+#define Meta_soundEngineer       0xD5
+#define Meta_soloist             0xD6
+#define Meta_executiveProducer   0xD7
 #define Meta_songtitle           's'
 #define Meta_subtitle            0xC5
 #define Meta_album               'b'
@@ -1053,6 +1064,16 @@ int real_main(int argc, char *argv[])
         { "extractPix",                       0,  NULL,           OPT_ExtractPix },
         { "extractPixToPath", required_argument,  NULL,           OPT_ExtractPixToPath },
         { "artist",           required_argument,  NULL,           Meta_artist },
+        { "artDirector",      required_argument,  NULL,           Meta_artDirector },
+        { "arranger",         required_argument,  NULL,           Meta_arranger },
+        { "author",           required_argument,  NULL,           Meta_author },
+        { "conductor",        required_argument,  NULL,           Meta_conductor },
+        { "director",         required_argument,  NULL,           Meta_director },
+        { "originalArtist",   required_argument,  NULL,           Meta_originalArtist },
+        { "producer",         required_argument,  NULL,           Meta_producer },
+//        { "performer",        required_argument,  NULL,           Meta_performer },
+        { "soundEngineer",    required_argument,  NULL,           Meta_soundEngineer },
+        { "executiveProducer",required_argument,  NULL,           Meta_executiveProducer },
         { "title",            required_argument,  NULL,           Meta_songtitle },
         { "subtitle",         required_argument,  NULL,           Meta_subtitle },
         { "album",            required_argument,  NULL,           Meta_album },
@@ -1253,6 +1274,151 @@ int real_main(int argc, char *argv[])
                 break;
             }
             AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©ART.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_artDirector : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "artDirector") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©ard.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_arranger : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "arranger") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©arg.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_author : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "author") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©aut.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_conductor : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "conductor") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©con.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_director : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "director") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©dir.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_originalArtist : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "originalArtist") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©ope.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_producer : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "producer") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©prd.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+/*
+        case Meta_performer : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "performer") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©prf.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+*/
+
+        case Meta_soundEngineer : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "soundEngineer") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©sne.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_soloist : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "soloist") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©sol.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_executiveProducer : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "executiveProducer") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.©xpd.data", optarg, AtomFlags_Data_Text);
             APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
             break;
         }
