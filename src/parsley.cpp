@@ -2099,11 +2099,8 @@ void APar_Unified_atom_Put(AtomicInfo* target_atom, const char* unicode_data,
 			} else if (text_tag_style == UTF8_iTunesStyle_Unlimited) {
 				total_bytes = strlen(unicode_data);
 
-				if (total_bytes > MAXDATA_PAYLOAD) {
-					free(target_atom->AtomicData);
-					target_atom->AtomicData = NULL;
-
-					target_atom->AtomicData = (char*)malloc( sizeof(char)* (total_bytes +1) );
+				if (atom_data_pos + total_bytes > MAXDATA_PAYLOAD) {
+					target_atom->AtomicData = (char*)realloc(target_atom->AtomicData, sizeof(char)* (atom_data_pos +total_bytes +1) );
 					memset(target_atom->AtomicData + atom_data_pos, 0, total_bytes +1);
 
 				}
