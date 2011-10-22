@@ -1308,20 +1308,21 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 
 					uuid_info.uuid_form = UUID_DEPRECATED_FORM; //start with the assumption that any found atom is in the depracted uuid form
 
-					APar_readX_noseek(data, file, 12);
+					APar_readX_noseek(data, file, 8);
 					char *atom = data+4;
 					dataSize = UInt32FromBigEndian(data);
 
 					if (jpeg2000signature) {
 						if (memcmp(atom, "ftyp", 4) == 0) {
-							APar_IdentifyBrand( data + 8 );
+							APar_readX_noseek(twenty_byte_buffer, file, 4);
+							APar_IdentifyBrand(twenty_byte_buffer);
 						} else {
 							exit(0); //the atom right after the jpeg2000/mjpeg2000 signature is *supposed* to be 'ftyp'
 						}
 						jpeg2000signature = false;
 					}
 
-					if ( dataSize > file_size) {
+					if (dataSize > file_size - jump) {
 						dataSize = file_size - jump;
 					}
 
@@ -1355,7 +1356,7 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 						APar_readX(uuid_info.binary_uuid, file, jump+8, 16);
 
 						if (UInt32FromBigEndian(uuid_info.binary_uuid+8) == 0) { //the deperacted uuid form
-							atom = data+8;
+							memcpy(atom, uuid_info.binary_uuid, 4);
 							atom_verflags = APar_read32(uuid_info.binary_uuid, file, jump+12);
 							if (atom_verflags > AtomFlags_Data_UInt) {
 								atom_verflags = 0;
@@ -1382,7 +1383,7 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 					}
 
 					if (KnownAtoms[filtered_known_atom].box_type == VERSIONED_ATOM && !corrupted_data_atom) {
-						atom_verflags = UInt32FromBigEndian(data+8); //flags & versioning were already read in with the original 12 bytes
+						atom_verflags = APar_read32(twenty_byte_buffer, file, jump+8);
 					}
 
 					if (KnownAtoms[filtered_known_atom].box_type == PACKED_LANG_ATOM) {
