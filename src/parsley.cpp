@@ -2247,7 +2247,7 @@ APar_MetaData_atomLyrics_Set
 void APar_MetaData_atomLyrics_Set(const char* lyricsPath) {
 	if (metadata_style == ITUNES_STYLE) {
 		TestFileExistence(lyricsPath, true);
-		off_t file_len = findFileSize(lyricsPath);
+		uint64_t file_len = findFileSize(lyricsPath);
 
 		APar_Verify__udta_meta_hdlr__atom();
 		modified_atoms = true;
@@ -2256,7 +2256,7 @@ void APar_MetaData_atomLyrics_Set(const char* lyricsPath) {
 		APar_MetaData_atom_QuickInit(lyricsData_atom->AtomicNumber, AtomFlags_Data_Text, 0, file_len + 1);
 
 		FILE* lyrics_file = APar_OpenFile(lyricsPath, "rb");
-		off_t remaining = file_len;
+		uint64_t remaining = file_len;
 		char* dest = lyricsData_atom->AtomicData + 4;
 		char* sol;
 		while (remaining && (sol = fgets(dest, remaining + 1, lyrics_file))) {
@@ -2288,7 +2288,7 @@ APar_MetaData_atomArtwork_Init
 ----------------------*/
 void APar_MetaData_atomArtwork_Init(short atom_num, const char* artworkPath) {
 	TestFileExistence(artworkPath, true);
-	off_t picture_size = findFileSize(artworkPath);
+	uint64_t picture_size = findFileSize(artworkPath);
 
 	if (picture_size > 0) {
 		APar_MetaData_atom_QuickInit(atom_num, APar_TestArtworkBinaryData(artworkPath), 0, picture_size );

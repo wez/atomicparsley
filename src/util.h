@@ -40,7 +40,7 @@
 
 #define MAXTIME_32 6377812095ULL
 
-off_t findFileSize(const char *utf8_filepath);
+uint64_t findFileSize(const char *utf8_filepath);
 FILE* APar_OpenFile(const char* utf8_filepath, const char* file_flags);
 FILE* APar_OpenISOBaseMediaFile(const char* file, bool open); //openSomeFile
 void TestFileExistence(const char *filePath, bool errorOut);

@@ -165,7 +165,7 @@ bool ResizeGivenImage(const char* filePath, PicPrefs myPicPrefs, char* resized_p
 		}
 	}
 	
-	off_t pic_file_size = findFileSize(filePath);
+	uint64_t pic_file_size = findFileSize(filePath);
 	if ( ( (int)pic_file_size > myPicPrefs.max_Kbytes) && ( myPicPrefs.max_Kbytes != 0) ) {
 		resize = true;
 	}

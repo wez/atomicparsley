@@ -41,13 +41,13 @@ findFileSize
 		AP is running on a unicode enabled Win32 OS. If it is and converted to utf8 (rather than just stripped), convert the utf8 filepath to a utf16 
 		(native-endian) filepath & pass that to a wide stat. Or stat it with a utf8 filepath on Unixen & win32 (stripped utf8).
 ----------------------*/
-off_t findFileSize(const char *utf8_filepath) {
+uint64_t findFileSize(const char *utf8_filepath) {
 #if defined (_WIN32) && !defined (__CYGWIN__)
 	if ( IsUnicodeWinOS() && UnicodeOutputStatus == WIN32_UTF16) {
 		wchar_t* utf16_filepath = Convert_multibyteUTF8_to_wchar(utf8_filepath);
 		
 		struct _stat fileStats;
-		_wstat(utf16_filepath, &fileStats);
+		_wstati64(utf16_filepath, &fileStats);
 		
 		free(utf16_filepath);
 		utf16_filepath = NULL;
