@@ -194,13 +194,20 @@ bool IsUnicodeWinOS() {
 //                             File reading routines                                 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
+const char *APar_strferror(FILE *f) {
+	if (feof(f) && ferror(f)) return "error and end of file";
+	else if (feof(f)) return "end of file";
+	else if (ferror(f)) return "error";
+	else return "neither error nor end of file";
+}
+
 uint8_t APar_read8(FILE* ISObasemediafile, uint64_t pos) {
 	uint8_t a_byte = 0;
 	size_t size;
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(&a_byte, 1, 1, ISObasemediafile);
 	if(size != 1) {
-		printf("%s read failed, expect 1, got %u: %s\n", __FUNCTION__, (unsigned int)size, strerror(errno));
+		printf("%s read failed, expect 1, got %u: %s\n", __FUNCTION__, (unsigned int)size, APar_strferror(ISObasemediafile));
 		exit(1);
 	}
 	return a_byte;
@@ -211,7 +218,7 @@ uint16_t APar_read16(char* buffer, FILE* ISObasemediafile, uint64_t pos) {
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(buffer, 1, 2, ISObasemediafile);
 	if(size != 2) {
-		printf("%s read failed, expect 2, got %u: %s\n", __FUNCTION__, (unsigned int)size, strerror(errno));
+		printf("%s read failed, expect 2, got %u: %s\n", __FUNCTION__, (unsigned int)size, APar_strferror(ISObasemediafile));
 		exit(1);
 	}
 	return UInt16FromBigEndian(buffer);
@@ -222,7 +229,7 @@ uint32_t APar_read32(char* buffer, FILE* ISObasemediafile, uint64_t pos) {
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(buffer, 1, 4, ISObasemediafile);
 	if(size != 4) {
-		printf("%s read failed, expect 4, got %u: %s\n", __FUNCTION__, (unsigned int)size, strerror(errno));
+		printf("%s read failed, expect 4, got %u: %s\n", __FUNCTION__, (unsigned int)size, APar_strferror(ISObasemediafile));
 		exit(1);
 	}
 	return UInt32FromBigEndian(buffer);
@@ -233,7 +240,7 @@ uint64_t APar_read64(char* buffer, FILE* ISObasemediafile, uint64_t pos) {
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(buffer, 1, 8, ISObasemediafile);
 	if(size != 8) {
-		printf("%s read failed, expect 8, got %u: %s\n", __FUNCTION__, (unsigned int)size, strerror(errno));
+		printf("%s read failed, expect 8, got %u: %s\n", __FUNCTION__, (unsigned int)size, APar_strferror(ISObasemediafile));
 		exit(1);
 	}
 	return UInt64FromBigEndian(buffer);
@@ -243,7 +250,7 @@ void APar_readX_noseek(char* buffer, FILE* ISObasemediafile, uint32_t length) {
 	size_t size;
 	size = fread(buffer, 1, length, ISObasemediafile);
 	if(size != length) {
-		printf("%s read failed, expect %u, got %u: %s\n", __FUNCTION__, length, (unsigned int)size, strerror(errno));
+		printf("%s read failed, expect %u, got %u: %s\n", __FUNCTION__, length, (unsigned int)size, APar_strferror(ISObasemediafile));
 		exit(1);
 	}
 	return;
@@ -254,7 +261,7 @@ void APar_readX(char* buffer, FILE* ISObasemediafile, uint64_t pos, uint32_t len
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(buffer, 1, length, ISObasemediafile);
 	if(size != length) {
-		printf("%s read failed, expect %u, got %u: %s\n", __FUNCTION__, length, (unsigned int) size, strerror(errno));
+		printf("%s read failed, expect %u, got %u: %s\n", __FUNCTION__, length, (unsigned int) size, APar_strferror(ISObasemediafile));
 		exit(1);
 	}
 	return;

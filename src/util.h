@@ -53,6 +53,7 @@ HANDLE APar_OpenFileWin32(const char* utf8_filepath, DWORD dwDesiredAccess, DWOR
 #endif
 bool IsUnicodeWinOS();
 
+const char *APar_strferror(FILE *f);
 uint8_t APar_read8(FILE* ISObasemediafile, uint64_t pos);
 uint16_t APar_read16(char* buffer, FILE* ISObasemediafile, uint64_t pos);
 uint32_t APar_read32(char* buffer, FILE* ISObasemediafile, uint64_t pos);
