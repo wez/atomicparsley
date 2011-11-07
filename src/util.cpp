@@ -46,7 +46,7 @@ uint64_t findFileSize(const char *utf8_filepath) {
 	if ( IsUnicodeWinOS() && UnicodeOutputStatus == WIN32_UTF16) {
 		wchar_t* utf16_filepath = Convert_multibyteUTF8_to_wchar(utf8_filepath);
 		
-		struct _stat fileStats;
+		struct _stati64 fileStats;
 		_wstati64(utf16_filepath, &fileStats);
 		
 		free(utf16_filepath);
