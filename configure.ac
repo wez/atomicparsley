@@ -64,6 +64,14 @@ if test "$GCC" = "yes" ; then
   CXXFLAGS="$CXXFLAGS -Wall"
 fi
 AC_PROG_OBJC
+# Thanks automake; we MUST invoke AC_PROG_OBJCXX even though
+# we roll our own objc++ build support, because automake 1.12.1
+# throws a fatal error when it finds our .mm sources.
+# We do this because there is no good reason to bump the minimum
+# autoconf and automake dependencies.
+m4_ifdef([AC_PROG_OBJCXX], [
+AC_PROG_OBJCXX
+])
 AC_C_BIGENDIAN
 
 AC_HEADER_DIRENT
