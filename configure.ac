@@ -5,7 +5,7 @@ dnl Some intro checks and defines
 
 AC_PREREQ(2.50)
 
-AC_INIT([atomicparsley],[0.9.4],
+AC_INIT([atomicparsley],[0.9.5],
   [http://bitbucket.org/wez/atomicparsley/issues/new/])
   
 dnl Need to disable dependency tracking option so that the universal
@@ -15,8 +15,8 @@ AM_INIT_AUTOMAKE([dist-bzip2 foreign no-dependencies subdir-objects -Wall])
 AC_CANONICAL_HOST
 
 AC_ARG_ENABLE(universal, dnl
-[  --disable-universal     build a universal binary on Mac OS X [default=yes]],
-              universal=$enableval, universal=yes)
+[  --enable-universal     build a universal binary on Mac OS X [default=no]],
+              universal=$enableval, universal=no)
 
 case $host in
   *darwin*)
