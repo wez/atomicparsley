@@ -1557,13 +1557,7 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 							break;
 						}
 						case UNKNOWN_ATOM_TYPE : {
-							short parent_atom = APar_FindParentAtom(atom_number-1, generalAtomicLevel);
-							//to accommodate the retarted utility that keeps putting in 'prjp' atoms in mpeg-4 files written QTstyle
-							if (parsedAtoms[parent_atom].AtomicContainerState == DUAL_STATE_ATOM) {
-								jump = parsedAtoms[parent_atom].AtomicStart + parsedAtoms[parent_atom].AtomicLength;
-							} else {
-								jump += dataSize;
-							}
+							jump += dataSize;
 							break;
 						}
 					} //end swtich
