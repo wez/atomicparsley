@@ -1252,15 +1252,15 @@ parent can hold other atoms, but not data; a child can hold data but not other
 atoms. This 'rule' is broken sometimes (the atoms listed as DUAL_STATE_ATOM),
 but largely holds.
 
-Each atom is read in as 12 bytes (to accommodate flags & versioning). The atom
-name is extracted, and using the last known container (either FILE_LEVEL or an
-actual atom name), the new atom's hierarchy is found based on its length &
-position. Using its containing atom, the KnownAtoms table is searched to locate
-the properties of that atom (parent/child, versioned/simple), and jumping
-around in the file is based off that known atom's type. Atoms that fall into a
-hybrid category (DUAL_STATE_ATOMs) are explicitly handled. If an atom is listed
-has having a language attribute, it is read to support multiple langauges (as
-most 3GP assets do).
+Each atom is read in as 8 bytes. The atom name is extracted, and using the last
+known container (either FILE_LEVEL or an actual atom name), the new atom's
+hierarchy is found based on its length & position. Using its containing atom,
+the KnownAtoms table is searched to locate the properties of that atom (parent/
+child, versioned/simple), and jumping around in the file is based off that
+known atom's type. Atoms that fall into a hybrid category (DUAL_STATE_ATOMs)
+are explicitly handled. If an atom is known to be versioned, the version-and-
+flags attribute is read. If an atom is listed as having a language attribute,
+it is read to support multiple languages (as most 3GP assets do).
 
 ----------------------*/
 void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
