@@ -1387,6 +1387,8 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 					}
 
 					if (KnownAtoms[filtered_known_atom].box_type == PACKED_LANG_ATOM) {
+						atom_verflags = APar_read32(twenty_byte_buffer, file, jump+8);
+
 						//the problem with storing the language is that the uint16_t 2 bytes that carry the actual language are in different places on different atoms
 						//some atoms have it right after the atom version/flags; some like rating/classification have it 8 bytes later; yrrc doesn't have it at all
 						char bitpacked_lang[4];
