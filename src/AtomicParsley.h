@@ -108,19 +108,30 @@
 #endif
 
 #ifndef PRIu64
-# define PRIu64 "llu"
+# ifdef _WIN32
+#  define PRIu64 "I64u"
+# else
+#  define PRIu64 "llu"
+# endif
 #endif
-#ifndef PRIu16
-# define PRIu16 "hu"
+#ifndef PRIu32
+# define PRIu32 "u"
 #endif
-#ifndef PRIu8
-# define PRIu8 "hhu"
+#ifndef PRIx32
+# define PRIx32 "x"
+#endif
+#ifndef SCNu64
+# ifdef _WIN32
+#  define SCNu64 "I64u"
+# else
+#  define SCNu64 "llu"
+# endif
 #endif
 #ifndef SCNu32
-# define SCNu32 "lu"
+# define SCNu32 "u"
 #endif
 #ifndef SCNu16
-# define SCNu16 "u"
+# define SCNu16 "hu"
 #endif
 
 #ifndef MIN

@@ -250,7 +250,7 @@ void APar_readX_noseek(char* buffer, FILE* ISObasemediafile, uint32_t length) {
 	size_t size;
 	size = fread(buffer, 1, length, ISObasemediafile);
 	if(size != length) {
-		printf("%s read failed, expect %u, got %u: %s\n", __FUNCTION__, length, (unsigned int)size, APar_strferror(ISObasemediafile));
+		printf("%s read failed, expect %" PRIu32 ", got %" PRIu32 ": %s\n", __FUNCTION__, length, (uint32_t)size, APar_strferror(ISObasemediafile));
 		exit(1);
 	}
 	return;
@@ -261,7 +261,7 @@ void APar_readX(char* buffer, FILE* ISObasemediafile, uint64_t pos, uint32_t len
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(buffer, 1, length, ISObasemediafile);
 	if(size != length) {
-		printf("%s read failed, expect %u, got %u: %s\n", __FUNCTION__, length, (unsigned int) size, APar_strferror(ISObasemediafile));
+		printf("%s read failed, expect %" PRIu32 ", got %" PRIu32 ": %s\n", __FUNCTION__, length, (uint32_t)size, APar_strferror(ISObasemediafile));
 		exit(1);
 	}
 	return;

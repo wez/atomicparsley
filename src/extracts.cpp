@@ -1216,7 +1216,7 @@ void APar_Print_TrackDetails(TrackInfo* track_info) {
 
 	if (track_info->type_of_track & VIDEO_TRACK &&
 			( ( track_info->max_bitrate > 0 && track_info->ObjectTypeIndication == 0x20) || track_info->avc_version == 1 || track_info->protected_codec != 0) ) {
-		fprintf(stdout, "  %ux%u  (%u macroblocks)\n", track_info->video_width, track_info->video_height, track_info->macroblocks);
+		fprintf(stdout, "  %ux%u  (%" PRIu32 " macroblocks)\n", track_info->video_width, track_info->video_height, track_info->macroblocks);
 	} else if (track_info->type_of_track & VIDEO_TRACK) {
 		fprintf(stdout, "\n");
 	}
@@ -1246,7 +1246,7 @@ void APar_ExtractDetails(FILE* isofile, uint8_t optional_output) {
 	if (optional_output & SHOW_TRACK_INFO) {
 		APar_TrackLevelInfo(&track, NULL); //With track_num set to 0, it will return the total trak atom into total_tracks here.
 
-		fprintf(stdout, "Low-level details. Total tracks: %u \n", track.total_tracks);
+		fprintf(stdout, "Low-level details. Total tracks: %u\n", track.total_tracks);
 		fprintf(stdout, "Trk  Type  Handler                    Kind  Lang  Bytes\n");
 
 		if (track.total_tracks > 0) {
@@ -1271,7 +1271,7 @@ void APar_ExtractDetails(FILE* isofile, uint8_t optional_output) {
 				}
 
 				//codec, language
-				fprintf(stdout, "  %s  %s   %" PRIu64 "", uint32tochar4(track_info.track_codec, uint32_buffer), track_info.unpacked_lang, track_info.sample_aggregate);
+				fprintf(stdout, "  %s  %s   %" PRIu64, uint32tochar4(track_info.track_codec, uint32_buffer), track_info.unpacked_lang, track_info.sample_aggregate);
 
 				if (track_info.encoder_name[0] != 0 && track_info.contains_esds) {
 					purge_extraneous_characters(track_info.encoder_name);
@@ -1334,7 +1334,7 @@ void APar_ExtractBrands(char* filepath) {
 		}
 
 		uint32_t minor_version = APar_read32(buffer, a_file, 12+file_type_offset);
-		fprintf(stdout, "  -  version %u\n", minor_version);
+		fprintf(stdout, "  -  version %" PRIu32 "\n", minor_version);
 
 		fprintf(stdout, " Compatible Brands:");
 		for (uint64_t i = 16+file_type_offset; i < atom_length; i+=4) {

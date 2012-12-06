@@ -213,7 +213,7 @@ uint8_t TextField_TestBOM(char* astring) {
 
 void APar_LimitBufferRange(uint32_t max_allowed, uint32_t target_amount) {
 	if (target_amount > max_allowed) {
-		fprintf(stderr, "AtomicParsley error: insufficient memory to process ID3 tags (%u>%u). Exiting.\n", target_amount, max_allowed);
+		fprintf(stderr, "AtomicParsley error: insufficient memory to process ID3 tags (%" PRIu32 ">%" PRIu32 "). Exiting.\n", target_amount, max_allowed);
 		exit( target_amount - max_allowed );
 	}
 	return;
@@ -644,7 +644,7 @@ uint32_t APar_ExtractField(char* buffer, uint32_t maxFieldLen, ID3v2Frame* thisF
 			break;
 		}
 	}
-	//fprintf(stdout, "%u, %s, %s\n", bytes_used, buffer, (thisFrame->ID3v2_Frame_Fields+fieldNum)->field_string);
+	//fprintf(stdout, "%" PRIu32 ", %s, %s\n", bytes_used, buffer, (thisFrame->ID3v2_Frame_Fields+fieldNum)->field_string);
 	return bytes_used;
 }
 
@@ -882,7 +882,7 @@ void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom) {
 	
 	if (ID3v2_TestTagFlag(id32_atom->ID32_TagInfo->ID3v2Tag_Flags, ID32_TAGFLAG_UNSYNCRONIZATION)) {
 		//uint32_t newtagsize = ID3v2_desynchronize(id32_fulltag, id32_atom->ID32_TagInfo->ID3v2Tag_Length);
-		//fprintf(stdout, "New tag size is %u\n", newtagsize);
+		//fprintf(stdout, "New tag size is %" PRIu32 "\n", newtagsize);
 		//WriteZlibData(id32_fulltag, newtagsize);
 		//exit(0);
 		fprintf(stdout, "AtomicParsley error: an ID3 tag with the unsynchronized flag set which is not supported. Skipping.\n");
@@ -1156,7 +1156,7 @@ void APar_RenderFields(char* dest_buffer, uint32_t max_alloc, ID3v2Tag* id3_tag,
 				if (this_field->field_string != NULL) {
 					memcpy(dest_buffer + *frame_length, this_field->field_string, this_field->field_length);
 					*frame_length += this_field->field_length;
-					//fprintf(stdout, "Field idx %u(%d) is now %u bytes long (+%u)\n", fld_idx, this_field->ID3v2_Field_Type, *frame_length, this_field->field_length);
+					//fprintf(stdout, "Field idx %u(%d) is now %" PRIu32 " bytes long (+%" PRIu32 ")\n", fld_idx, this_field->ID3v2_Field_Type, *frame_length, this_field->field_length);
 				}
 				break;
 			}
@@ -1189,7 +1189,7 @@ void APar_RenderFields(char* dest_buffer, uint32_t max_alloc, ID3v2Tag* id3_tag,
 						*frame_length += this_field->field_length;
 					}
 				}
-				//fprintf(stdout, "Field idx %u(%d) is now %u bytes long\n", fld_idx, this_field->ID3v2_Field_Type, *frame_length);
+				//fprintf(stdout, "Field idx %u(%d) is now %" PRIu32 " bytes long\n", fld_idx, this_field->ID3v2_Field_Type, *frame_length);
 				break;
 			}
 			
@@ -1210,7 +1210,7 @@ void APar_RenderFields(char* dest_buffer, uint32_t max_alloc, ID3v2Tag* id3_tag,
 					*frame_length += this_field->field_length;
 
 				}
-				//fprintf(stdout, "Field idx %u(%d) is now %u bytes long\n", fld_idx, this_field->ID3v2_Field_Type, *frame_length);
+				//fprintf(stdout, "Field idx %u(%d) is now %" PRIu32 " bytes long\n", fld_idx, this_field->ID3v2_Field_Type, *frame_length);
 				break;
 			}
 			default : {
@@ -1422,7 +1422,7 @@ void APar_FieldInit(ID3v2Frame* aFrame, uint8_t a_field, uint8_t frame_comp_list
 	this_field->field_length = 0;
 	this_field->alloc_length = byte_allocation;
 	this_field->next_field = NULL;
-	//fprintf(stdout, "For %u field, %u bytes were allocated.\n", this_field->ID3v2_Field_Type, byte_allocation);
+	//fprintf(stdout, "For %u field, %" PRIu32 " bytes were allocated.\n", this_field->ID3v2_Field_Type, byte_allocation);
 	return;
 }
 
@@ -1506,7 +1506,7 @@ uint32_t APar_TextFieldDataPut(ID3v2Fields* thisField, const char* this_payload,
 		if (converted_bytes > 0) {
 			thisField->field_length += converted_bytes;
 			bytes_used = converted_bytes;
-			//fprintf(stdout, "string %s, %u=%u\n", thisField->field_string, thisField->field_length, bytes_used);
+			//fprintf(stdout, "string %s, %" PRIu32 "=%" PRIu32 "\n", thisField->field_string, thisField->field_length, bytes_used);
 		}
 		
 	} else if (str_encoding == TE_UTF16BE_NO_BOM) {
@@ -1775,7 +1775,7 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 					playcount = 1;
 				}
 			} else {
-				sscanf(frame_payload, "%" PRIu64 "", &playcount);
+				sscanf(frame_payload, "%" SCNu64, &playcount);
 			}
 			
 			if (playcount < 268435455) {
@@ -1799,7 +1799,7 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 				sizeof(popm_play_count_syncsafe));
 			
 			if (adjunct_payload->ratingArg != NULL) {
-				sscanf(adjunct_payload->ratingArg, "%hhu", &popm_rating);
+				popm_rating = strtoul(adjunct_payload->ratingArg, NULL, 10);
 			}
 			thisFrame->ID3v2_Frame_Length += APar_TextFieldDataPut(thisFrame->ID3v2_Frame_Fields, frame_payload, TE_LATIN1); //owner field
 			thisFrame->ID3v2_Frame_Length += APar_BinaryFieldPut(thisFrame->ID3v2_Frame_Fields+1, 0, (char*)&popm_rating, 1); //rating
@@ -1815,7 +1815,7 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 							popm_playcount = 1;
 						}
 					} else {
-						sscanf(adjunct_payload->dataArg, "%" PRIu64 "", &popm_playcount);
+						sscanf(adjunct_payload->dataArg, "%" SCNu64, &popm_playcount);
 					}
 				}
 			}
@@ -2127,7 +2127,7 @@ void APar_ID3FrameAmmend(AtomicInfo* id32_atom, const char* frame_str, const cha
 			if (genre_idx != 0xFF) {
 				char genre_str_idx[2];
 				genre_str_idx[0] = 0; genre_str_idx[1] = 0; genre_str_idx[1] = 0;
-				sprintf(genre_str_idx, "%" PRIu8 "", genre_idx);
+				sprintf(genre_str_idx, "%u", genre_idx);
 				APar_FrameDataPut(targetFrame, genre_str_idx, adjunct_payloads, str_encoding);
 			} else {
 				APar_FrameDataPut(targetFrame, frame_payload, adjunct_payloads, str_encoding);

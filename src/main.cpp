@@ -813,18 +813,18 @@ void ExtractPaddingPrefs(char* env_padding_prefs) {
 
         if (strncmp(env_pad_prefs_ptr, "DEFAULT_PAD=", 12) == 0) {
             strsep(&env_pad_prefs_ptr,"=");
-            sscanf(env_pad_prefs_ptr, "%u", &pad_prefs.default_padding_size);
+            sscanf(env_pad_prefs_ptr, "%" SCNu32, &pad_prefs.default_padding_size);
         }
         if (strncmp(env_pad_prefs_ptr, "MIN_PAD=", 8) == 0) {
             strsep(&env_pad_prefs_ptr,"=");
-            sscanf(env_pad_prefs_ptr, "%u", &pad_prefs.minimum_required_padding_size);
+            sscanf(env_pad_prefs_ptr, "%" SCNu32, &pad_prefs.minimum_required_padding_size);
         }
         if (strncmp(env_pad_prefs_ptr, "MAX_PAD=", 8) == 0) {
             strsep(&env_pad_prefs_ptr,"=");
-            sscanf(env_pad_prefs_ptr, "%u", &pad_prefs.maximum_present_padding_size);
+            sscanf(env_pad_prefs_ptr, "%" SCNu32, &pad_prefs.maximum_present_padding_size);
         }
     }
-    //fprintf(stdout, "Def %u; Min %u; Max %u\n", pad_prefs.default_padding_size, pad_prefs.minimum_required_padding_size, pad_prefs.maximum_present_padding_size);
+    //fprintf(stdout, "Def %" PRIu32 "; Min %" PRIu32 "; Max %" PRIu32 "\n", pad_prefs.default_padding_size, pad_prefs.minimum_required_padding_size, pad_prefs.maximum_present_padding_size);
     return;
 }
 
@@ -863,7 +863,7 @@ void find_optional_args(char *argv[], int start_optindargs, uint16_t &packed_lan
             } else if ( strncmp(argv[optind + i], "track=", 6) == 0 ) {
                 char* track_index_str = argv[optind + i];
                 strsep(&track_index_str, "=");
-                sscanf(track_index_str, "%" PRIu8 "", &trk_idx);
+                trk_idx = strtoul(track_index_str, NULL, 10);
                 udta_container = SINGLE_TRACK_ATOM;
             } else if ( strcmp(argv[optind + i], "track") == 0 ) {
                 udta_container = ALL_TRACKS_ATOM;
@@ -904,7 +904,7 @@ void scan_ID3_optargs(char *argv[], int start_optargs, const char* &target_lang,
             } else if ( strncmp(argv[optind + i], "track=", 6) == 0 ) {
                 char* track_index_str = argv[optind + i];
                 strsep(&track_index_str, "=");
-                sscanf(track_index_str, "%hhu", meta_container);
+                *meta_container = strtoul(track_index_str, NULL, 10);
             }
         }
 
@@ -1696,7 +1696,7 @@ int real_main(int argc, char *argv[])
                 if (strncmp(optarg, "value=", 6) == 0) {
                     char* stik_val_str_ptr = optarg;
                     strsep(&stik_val_str_ptr,"=");
-                    sscanf(stik_val_str_ptr, "%" PRIu8 "", &stik_value);
+                    stik_value = strtoul(stik_val_str_ptr, NULL, 10);
                 } else {
                     stiks* return_stik = MatchStikString(optarg);
                     if (return_stik != NULL) {
@@ -2254,13 +2254,13 @@ int real_main(int argc, char *argv[])
 
                 while (a_track < total_tracks) {
                     a_track++;
-                    sprintf(atom_path, "moov.trak[%" PRIu8 "].mdia.minf.stbl.stsd.avc1", a_track);
+                    sprintf(atom_path, "moov.trak[%u].mdia.minf.stbl.stsd.avc1", a_track);
                     video_desc_atom = APar_FindAtom(atom_path, false, VERSIONED_ATOM, 0, false);
 
                     if (video_desc_atom != NULL) {
                         uint16_t mb_t = APar_TestVideoDescription(video_desc_atom, APar_OpenFile(ISObasemediafile, "rb"));
                         if (mb_t > 0 && mb_t <= 1200) {
-                            sprintf(atom_path, "moov.trak[%" PRIu8 "].mdia.minf.stbl.stsd.avc1.uuid=", a_track);
+                            sprintf(atom_path, "moov.trak[%u].mdia.minf.stbl.stsd.avc1.uuid=", a_track);
                             uint8_t uuid_baselen = (uint8_t)strlen(atom_path);
                             APar_uuid_scanf(atom_path + uuid_baselen, "6b6840f2-5f24-4fc5-ba39-a51bcf0323f3");
                             APar_endian_uuid_bin_str_conversion(atom_path + uuid_baselen);
@@ -2524,7 +2524,7 @@ int real_main(int argc, char *argv[])
                     if ( strncmp(argv[optind + i], "trknum=", 7) == 0 ) {
                         char* track_num = argv[optind + i];
                         strsep(&track_num,"=");
-                        sscanf(track_num, "%" PRIu8 "", &tracknum);
+                        tracknum = strtoul(track_num, NULL, 10);
                     }
                     if (*argv[optind + i] == '-') break;
                 }
@@ -2564,7 +2564,7 @@ int real_main(int argc, char *argv[])
                 if ( strncmp(argv[optind], "track=", 6) == 0 ) {
                     char* trak_idx = argv[optind];
                     strsep(&trak_idx, "=");
-                    sscanf(trak_idx, "%" PRIu8 "", &selected_track);
+                    selected_track = strtoul(trak_idx, NULL, 10);
                     userdata_area = SINGLE_TRACK_ATOM;
                 } else if ( strcmp(argv[optind], "track") == 0 ) {
                     userdata_area = ALL_TRACKS_ATOM;
@@ -2870,7 +2870,7 @@ int real_main(int argc, char *argv[])
                     } else if ( strncmp(argv[optind + i], "domain=", 7) == 0 ) {
                         reverseDNS_atomdomain = argv[optind + i]+7;
                     } else if ( strncmp(argv[optind + i], "datatype=", 9) == 0 ) {
-                        sscanf(argv[optind + i]+9, "%u", &rdns_atom_flags);
+                        sscanf(argv[optind + i]+9, "%" SCNu32, &rdns_atom_flags);
                     }
                     if (*argv[optind + i] == '-') {
                         break; //we've hit another cli argument
@@ -2979,7 +2979,7 @@ int real_main(int argc, char *argv[])
 
                 const char* groupsymbol = find_ID3_optarg(argv, optind, "groupsymbol=");
                 if (groupsymbol[0] == '0' && groupsymbol[1] == 'x') {
-                    sscanf(groupsymbol, "%hhX", &id3args->groupSymbol);
+                    id3args->groupSymbol = strtoul(groupsymbol, NULL, 16);
                     if (id3args->groupSymbol < 0x80 || id3args->groupSymbol > 0xF0) id3args->groupSymbol = 0;
                 }
             }

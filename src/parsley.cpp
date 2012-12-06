@@ -1079,7 +1079,7 @@ void APar_SampleTableIterator(FILE *file) {
 
 	APar_FindAtomInTrack(total_tracks, a_track, NULL); //gets the number of tracks
 	for (uint8_t trk_idx=1; trk_idx <= total_tracks; trk_idx++) {
-		sprintf(track_path, "moov.trak[%hhu].mdia.minf.stbl", trk_idx);
+		sprintf(track_path, "moov.trak[%u].mdia.minf.stbl", trk_idx);
 		samples_parent = APar_FindAtom(track_path, false, SIMPLE_ATOM, 0, false);
 		if (samples_parent != NULL) {
 			chunk_offset_atom = APar_FindChildAtom(samples_parent->AtomicNumber, "stco");
@@ -1749,7 +1749,7 @@ void APar_freefree(int purge_level) {
 		}
 
 		if ( memcmp(parsedAtoms[eval_atom].AtomicName, "free", 4) == 0 || memcmp(parsedAtoms[eval_atom].AtomicName, "skip", 4) == 0 ) {
-			//fprintf(stdout, "i am of size %u purge level %i (%u) -> %i\n", parsedAtoms[eval_atom].AtomicLength, purge_level, parsedAtoms[eval_atom].AtomicLevel, eval_atom);
+			//fprintf(stdout, "i am of size %" PRIu64 " purge level %i (%u) -> %i\n", parsedAtoms[eval_atom].AtomicLength, purge_level, parsedAtoms[eval_atom].AtomicLevel, eval_atom);
 			if ( purge_level == -1 || purge_level >= parsedAtoms[eval_atom].AtomicLevel ||
 			     (purge_level == 0 && parsedAtoms[eval_atom].AtomicLevel == 1 && (moov_atom == 0 || mdat_atom != 0)) ) {
 				short prev_atom = APar_FindPrecedingAtom(eval_atom);
@@ -2464,7 +2464,7 @@ AtomicInfo* APar_uuid_atom_Init(const char* atom_path, const char* uuidName, con
 
 	} else {
 		if ( !(dataType == AtomFlags_Data_Text || dataType == AtomFlags_Data_uuid_binary) ) { //the only supported types
-			fprintf(stdout, "AP warning: only text or file types are allowed on uuid atom %s (%u-%u); skipping\n", uuidName, dataType, AtomFlags_Data_Text);
+			fprintf(stdout, "AP warning: only text or file types are allowed on uuid atom %s (%" PRIu32 "-%u); skipping\n", uuidName, dataType, AtomFlags_Data_Text);
 			return NULL;
 		}
 		//uuid atoms won't have 'data' child atoms - they will carry the data directly as opposed to traditional iTunes-style metadata that does store the information on 'data' atoms. But user-defined is user-defined, so that is how it will be defined here.
@@ -3074,7 +3074,7 @@ uint32_t APar_SimpleSumAtoms(short stop_atom) {
 	while (true) {
 		if (parsedAtoms[stop_atom].AtomicLevel == 1) {
 			byte_sum+= (parsedAtoms[stop_atom].AtomicLength == 1 ? parsedAtoms[stop_atom].AtomicLengthExtended : parsedAtoms[stop_atom].AtomicLength);
-			//fprintf(stdout, "%i %s (%u)\n", stop_atom, parsedAtoms[stop_atom].AtomicName, parsedAtoms[stop_atom].AtomicLength);
+			//fprintf(stdout, "%i %s (%" PRIu64 ")\n", stop_atom, parsedAtoms[stop_atom].AtomicName, parsedAtoms[stop_atom].AtomicLength);
 		}
 		if (stop_atom == 0) {
 			break;
@@ -3232,7 +3232,7 @@ bool APar_Readjust_iloc_atom(short iloc_number) {
 			} //for loop extent
 
 #if defined(DEBUG_V)
-			fprintf(stdout, "debug: AP_Readjust_iloc_atom  iloc's %u index at base offset: %u, total bytes %u\n", an_item_ID, base_offset, extent_len_sum);
+			fprintf(stdout, "debug: AP_Readjust_iloc_atom  iloc's %u index at base offset: %" PRIu64 ", total bytes %" PRIu64 "\n", an_item_ID, base_offset, extent_len_sum);
 #endif
 			AtomicInfo* container_atom = APar_Constituent_mdat_data(base_offset, 0x013077 );
 
@@ -3242,8 +3242,8 @@ bool APar_Readjust_iloc_atom(short iloc_number) {
 				uint64_t new_item_offset = curr_container_pos + exisiting_offset_into_atom;
 
 #if defined(DEBUG_V)
-				fprintf(stdout, "debug: AP_Readjust_iloc_atom  item is contained on mdat started @ %u (now at %u)\n", container_atom->AtomicStart, curr_container_pos);
-				fprintf(stdout, "debug: AP_Readjust_iloc_atom  item is %u bytes offset into atom (was %u, now %u)\n", exisiting_offset_into_atom, base_offset, new_item_offset);
+				fprintf(stdout, "debug: AP_Readjust_iloc_atom  item is contained on mdat started @ %" PRIu64 " (now at %" PRIu64 ")\n", container_atom->AtomicStart, curr_container_pos);
+				fprintf(stdout, "debug: AP_Readjust_iloc_atom  item is %" PRIu64 " bytes offset into atom (was %" PRIu64 ", now %" PRIu64 ")\n", exisiting_offset_into_atom, base_offset, new_item_offset);
 #endif
 				if (base_offset_size == 4) {
 					UInt32_TO_String4(new_item_offset, base_offset_ptr);
@@ -4079,11 +4079,11 @@ void APar_DetermineAtomLengths() {
 		}
 
 		while (parsedAtoms[next_atom].AtomicLevel > parsedAtoms[rev_atom_loop].AtomicLevel) { // eval all child atoms....
-			//fprintf(stdout, "\ttest child atom %s, level:%i (sum %u)\n", parsedAtoms[next_atom].AtomicName, parsedAtoms[next_atom].AtomicLevel, atom_size);
+			//fprintf(stdout, "\ttest child atom %s, level:%i (sum %" PRIu64 ")\n", parsedAtoms[next_atom].AtomicName, parsedAtoms[next_atom].AtomicLevel, atom_size);
 			if (parsedAtoms[rev_atom_loop].AtomicLevel == ( parsedAtoms[next_atom].AtomicLevel - 1) ) { // only child atoms 1 level down
 				atom_size += parsedAtoms[next_atom].AtomicLength;
-				//fprintf(stdout, "\t\teval child atom %s, level:%i (sum %u)\n", parsedAtoms[next_atom].AtomicName, parsedAtoms[next_atom].AtomicLevel, atom_size);
-				//fprintf(stdout, "\t\teval %s's child atom %s, level:%i (sum %u, added %u)\n", parsedAtoms[previous_atom].AtomicName, parsedAtoms[next_atom].AtomicName, parsedAtoms[next_atom].AtomicLevel, atom_size, parsedAtoms[next_atom].AtomicLength);
+				//fprintf(stdout, "\t\teval child atom %s, level:%i (sum %" PRIu64 ")\n", parsedAtoms[next_atom].AtomicName, parsedAtoms[next_atom].AtomicLevel, atom_size);
+				//fprintf(stdout, "\t\teval %s's child atom %s, level:%i (sum %" PRIu64 ", added %" PRIu64 ")\n", parsedAtoms[previous_atom].AtomicName, parsedAtoms[next_atom].AtomicName, parsedAtoms[next_atom].AtomicLevel, atom_size, parsedAtoms[next_atom].AtomicLength);
 			} else if (parsedAtoms[next_atom].AtomicLevel < parsedAtoms[rev_atom_loop].AtomicLevel) {
 				break;
 			}
@@ -4152,11 +4152,7 @@ void APar_ValidateAtoms() {
 		if (parsedAtoms[iter].AtomicLength > file_size && file_size > 300000) {
 			if (parsedAtoms[iter].AtomicData == NULL) {
 				fprintf(stderr, "AtomicParsley error: an atom was detected that presents as larger than filesize. Aborting. %c\n", '\a');
-#if defined (_WIN32) && !defined (__CYGWIN__) /* apparently, long long is forbidden there*/
-				fprintf(stderr, "atom %s is %I64u\n bytes long which is greater than the filesize of %I64u\n", parsedAtoms[iter].AtomicName, parsedAtoms[iter].AtomicLength, file_size);
-#else
 				fprintf(stderr, "atom %s is %" PRIu64 " bytes long which is greater than the filesize of %" PRIu64 "\n", parsedAtoms[iter].AtomicName, parsedAtoms[iter].AtomicLength, file_size);
-#endif
 				exit(1); //its conceivable to repair such an off length by the surrounding atoms constrained by file_size - just not anytime soon; probly would catch a foobar2000 0.9 tagged file
 			}
 		}
@@ -4648,7 +4644,7 @@ uint64_t APar_WriteAtomically(FILE* source_file, FILE* temp_file,
 		if (parsedAtoms[this_atom].AtomicClassification == EXTENDED_ATOM) {
 			fwrite("uuid", 4, 1, temp_file);
 			atom_name_len = 16; //total of 20 bytes for a uuid atom
-			//fprintf(stdout, "%u\n", parsedAtoms[this_atom].AtomicLength);
+			//fprintf(stdout, "%" PRIu64 "\n", parsedAtoms[this_atom].AtomicLength);
 			if (parsedAtoms[this_atom].AtomicClassification == EXTENDED_ATOM && parsedAtoms[this_atom].uuid_style == UUID_OTHER) bytes_written += 4;
 		}
 

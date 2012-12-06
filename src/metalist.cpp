@@ -340,7 +340,7 @@ void APar_Extract_ID3v2_file(AtomicInfo* id32_atom, const char* frame_str, const
 				if (eval_frame->ID3v2_FrameType == ID3_ATTACHED_PICTURE_FRAME) {
 					ImageFileFormatDefinition* thisimage = APar_ImageExtractTest((eval_frame->ID3v2_Frame_Fields+4)->field_string, NULL);
 					char* img_description = APar_ConvertField_to_UTF8(eval_frame, ID3_DESCRIPTION_FIELD);
-					sprintf(extract_filename+basepath_len, "-img#%u-(desc=%s)-0x%02X%s", 
+					sprintf(extract_filename+basepath_len, "-img#%u-(desc=%s)-0x%02X%s",
 				                                     iter, img_description, (uint8_t)((eval_frame->ID3v2_Frame_Fields+2)->field_string[0]), thisimage->image_fileextn);
 				
 					if (img_description != NULL) {
@@ -423,9 +423,9 @@ void APar_ExtractDataAtom(int this_atom_number) {
 			} else {
 				if ( (memcmp(parent_atom_name, "trkn", 4) == 0) || (memcmp(parent_atom_name, "disk", 4) == 0) ) {
 					if (UInt16FromBigEndian(data_payload+4) != 0) {
-						fprintf(stdout, "%hu of %hu\n", UInt16FromBigEndian(data_payload+2), UInt16FromBigEndian(data_payload+4) );
+						fprintf(stdout, "%u of %u\n", UInt16FromBigEndian(data_payload+2), UInt16FromBigEndian(data_payload+4) );
 					} else {
-						fprintf(stdout, "%hu\n", UInt16FromBigEndian(data_payload+2) );
+						fprintf(stdout, "%u\n", UInt16FromBigEndian(data_payload+2) );
 					}
 					
 				} else if (strncmp(parent_atom_name, "gnre", 4) == 0) {
@@ -434,10 +434,10 @@ void APar_ExtractDataAtom(int this_atom_number) {
 						if (genre_string != NULL) {
 							fprintf(stdout,"%s\n", genre_string);
 						} else {
-							fprintf(stdout," out of bound value - %hu\n", UInt16FromBigEndian(data_payload) );
+							fprintf(stdout," out of bound value - %u\n", UInt16FromBigEndian(data_payload) );
 						}
 					} else {
-						fprintf(stdout," out of bound value - %hu\n", UInt16FromBigEndian(data_payload) );
+						fprintf(stdout," out of bound value - %u\n", UInt16FromBigEndian(data_payload) );
 					}
 					
 				} else if ( (strncmp(parent_atom_name, "purl", 4) == 0) || (strncmp(parent_atom_name, "egid", 4) == 0) ) {
@@ -461,7 +461,7 @@ void APar_ExtractDataAtom(int this_atom_number) {
 									if (returned_stik != NULL) {
 										fprintf(stdout, "%s\n", returned_stik->stik_string);
 									} else {
-										fprintf(stdout, "Unknown value: %" PRIu8 "\n", (uint8_t)data_payload[0]);
+										fprintf(stdout, "Unknown value: %u\n", (uint8_t)data_payload[0]);
 									}
 									
 								} else if (strncmp(parent_atom_name, "rtng", 4) == 0) { //okay, this is definitely an 8-bit number
@@ -474,25 +474,25 @@ void APar_ExtractDataAtom(int this_atom_number) {
 									}
 									
 								} else {
-									fprintf(stdout, "%hhu\n", data_payload[0] );
+									fprintf(stdout, "%u\n", (uint8_t)data_payload[0] );
 								}
 								break;
 							}
 							case 2 : { //tmpo
-								fprintf(stdout, "%hu\n", UInt16FromBigEndian(data_payload) );
+								fprintf(stdout, "%u\n", UInt16FromBigEndian(data_payload) );
 								break;
 							}
 							case 4 : { //tves, tvsn
 								if (memcmp(parent_atom_name, "sfID", 4) == 0) {
 									sfIDs* this_store = MatchStoreFrontNumber( UInt32FromBigEndian(data_payload) );
 									if (this_store != NULL) {
-										fprintf(stdout, "%s (%u)\n", this_store->storefront_string, this_store->storefront_number );
+										fprintf(stdout, "%s (%" PRIu32 ")\n", this_store->storefront_string, this_store->storefront_number );
 									} else {
-										fprintf(stdout, "Unknown (%u)\n", UInt32FromBigEndian(data_payload) );
+										fprintf(stdout, "Unknown (%" PRIu32 ")\n", UInt32FromBigEndian(data_payload) );
 									}
 								
 								} else {
-									fprintf(stdout, "%u\n", UInt32FromBigEndian(data_payload) );
+									fprintf(stdout, "%" PRIu32 "\n", UInt32FromBigEndian(data_payload) );
 								}
 								break;
 							}
@@ -632,7 +632,7 @@ void APar_Print_iTunesData(const char *path, char* output_path, uint8_t suppleme
 		APar_Optimize(true); //just to know if 'free' atoms can be considered padding, or (in the case of say a faac file) it's *just* 'free'
 		
 		if (supplemental_info && 0x02) { //PRINT_FREE_SPACE
-			fprintf(stdout, "free atom space: %u\n", APar_ProvideTallyForAtom("free") );
+			fprintf(stdout, "free atom space: %" PRIu32 "\n", APar_ProvideTallyForAtom("free") );
 		}
 		if (supplemental_info && 0x04) { //PRINT_PADDING_SPACE
 			if (!moov_atom_was_mooved) {
@@ -645,7 +645,7 @@ void APar_Print_iTunesData(const char *path, char* output_path, uint8_t suppleme
 			fprintf(stdout, "user data space: %" PRIu64 "\n", dynUpd.moov_udta_atom->AtomicLength);
 		}
 		if (supplemental_info && 0x10) { //PRINT_USER_DATA_SPACE
-			fprintf(stdout, "media data space: %u\n", APar_ProvideTallyForAtom("mdat") );
+			fprintf(stdout, "media data space: %" PRIu32 "\n", APar_ProvideTallyForAtom("mdat") );
 		}
 	}
 	
@@ -806,7 +806,6 @@ void APar_Print_single_userdata_atomcontents(uint8_t track_num, short userdata_a
 			APar_readX(box_data, source_file, parsedAtoms[userdata_atom].AtomicStart + 12, 4);
 			
 			fprintf(stdout, "[Rating Entity=%s", box_data);
-			//fprintf(stdout, " Rating Criteria: %u%u%u%u", box_data[4], box_data[5], box_data[6], box_data[7]);
 			memset(box_data, 0, box_length);
 			APar_readX(box_data, source_file, parsedAtoms[userdata_atom].AtomicStart + 16, 4);
 			fprintf(stdout, " | Criteria=%s", box_data);
@@ -1031,7 +1030,7 @@ void APar_Print_ID3TextField(ID3v2Frame* textframe, ID3v2Fields* textfield, bool
 	} else if (textframe->ID3v2_Frame_Fields->field_string[0] == TE_UTF8) {
 		fprintf(stdout, "%s", textfield->field_string);
 	} else {
-		fprintf(stdout, "(unknown type: 0x%X", textframe->ID3v2_Frame_Fields->field_string[0]);
+		fprintf(stdout, "(unknown type: 0x%X", (uint8_t)textframe->ID3v2_Frame_Fields->field_string[0]);
 	}
 	if(linefeed) fprintf(stdout, "\n");
 	return;
@@ -1073,7 +1072,7 @@ void APar_Print_ID3v2_tags(AtomicInfo* id32_atom) {
 	} else {
 		fprintf(stdout, "ID32 atom [lang=%s] at %s contains an ID3v2.%u.%u tag. ", unpacked_lang, id32_level, id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion, id32_atom->ID32_TagInfo->ID3v2Tag_RevisionVersion);
 		if (ID3v2_TestTagFlag(id32_atom->ID32_TagInfo->ID3v2Tag_Flags, ID32_TAGFLAG_UNSYNCRONIZATION)) {
-			fprintf(stdout, "Unsyncrhonized flag set. Unsupported. No tags read. %u bytes.\n", id32_atom->ID32_TagInfo->ID3v2Tag_Length);
+			fprintf(stdout, "Unsynchronized flag set. Unsupported. No tags read. %" PRIu32 " bytes.\n", id32_atom->ID32_TagInfo->ID3v2Tag_Length);
 		}
 	}
 	
@@ -1087,7 +1086,7 @@ void APar_Print_ID3v2_tags(AtomicInfo* id32_atom) {
 		}
 		uint8_t frame_comp_idx = GetFrameCompositionDescription(target_frameinfo->ID3v2_FrameType);
 		if (FrameTypeConstructionList[frame_comp_idx].ID3_FrameType == ID3_UNKNOWN_FRAME) {
-			fprintf(stdout, "(unknown frame) %u bytes\n", target_frameinfo->ID3v2_Frame_Fields->field_length);
+			fprintf(stdout, "(unknown frame) %" PRIu32 " bytes\n", target_frameinfo->ID3v2_Frame_Fields->field_length);
 			
 		} else if (FrameTypeConstructionList[frame_comp_idx].ID3_FrameType == ID3_TEXT_FRAME) {
 			ID3v2Fields* atextfield = target_frameinfo->ID3v2_Frame_Fields+1;
@@ -1189,15 +1188,15 @@ void APar_Print_ID3v2_tags(AtomicInfo* id32_atom) {
 			APar_Print_ID3TextField(target_frameinfo, target_frameinfo->ID3v2_Frame_Fields+3, true);
 				
 		} else if (FrameTypeConstructionList[frame_comp_idx].ID3_FrameType == ID3_ATTACHED_PICTURE_FRAME) {
-			fprintf(stdout, "(type=0x%02X-'%s', mimetype=%s, %s, desc[", (target_frameinfo->ID3v2_Frame_Fields+2)->field_string[0],
+			fprintf(stdout, "(type=0x%02X-'%s', mimetype=%s, %s, desc[", (uint8_t)(target_frameinfo->ID3v2_Frame_Fields+2)->field_string[0],
 			                 ImageTypeList[ (uint8_t)(target_frameinfo->ID3v2_Frame_Fields+2)->field_string[0] ].imagetype_str, (target_frameinfo->ID3v2_Frame_Fields+1)->field_string,
 											 APar_GetTextEncoding(target_frameinfo, target_frameinfo->ID3v2_Frame_Fields+1)  );
 			APar_Print_ID3TextField(target_frameinfo, target_frameinfo->ID3v2_Frame_Fields+3);
 			if (ID3v2_TestFrameFlag(target_frameinfo->ID3v2_Frame_Flags, ID32_FRAMEFLAG_COMPRESSED)) {
-				fprintf(stdout, "]) : %u bytes (%u compressed)\n",
+				fprintf(stdout, "]) : %" PRIu32 " bytes (%" PRIu32 " compressed)\n",
 				                     (target_frameinfo->ID3v2_Frame_Fields+4)->field_length, target_frameinfo->ID3v2_Frame_Length);
 			} else {
-				fprintf(stdout, "]) : %u bytes\n", (target_frameinfo->ID3v2_Frame_Fields+4)->field_length);
+				fprintf(stdout, "]) : %" PRIu32 " bytes\n", (target_frameinfo->ID3v2_Frame_Fields+4)->field_length);
 			}
 
 		} else if (target_frameinfo->ID3v2_FrameType == ID3_ATTACHED_OBJECT_FRAME) {
@@ -1206,10 +1205,10 @@ void APar_Print_ID3v2_tags(AtomicInfo* id32_atom) {
 			fprintf(stdout, ", mimetype=%s, desc[", (target_frameinfo->ID3v2_Frame_Fields+1)->field_string);
 			APar_Print_ID3TextField(target_frameinfo, target_frameinfo->ID3v2_Frame_Fields+3);
 			if (ID3v2_TestFrameFlag(target_frameinfo->ID3v2_Frame_Flags, ID32_FRAMEFLAG_COMPRESSED)) {
-				fprintf(stdout, "]) : %u bytes (%u compressed)\n",
+				fprintf(stdout, "]) : %" PRIu32 " bytes (%" PRIu32 " compressed)\n",
 				                     (target_frameinfo->ID3v2_Frame_Fields+4)->field_length, target_frameinfo->ID3v2_Frame_Length);
 			} else {
-				fprintf(stdout, "]) : %u bytes\n", (target_frameinfo->ID3v2_Frame_Fields+4)->field_length);
+				fprintf(stdout, "]) : %" PRIu32 " bytes\n", (target_frameinfo->ID3v2_Frame_Fields+4)->field_length);
 			}
 		
 		} else if (target_frameinfo->ID3v2_FrameType == ID3_GROUP_ID_FRAME) {
@@ -1228,16 +1227,16 @@ void APar_Print_ID3v2_tags(AtomicInfo* id32_atom) {
 		
 		} else if (target_frameinfo->ID3v2_FrameType == ID3_PLAYCOUNTER_FRAME) {
 			if (target_frameinfo->ID3v2_Frame_Fields->field_length == 4) {
-				fprintf(stdout, ": %u\n", syncsafe32_to_UInt32(target_frameinfo->ID3v2_Frame_Fields->field_string) );
+				fprintf(stdout, ": %" PRIu32 "\n", syncsafe32_to_UInt32(target_frameinfo->ID3v2_Frame_Fields->field_string) );
 			} else if (target_frameinfo->ID3v2_Frame_Fields->field_length > 4) {
 				fprintf(stdout, ": %" PRIu64 "\n", syncsafeXX_to_UInt64(target_frameinfo->ID3v2_Frame_Fields->field_string, target_frameinfo->ID3v2_Frame_Fields->field_length) );
 			}
 		
 		} else if (target_frameinfo->ID3v2_FrameType == ID3_POPULAR_FRAME) {
-			fprintf(stdout, "(owner='%s') : %u", target_frameinfo->ID3v2_Frame_Fields->field_string, (target_frameinfo->ID3v2_Frame_Fields+1)->field_string[0]);
+			fprintf(stdout, "(owner='%s') : %u", target_frameinfo->ID3v2_Frame_Fields->field_string, (uint8_t)(target_frameinfo->ID3v2_Frame_Fields+1)->field_string[0]);
 			if ((target_frameinfo->ID3v2_Frame_Fields+2)->field_length > 0) {
 				if ((target_frameinfo->ID3v2_Frame_Fields+2)->field_length == 4) {
-					fprintf(stdout, "; playcount=%u\n", syncsafe32_to_UInt32((target_frameinfo->ID3v2_Frame_Fields+2)->field_string));
+					fprintf(stdout, "; playcount=%" PRIu32 "\n", syncsafe32_to_UInt32((target_frameinfo->ID3v2_Frame_Fields+2)->field_string));
 				} else if ((target_frameinfo->ID3v2_Frame_Fields+2)->field_length > 4) {
 					fprintf(stdout, "; playcount=%" PRIu64 "\n", syncsafeXX_to_UInt64((target_frameinfo->ID3v2_Frame_Fields+2)->field_string, (target_frameinfo->ID3v2_Frame_Fields+2)->field_length));
 				} else {
@@ -1465,9 +1464,9 @@ void APar_PrintAtomicTree() {
 			if (UnicodeOutputStatus == WIN32_UTF16) {
 				fprintf(stdout, "%sAtom ", tree_padding);
 				APar_fprintf_UTF8_data(twenty_byte_buffer);
-				fprintf(stdout, " @ %" PRIu64 " of size: %" PRIu64 ", ends @ %" PRIu64 "", thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
+				fprintf(stdout, " @ %" PRIu64 " of size: %" PRIu64 ", ends @ %" PRIu64, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
 			} else {
-				fprintf(stdout, "%sAtom %s @ %" PRIu64 " of size: %" PRIu64 ", ends @ %" PRIu64 "", tree_padding, twenty_byte_buffer, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
+				fprintf(stdout, "%sAtom %s @ %" PRIu64 " of size: %" PRIu64 ", ends @ %" PRIu64, tree_padding, twenty_byte_buffer, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
 			}
 
 			if (thisAtom->AtomicContainerState == UNKNOWN_ATOM_TYPE) {
@@ -1512,7 +1511,7 @@ void APar_PrintAtomicTree() {
 		mdatData, file_size - mdatData,
 		(double)(file_size - mdatData)/(double)file_size * 100.0 );
 
-	fprintf(stdout, "Total free atom space: %u bytes; %2.3lf%% waste.",
+	fprintf(stdout, "Total free atom space: %" PRIu32 " bytes; %2.3lf%% waste.",
 		freeSpace, (double)freeSpace/(double)file_size * 100.0 );
 
 	if (freeSpace) {
