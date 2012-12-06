@@ -678,17 +678,15 @@ AtomicInfo* APar_FindAtom(const char* atom_name, bool createMissing, uint8_t ato
 	AtomicInfo* thisAtom = NULL;
 	char* search_atom_name = (char*)atom_name;
 	char* reverse_dns_name = NULL;
-	short iter=0;
 	uint8_t revdns_name_len = 0;
 	uint8_t atom_index = 0; // if there are atoms mutliple identically named at the same level, this is where to store the count as it occurs
-	uint16_t desired_index = 1;
+	uint8_t desired_index = 1;
 	uint8_t search_atom_type = UNKNOWN_ATOM;
 	int known_atom = -1;
 	short search_atom_start_num = parsedAtoms[0].NextAtomNumber; //don't test 'ftyp'; its atom_number[0] & will be used to know when we have hit the end of the tree; can't hardcode it to '1' because ftyp's following atom can change; only ftyp as parsedAtoms[0] is guaranteed.
 	uint8_t present_atomic_level = 1;
 	AtomicInfo* last_known_present_parent = NULL;
 	AtomicInfo atom_surrogate = { 0 };
-
 
 #if defined(DEBUG_V)
 	fprintf(stdout, "debug: AP_FindAtom entry trying to find '%s'; create missing: %u\n", atom_name, createMissing);
@@ -711,16 +709,8 @@ AtomicInfo* APar_FindAtom(const char* atom_name, bool createMissing, uint8_t ato
 			reverse_dns_name = search_atom_name + 4+2; //4bytes atom name 2bytes ":["
 			revdns_name_len = portion_len-7; //4bytes atom name, 2 bytes ":[", 1 byte "]"
 			search_atom_type = atom_type;
-
 		} else if (search_atom_name[4] == '[') {
-			long sa_length=0;
-			char sa_at_5=NULL;
-			sa_length=strlen(search_atom_name);
-			sa_at_5=*(search_atom_name+5);
-
-			sscanf(search_atom_name+5, "%" PRIu16 "", &desired_index);
-
-
+			desired_index = strtoul(search_atom_name+5, NULL, 10);
 #if defined(DEBUG_V)
 			fprintf(stdout, "debug: AP_FindAtom     >#<indexed atom>#< '%s' at index=%u\n", search_atom_name, desired_index);
 #endif
@@ -738,7 +728,7 @@ AtomicInfo* APar_FindAtom(const char* atom_name, bool createMissing, uint8_t ato
 		APar_CreateSurrogateAtom(&atom_surrogate, search_atom_name, present_atomic_level, search_atom_type, atom_lang, reverse_dns_name, revdns_name_len);
 		atom_index = 0;
 
-		iter = search_atom_start_num;
+		short iter = search_atom_start_num;
 		while (true) {
 			AtomicInfo* result = NULL;
 
@@ -797,7 +787,6 @@ AtomicInfo* APar_FindAtom(const char* atom_name, bool createMissing, uint8_t ato
 						short total_root_level_atoms = APar_ReturnChildrenAtoms (0, 0);
 						short test_root_atom = 0;
 
-
 						//scan through all top level atoms
 						for(uint8_t root_atom_i = 1; root_atom_i <= total_root_level_atoms; root_atom_i++) {
 							test_root_atom = APar_ReturnChildrenAtoms (0, root_atom_i);
@@ -811,7 +800,6 @@ AtomicInfo* APar_FindAtom(const char* atom_name, bool createMissing, uint8_t ato
 					}
 				}
 				break;
-
 			} else if (iter == 0 && !createMissing) {
 					search_atom_name = NULL; //force the break;
 					break;
