@@ -1201,6 +1201,7 @@ int real_main(int argc, char *argv[])
                     APar_ExtractDetails( APar_OpenISOBaseMediaFile(ISObasemediafile, true), SHOW_TRACK_INFO);
                 }
             }
+            APar_OpenISOBaseMediaFile(ISObasemediafile, false);
             break;
         }
 
@@ -1239,7 +1240,6 @@ int real_main(int argc, char *argv[])
                 }
             }
             APar_OpenISOBaseMediaFile(ISObasemediafile, false);
-            APar_FreeMemory();
             break;
         }
 
