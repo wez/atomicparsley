@@ -34,19 +34,26 @@ To *not* build a Mac OS X universal binary:
 
 
 ## For Windows users:
+AtomicParsley builds under cygwin and/or mingw using the same procedure as above.
 
-AtomicParsley builds under cygwin and/or mingw using the same procedure
-as above.
+Foosatraz built in Windows 8 using MinGW.
+
+MinGW-get version 0.6.2-beta-20131004-1
+
+mingw-libz version 1.2.8-1 from MinGW Installation Manager
+
+      % ./autogen.sh
+      % ./configure --prefix=/mingw
+      % make LDFLAGS=-static
+      % strip AtomicParsley.exe
+
+Full details [pdf](https://bitbucket.org/Foosatraz/wez-atomicparsley-foosatraz-fork/downloads/AtomicParsleyMinGWBuildNotebook.pdf)
 
 To build with MSVC, you will need to create your own project file; look
 at the list of source files in Makefile.am; you need to add all of the
 source files *except* the .mm files.  You will also need to provide your
 own zlib.
 
-If you don't want to build it yourself, Jon Hedgrows' forks maintains
-pre-built Windows binaries:
-
+If you don't want to build it yourself, [Jon Hedgrows' fork ](https://bitbucket.org/jonhedgerows/atomicparsley/wiki/Home) maintains pre-built Windows binaries of the Wez fork:
 [Windows Downloads](https://bitbucket.org/jonhedgerows/atomicparsley/downloads)
 
-<!-- vim:ts=2:sw=2:et:
--->

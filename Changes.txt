@@ -524,4 +524,13 @@ initial (unfinished) revisit of file reorganizing/padding
 
 update mvhd/tkhd modification timestamps
 
-# vim:ts=2:sw=2:et:
+v0.9.6  02/22/2014
+
+update for iTunes 11 compatibility
+if stik "Movie" is used, set value to 9, instead of 0
+iTunes now views stick value 0 as "Home Video"
+left "Short Film" to also set stik 9, for backward compatibility with work-arounds using "Short Film" to set stik to 9
+
+Swapped TV-Y and TV-Y7 to conform with iTunes usage.
+
+
