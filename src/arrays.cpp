@@ -65,11 +65,12 @@ static const char* ID3v1GenreList[] = {
 }; */  //apparently the other winamp id3v1 extensions aren't valid
 
 stiks stikArray[] = {
-	{ "Movie", 0 },
+	{ "Home Video", 0 },
 	{ "Normal", 1 },
 	{ "Audiobook", 2 },
 	{ "Whacked Bookmark", 5 },
 	{ "Music Video", 6 },
+	{ "Movie", 9 },
 	{ "Short Film", 9 },
 	{ "TV Show", 10 },
 	{ "Booklet", 11 }
@@ -639,8 +640,8 @@ m_ratings known_ratings[] = {
 	{ "us-tv|TV-14|500|",  "TV-14" },
 	{ "us-tv|TV-PG|400|",  "TV-PG" },
 	{ "us-tv|TV-G|300|",   "TV-G" },
-	{ "us-tv|TV-Y|200|",   "TV-Y" },
-	{ "us-tv|TV-Y7|100|",  "TV-Y7" },
+	{ "us-tv|TV-Y7|200|",  "TV-Y7" },
+	{ "us-tv|TV-Y|100|",   "TV-Y" },
 	//{ "us-tv||0|",         "not-applicable" }, //though its a valid flag & some files have this, AP won't be setting it.
 	{ "mpaa|UNRATED|600|",  "Unrated" },
 	{ "mpaa|NC-17|500|",    "NC-17" },
