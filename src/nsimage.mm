@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright ©2005-2007 puck_lock
+    Copyright ?2005-2007 puck_lock
     with contributions from others; see the CREDITS file
                                                                    */
 //==================================================================//
@@ -48,7 +48,7 @@ void DetermineType(const char *picfilePath) {
 }
 
 char* DeriveNewPath(const char *filePath, PicPrefs myPicPrefs, char* newpath) {
-	char* suffix = strrchr(filePath, '.');
+	char* suffix = strrchr((char *)filePath, '.');
 	
 	size_t filepath_len = strlen(filePath);
 	memset(newpath, 0, MAXPATHLEN+1);
