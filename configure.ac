@@ -22,14 +22,7 @@ case $host in
   *darwin*)
 
     AP_NATIVE_ARCH=`arch`
-    case $AP_NATIVE_ARCH in
-      ppc*)
-        AP_CROSS_ARCH="i386"
-      ;;
-    *)
-        AP_CROSS_ARCH="ppc"
-      ;;
-    esac
+    AP_CROSS_ARCH="x86_64"
     AC_SUBST(AP_CROSS_ARCH)
     AC_SUBST(AP_NATIVE_ARCH)
 
@@ -62,6 +55,7 @@ if test "$GCC" = "yes" ; then
   CXXFLAGS="$CXXFLAGS -Wall"
 fi
 AC_PROG_OBJC
+AC_PROG_OBJCXX
 AC_C_BIGENDIAN
 
 AC_HEADER_DIRENT

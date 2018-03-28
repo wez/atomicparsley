@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright ©2006-2007 puck_lock
+    Copyright ?2006-2007 puck_lock
     with contributions from others; see the CREDITS file
                                                                    */
 //==================================================================//
@@ -145,10 +145,10 @@ void APar_SupplySelectiveTypeCreatorCodes(const char *inputPath, const char *out
 		return;
 	}
 	
-	char* input_suffix = strrchr(inputPath, '.');
+	char* input_suffix = strrchr((char *)inputPath, '.');
 	//user-defined output paths may have the original file as ".m4a" & show up fine when output to ".m4a"
 	//output to ".mp4" and it becomes a generic (sans TYPE/CREATOR) file that defaults to Quicktime Player
-	char* output_suffix = strrchr(outputPath, '.');
+	char* output_suffix = strrchr((char *)outputPath, '.');
 	
 	char* typecode = (char*)malloc( sizeof(char)* 4 );
 	memset(typecode, 0, sizeof(char)*4);
