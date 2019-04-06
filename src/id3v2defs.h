@@ -130,6 +130,7 @@ ID3v2FieldDefinition FrameTypeConstructionList[] = {
 ImageFileFormatDefinition ImageList[] = {
 	{ "image/jpeg",				".jpg",  4,  "\xFF\xD8\xFF\xE0" },
 	{ "image/jpeg",				".jpg",  4,  "\xFF\xD8\xFF\xE1" },
+	{ "image/jpeg",				".jpg",  4,  "\xFF\xD8\xFF\xEE" },
 	{ "image/png",				".png",  8,  "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A" },
 	{ "image/pdf",				".pdf",  7,  "%PDF-1." },
 	{ "image/jp2",				".jp2",  12, "\x00\x00\x00\x0C\x6A\x50\x20\x20\x0D\x0A\x87\x0A\x00\x00\x00\x14\x66\x74\x79\x70\x6A\x70\x32\x20" },

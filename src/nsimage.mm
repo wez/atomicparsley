@@ -41,6 +41,9 @@ void DetermineType(const char *picfilePath) {
 	} else if (memcmp(picHeader, "\xFF\xD8\xFF\xE0", 4) == 0) {
 				isJPEG=true;
 				isPNG=false;
+	} else if (memcmp(picHeader, "\xFF\xD8\xFF\xEE", 4) == 0) {
+				isJPEG=true;
+				isPNG=false;
 	}
 	free(picHeader);
 	picHeader=NULL;

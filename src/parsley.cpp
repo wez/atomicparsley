@@ -147,7 +147,11 @@ int APar_TestArtworkBinaryData(const char* artworkPath) {
 		APar_read64(twenty_byte_buffer, artfile, 0);
 		if ( strncmp(twenty_byte_buffer, "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A", 8) == 0 ) {
 			artwork_dataType = AtomFlags_Data_PNGBinary;
-		} else if ( strncmp(twenty_byte_buffer, "\xFF\xD8\xFF\xE0", 4) == 0 || memcmp(twenty_byte_buffer, "\xFF\xD8\xFF\xE1", 4) == 0 ) {
+		} else if ( 
+			strncmp(twenty_byte_buffer, "\xFF\xD8\xFF\xE0", 4) == 0 ||
+			memcmp(twenty_byte_buffer, "\xFF\xD8\xFF\xE1", 4) == 0 ||
+			memcmp(twenty_byte_buffer, "\xFF\xD8\xFF\xEE", 4) == 0 
+		) {
 			artwork_dataType = AtomFlags_Data_JPEGBinary;
 		} else {
 			fprintf(stdout, "AtomicParsley error: %s\n\t image file is not jpg/png and cannot be embedded.\n", artworkPath);
