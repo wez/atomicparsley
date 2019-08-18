@@ -1,0 +1,14 @@
+*.o
+AtomicParsley
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+compile
+config.*
+configure
+install-sh
+missing
+src/.dirstamp
+src/config.h*
+src/stamp-h1

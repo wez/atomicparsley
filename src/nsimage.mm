@@ -48,7 +48,7 @@ void DetermineType(const char *picfilePath) {
 }
 
 char* DeriveNewPath(const char *filePath, PicPrefs myPicPrefs, char* newpath) {
-	char* suffix = strrchr(filePath, '.');
+	const char* suffix = strrchr(filePath, '.');
 	
 	size_t filepath_len = strlen(filePath);
 	memset(newpath, 0, MAXPATHLEN+1);

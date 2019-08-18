@@ -145,10 +145,10 @@ void APar_SupplySelectiveTypeCreatorCodes(const char *inputPath, const char *out
 		return;
 	}
 	
-	char* input_suffix = strrchr(inputPath, '.');
+	const char* input_suffix = strrchr(inputPath, '.');
 	//user-defined output paths may have the original file as ".m4a" & show up fine when output to ".m4a"
 	//output to ".mp4" and it becomes a generic (sans TYPE/CREATOR) file that defaults to Quicktime Player
-	char* output_suffix = strrchr(outputPath, '.');
+	const char* output_suffix = strrchr(outputPath, '.');
 	
 	char* typecode = (char*)malloc( sizeof(char)* 4 );
 	memset(typecode, 0, sizeof(char)*4);

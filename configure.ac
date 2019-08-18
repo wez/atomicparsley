@@ -15,8 +15,8 @@ AM_INIT_AUTOMAKE([dist-bzip2 foreign no-dependencies subdir-objects -Wall])
 AC_CANONICAL_HOST
 
 AC_ARG_ENABLE(universal, dnl
-[  --disable-universal     build a universal binary on Mac OS X [default=yes]],
-              universal=$enableval, universal=yes)
+[  --enable-universal      build a universal binary on Mac OS X [default=no]],
+              universal=$enableval, universal=no)
 
 case $host in
   *darwin*)
@@ -57,6 +57,7 @@ AC_CONFIG_HEADER(src/config.h)
 
 AM_PROG_CC_C_O
 AC_PROG_CXX
+AC_PROG_OBJCXX
 if test "$GCC" = "yes" ; then
   CFLAGS="$CFLAGS -Wall"
   CXXFLAGS="$CXXFLAGS -Wall"
