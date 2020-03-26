@@ -133,6 +133,12 @@
 
 #define Meta_ID3v2Tag 0xBC
 
+#define Meta_movementCount 0xE0
+#define Meta_movementName 0xE1
+#define Meta_movementNumber 0xE2
+#define Meta_showWorkMovement 0xE3
+#define Meta_work 0xE4
+
 char *output_file;
 
 int total_args;
@@ -1577,6 +1583,11 @@ int real_main(int argc, char *argv[]) {
       {"ID3Tag", required_argument, NULL, Meta_ID3v2Tag},
 
       {"DeepScan", 0, &extr, 1},
+      {"movementCount", required_argument, NULL, Meta_movementCount},
+      {"movementName", required_argument, NULL, Meta_movementName},
+      {"movementNumber", required_argument, NULL, Meta_movementNumber},
+      {"showWorkMovement", required_argument, NULL, Meta_showWorkMovement},
+      {"work", required_argument, NULL, Meta_work},
 
       {0, 0, 0, 0}
     };
@@ -4252,6 +4263,69 @@ int real_main(int argc, char *argv[]) {
       break;
     }
 
+    case Meta_movementCount: {
+      APar_ScanAtoms(ISObasemediafile);
+      if (!APar_assert(metadata_style == ITUNES_STYLE, 1, "movementCount")) {
+        break;
+      }
+      uint8_t data_value = 0;
+      sscanf(optarg, "%" SCNu8, &data_value);
+      AtomicInfo *atom = APar_MetaData_atom_Init(
+          "moov.udta.meta.ilst.\251mvc.data", optarg, AtomFlags_Data_UInt);
+      APar_Unified_atom_Put(
+          atom, NULL, UTF8_iTunesStyle_256glyphLimited, data_value, 8);
+      break;
+    }
+
+    case Meta_movementName: {
+      APar_ScanAtoms(ISObasemediafile);
+      if (!APar_assert(metadata_style == ITUNES_STYLE, 1, "movementName")) {
+        break;
+      }
+      AtomicInfo *atom = APar_MetaData_atom_Init(
+          "moov.udta.meta.ilst.\251mvn.data", optarg, AtomFlags_Data_Text);
+      APar_Unified_atom_Put(
+          atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+      break;
+    }
+
+    case Meta_movementNumber: {
+      APar_ScanAtoms(ISObasemediafile);
+      if (!APar_assert(metadata_style == ITUNES_STYLE, 1, "movementNumber")) {
+        break;
+      }
+      uint8_t data_value = 0;
+      sscanf(optarg, "%" SCNu8, &data_value);
+      AtomicInfo *atom = APar_MetaData_atom_Init(
+          "moov.udta.meta.ilst.\251mvi.data", optarg, AtomFlags_Data_UInt);
+      APar_Unified_atom_Put(
+          atom, NULL, UTF8_iTunesStyle_256glyphLimited, data_value, 8);
+      break;
+    }
+
+    case Meta_showWorkMovement: {
+      APar_ScanAtoms(ISObasemediafile);
+      if (!APar_assert(metadata_style == ITUNES_STYLE, 1, "showWorkMovement")) {
+        break;
+      }
+      AtomicInfo *atom = APar_MetaData_atom_Init(
+          "moov.udta.meta.ilst.shwm.data", optarg, AtomFlags_Data_Binary);
+      APar_Unified_atom_Put(
+          atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+      break;
+    }
+
+    case Meta_work: {
+      APar_ScanAtoms(ISObasemediafile);
+      if (!APar_assert(metadata_style == ITUNES_STYLE, 1, "work")) {
+        break;
+      }
+      AtomicInfo *atom = APar_MetaData_atom_Init(
+          "moov.udta.meta.ilst.\251wrk.data", optarg, AtomFlags_Data_Text);
+      APar_Unified_atom_Put(
+          atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+      break;
+    }
     } /* end switch */
   }   /* end while */
 
