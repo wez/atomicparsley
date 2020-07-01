@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ master ]
 
+default:
+  run:
+    shell: bash
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
