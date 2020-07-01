@@ -19,7 +19,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
     - uses: actions/checkout@v2
-    - name: cmake
-      run: cmake .
-    - name: make
-      run: make
+    - name: configure
+      run: cmake -GNinja .
+    - name: build
+      run: ninja

@@ -2,7 +2,7 @@
 /*
     AtomicParsley - util.cpp
 
-    AtomicParsley is GPL software; you can freely distribute, 
+    AtomicParsley is GPL software; you can freely distribute,
     redistribute, modify & use under the terms of the GNU General
     Public License; either version 2 or its successor.
 
@@ -10,19 +10,19 @@
     any warranty; without the implied warranty of merchantability
     or fitness for either an expressed or implied particular purpose.
 
-    Please see the included GNU General Public License (GPL) for 
+    Please see the included GNU General Public License (GPL) for
     your rights and further details; see the file COPYING. If you
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
     Copyright ©2006-2007 puck_lock
     with contributions from others; see the CREDITS file
-		
+
 		----------------------
     Code Contributions by:
-		
+
     * SLarew - prevent writing past array in Convert_multibyteUTF16_to_wchar bugfix
-		
+
 																																		*/
 //==================================================================//
 
@@ -38,17 +38,17 @@ findFileSize
   utf8_filepath - a pointer to a string (possibly utf8) of the full path to the file
 
     take an ascii/utf8 filepath (which if under a unicode enabled Win32 OS was already converted from utf16le to utf8 at program start) and test if
-		AP is running on a unicode enabled Win32 OS. If it is and converted to utf8 (rather than just stripped), convert the utf8 filepath to a utf16 
+		AP is running on a unicode enabled Win32 OS. If it is and converted to utf8 (rather than just stripped), convert the utf8 filepath to a utf16
 		(native-endian) filepath & pass that to a wide stat. Or stat it with a utf8 filepath on Unixen & win32 (stripped utf8).
 ----------------------*/
 uint64_t findFileSize(const char *utf8_filepath) {
 #if defined (_WIN32) && !defined (__CYGWIN__)
 	if ( IsUnicodeWinOS() && UnicodeOutputStatus == WIN32_UTF16) {
 		wchar_t* utf16_filepath = Convert_multibyteUTF8_to_wchar(utf8_filepath);
-		
+
 		struct _stati64 fileStats;
 		_wstati64(utf16_filepath, &fileStats);
-		
+
 		free(utf16_filepath);
 		utf16_filepath = NULL;
 		return fileStats.st_size;
@@ -78,11 +78,11 @@ FILE* APar_OpenFile(const char* utf8_filepath, const char* file_flags) {
 		wchar_t* Lfile_flags = (wchar_t *)malloc(sizeof(wchar_t)*4);
 		memset(Lfile_flags, 0, sizeof(wchar_t)*4);
 		mbstowcs(Lfile_flags, file_flags, strlen(file_flags) );
-		
+
 		wchar_t* utf16_filepath = Convert_multibyteUTF8_to_wchar(utf8_filepath);
-		
+
 		aFile = _wfopen(utf16_filepath, Lfile_flags);
-		
+
 		free(Lfile_flags); Lfile_flags=NULL;
 		free(utf16_filepath);
 		utf16_filepath = NULL;
@@ -91,7 +91,7 @@ FILE* APar_OpenFile(const char* utf8_filepath, const char* file_flags) {
 	{
 		aFile = fopen(utf8_filepath, file_flags);
 	}
-	
+
 	if (!aFile) {
 		fprintf(stdout, "AP error trying to fopen %s: %s\n", utf8_filepath, strerror(errno));
 	}
@@ -317,20 +317,20 @@ void APar_UnpackLanguage(unsigned char lang_code[], uint16_t packed_language) {
 uint16_t PackLanguage(const char* language_code, uint8_t lang_offset) { //?? is there a problem here? und does't work http://www.w3.org/WAI/ER/IG/ert/iso639.htm
 	//I think Apple's 3gp asses decoder is a little off. First, it doesn't support a lot of those 3 letter language codes above on that page. for example 'zul' blocks *all* metadata from showing up. 'fre' is a no-no, but 'fra' is fine.
 	//then, the spec calls for all strings to be null terminated. So then why does a '© 2005' (with a NULL at the end) show up as '© 2005' in 'pol', but '© 2005 ?' in 'fas' Farsi? Must be Apple's implementation, because the files are identical except for the uint16_t lang setting.
-	
+
 	uint16_t packed_language = 0;
-	
+
 	//fprintf(stdout, "%i, %i, %i\n", language_code[0+lang_offset], language_code[1+lang_offset], language_code[2+lang_offset]);
-	
+
 	if (language_code[0+lang_offset] < 97 || language_code[0+lang_offset] > 122 ||
 			language_code[1+lang_offset] < 97 || language_code[1+lang_offset] > 122 ||
 			language_code[2+lang_offset] < 97 || language_code[2+lang_offset] > 122) {
-			
+
 		return packed_language;
 	}
-	
-	packed_language = (((language_code[0+lang_offset] - 0x60) & 0x1F) << 10 ) | 
-	                   (((language_code[1+lang_offset] - 0x60) & 0x1F) << 5)  | 
+
+	packed_language = (((language_code[0+lang_offset] - 0x60) & 0x1F) << 10 ) |
+	                   (((language_code[1+lang_offset] - 0x60) & 0x1F) << 5)  |
 										  ((language_code[2+lang_offset] - 0x60) & 0x1F);
 	return packed_language;
 }
@@ -339,7 +339,7 @@ uint16_t PackLanguage(const char* language_code, uint8_t lang_offset) { //?? is 
 //                                platform specifics                                 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HAVE_LROUNDF)
+#ifdef _WIN32
 int lroundf(float a) {
 	return (int)(a/1);
 }
@@ -397,77 +397,77 @@ char *strsep (char **stringp, const char *delim)
 void determine_MonthDay(int literal_day, int &month, int &day) {
 	if (literal_day <= 31) {
 		month = 1; day = literal_day;
-	
+
 	} else if (literal_day <= 59) {
 		month = 2; day = literal_day - 31;
-	
+
 	} else if (literal_day <= 90) {
 		month = 3; day = literal_day - 59;
-	
+
 	} else if (literal_day <= 120) {
 		month = 4; day = literal_day - 90;
-	
+
 	} else if (literal_day <= 151) {
 		month = 5; day = literal_day - 120;
-	
+
 	} else if (literal_day <= 181) {
 		month = 6; day = literal_day - 151;
-	
+
 	} else if (literal_day <= 212) {
 		month = 7; day = literal_day - 181;
-		
+
 	} else if (literal_day <= 243) {
 		month = 8; day = literal_day - 212;
-	
+
 	} else if (literal_day <= 273) {
 		month = 9; day = literal_day - 243;
-	
+
 	} else if (literal_day <= 304) {
 		month = 10; day = literal_day - 273;
-	
+
 	} else if (literal_day <= 334) {
 		month = 11; day = literal_day - 304;
-	
+
 	} else if (literal_day <= 365) {
 		month = 12; day = literal_day - 334;
 	}
 	return;
 }
 
-char* APar_gmtime64(uint64_t total_secs, char* utc_time) {	
+char* APar_gmtime64(uint64_t total_secs, char* utc_time) {
 	//this will probably be off between Jan 1 & Feb 28 on a leap year by a day.... I'll somehow cope & deal.
 	struct tm timeinfo = {0,0,0,0,0};
 
 	int offset_year = (int) (total_secs / 31536000); //60 * 60 * 24 * 365 (ordinary year in seconds; doesn't account for leap year)
 	int literal_year = 1904 + offset_year;
 	int literal_days_into_year = ((total_secs % 31536000) / 86400) - (offset_year / 4); //accounts for the leap year
-	
+
 	uint32_t literal_seconds_into_day = total_secs % 86400;
-	
+
 	int month =  0;
 	int days = 0;
-	
+
 	determine_MonthDay(literal_days_into_year, month, days);
-	
+
 	if (literal_days_into_year < 0 ) {
 		literal_year -=1;
 		literal_days_into_year = 31 +literal_days_into_year;
 		month = 12;
 		days = literal_days_into_year;
 	}
-	
+
 	int hours = literal_seconds_into_day / 3600;
-	
+
 	timeinfo.tm_year = literal_year - 1900;
 	timeinfo.tm_yday = literal_days_into_year;
 	timeinfo.tm_mon = month - 1;
 	timeinfo.tm_mday = days;
 	timeinfo.tm_wday = (((total_secs / 86400) - (offset_year / 4)) - 5 ) % 7;
-	
+
 	timeinfo.tm_hour = hours;
 	timeinfo.tm_min = (literal_seconds_into_day - (hours * 3600)) / 60;
 	timeinfo.tm_sec = (int)(literal_seconds_into_day % 60);
-	
+
 	strftime(utc_time, 50 , "%a %b %d %H:%M:%S %Y", &timeinfo);
 	return utc_time;
 }
@@ -481,11 +481,11 @@ ExtractUTC
 char* APar_extract_UTC(uint64_t total_secs) {
 	//2082844800 seconds between 01/01/1904 & 01/01/1970
 	//  2,081,376,000 (60 seconds * 60 minutes * 24 hours * 365 days * 66 years)
-	//    + 1,468,800 (60 * 60 * 24 * 17 leap days in 01/01/1904 to 01/01/1970 duration) 
+	//    + 1,468,800 (60 * 60 * 24 * 17 leap days in 01/01/1904 to 01/01/1970 duration)
 	//= 2,082,844,800
 	static char utc_time[50];
 	memset(utc_time, 0, 50);
-		
+
 	if (total_secs > MAXTIME_32) {
 		return APar_gmtime64(total_secs, utc_time);
 	} else {
@@ -535,7 +535,7 @@ void APar_StandardTime(char* &formed_time) {
   time (&rawtime);
   timeinfo = gmtime (&rawtime);
 	strftime(formed_time ,100 , "%Y-%m-%dT%H:%M:%SZ", timeinfo); //that hanging Z is there; denotes the UTC
-	
+
 	return;
 }
 
@@ -548,10 +548,10 @@ wchar_t* Convert_multibyteUTF16_to_wchar(char* input_unicode, size_t glyph_lengt
 	if (skip_BOM) {
 		BOM_mark_bytes = 2;
 	}
-	
+
 	wchar_t* utf16_data = (wchar_t*)malloc( sizeof(wchar_t)* (glyph_length+1) ); //just to be sure there will be a trailing NULL
 	wmemset(utf16_data, 0, glyph_length + 1);
-						
+
 	for(size_t i = 0; i < glyph_length; i++) {
 #if defined (__ppc__) || defined (__ppc64__)
 		utf16_data[i] = (input_unicode[2*i + BOM_mark_bytes] & 0x00ff) << 8 | (input_unicode[2*i + 1 + BOM_mark_bytes]) << 0; //+2 & +3 to skip over the BOM
@@ -565,7 +565,7 @@ wchar_t* Convert_multibyteUTF16_to_wchar(char* input_unicode, size_t glyph_lengt
 unsigned char* Convert_multibyteUTF16_to_UTF8(char* input_utf16, size_t glyph_length, size_t byte_count) {
 	unsigned char* utf8_data = (unsigned char*)malloc(sizeof(unsigned char)* glyph_length );
 	memset(utf8_data, 0, glyph_length);
-						
+
 	UTF16BEToUTF8(utf8_data, glyph_length, (unsigned char*)input_utf16 + 2, byte_count);
 	return utf8_data;
 }
@@ -574,10 +574,10 @@ wchar_t* Convert_multibyteUTF8_to_wchar(const char* input_utf8) { //TODO: is thi
 	wchar_t *return_val=NULL;
 	size_t string_length = strlen(input_utf8) + 1;  //account for terminating NULL
 	size_t char_glyphs = mbstowcs(NULL, input_utf8, string_length); //passing NULL pre-calculates the size of wchar_t needed
-			
+
 	unsigned char* utf16_conversion = (unsigned char*)malloc( sizeof(unsigned char)* string_length * 2 );
 	memset(utf16_conversion, 0, string_length * 2 );
-			
+
 	int utf_16_glyphs = UTF8ToUTF16BE(utf16_conversion, char_glyphs * 2, (unsigned char*)input_utf8, string_length) / 2; //returned value is in bytes
 	return_val = Convert_multibyteUTF16_to_wchar((char*)utf16_conversion, (size_t)utf_16_glyphs, false );
 	free(utf16_conversion); utf16_conversion=NULL;
@@ -586,10 +586,10 @@ wchar_t* Convert_multibyteUTF8_to_wchar(const char* input_utf8) { //TODO: is thi
 
 //these flags from id3v2 2.4
 //0x00 = ISO-8859-1 & terminate with 0x00.
-//0x01 = UTF-16 with BOM. All frames have same encoding & terminate with 0x0000. 
+//0x01 = UTF-16 with BOM. All frames have same encoding & terminate with 0x0000.
 //0x02 = UTF-16BE without BOM & terminate with 0x0000.
 //0x03 = UTF-8 & terminated with 0x00.
-//buffer can hold either ut8 or utf16 carried on 8-bit char which requires a cast	
+//buffer can hold either ut8 or utf16 carried on 8-bit char which requires a cast
 /*----------------------
 findstringNULLterm
   in_string - pointer to location of a string (can be either 8859-1, utf8 or utf16be/utf16be needing a cast to wchar)
@@ -600,7 +600,7 @@ findstringNULLterm
 ----------------------*/
 uint32_t findstringNULLterm (char* in_string, uint8_t encodingFlag, uint32_t max_len) {
 	uint32_t byte_count = 0;
-	
+
 	if (encodingFlag == 0x00 || encodingFlag == 0x03) {
 		char* bufptr = in_string;
 		while (bufptr <= in_string+max_len) {
@@ -609,7 +609,7 @@ uint32_t findstringNULLterm (char* in_string, uint8_t encodingFlag, uint32_t max
 			}
 			bufptr++;
 			byte_count++;
-		}		
+		}
 	} else if ((encodingFlag == 0x01 || encodingFlag == 0x02) && max_len >= 2) {
 		short wbufptr;
 		while (byte_count <= max_len) {
@@ -618,7 +618,7 @@ uint32_t findstringNULLterm (char* in_string, uint8_t encodingFlag, uint32_t max
 				break;
 			}
 			byte_count+=2;
-		}	
+		}
 	}
 	if (byte_count > max_len) return max_len;
 	return byte_count;
@@ -626,7 +626,7 @@ uint32_t findstringNULLterm (char* in_string, uint8_t encodingFlag, uint32_t max
 
 uint32_t skipNULLterm (char* in_string, uint8_t encodingFlag, uint32_t max_len) {
 	uint32_t byte_count = 0;
-	
+
 	if (encodingFlag == 0x00 || encodingFlag == 0x03) {
 		char* bufptr = in_string;
 		while (bufptr <= in_string+max_len) {
@@ -635,7 +635,7 @@ uint32_t skipNULLterm (char* in_string, uint8_t encodingFlag, uint32_t max_len) 
 				break;
 			}
 			bufptr++;
-		}		
+		}
 	} else if ((encodingFlag == 0x01 || encodingFlag == 0x02) && max_len >= 2) {
 		short wbufptr;
 		while (byte_count <= max_len) {
@@ -644,7 +644,7 @@ uint32_t skipNULLterm (char* in_string, uint8_t encodingFlag, uint32_t max_len) 
 				byte_count+=2;
 				break;
 			}
-		}	
+		}
 	}
 	return byte_count;
 }
@@ -679,7 +679,7 @@ uint64_t UInt64FromBigEndian(const char *string) {
 	memcpy(&test,string,8);
 	return test;
 #else
-	return (uint64_t)(string[0] & 0xff) << 54 | (uint64_t)(string[1] & 0xff) << 48 | (uint64_t)(string[2] & 0xff) << 40 | (uint64_t)(string[3] & 0xff) << 32 | 
+	return (uint64_t)(string[0] & 0xff) << 54 | (uint64_t)(string[1] & 0xff) << 48 | (uint64_t)(string[2] & 0xff) << 40 | (uint64_t)(string[3] & 0xff) << 32 |
 				 (uint64_t)(string[4] & 0xff) << 24 | (uint64_t)(string[5] & 0xff) << 16 | (uint64_t)(string[6] & 0xff) <<  8 | (uint64_t)(string[7] & 0xff) <<  0;
 #endif
 }
@@ -719,7 +719,7 @@ uint32_t float_to_16x16bit_fixed_point(double floating_val) {
 	int16_t long_integer = (int16_t)floating_val;
 	//to get a fixed 16-bit decimal, work on the decimal part along; multiply by (2^8 * 2) which moves the decimal over 16 bits to create our int16_t
 	//now while the degrees can be negative (requiring a int16_6), the decimal portion is always positive (and thus requiring a uint16_t)
-	uint16_t long_decimal = (int16_t) ((floating_val - long_integer) * (double)(65536) ); 
+	uint16_t long_decimal = (int16_t) ((floating_val - long_integer) * (double)(65536) );
 	fixedpoint_16bit = long_integer * 65536 + long_decimal; //same as bitshifting, less headache doing it
 	return fixedpoint_16bit;
 }
@@ -729,11 +729,11 @@ double fixed_point_16x16bit_to_double(uint32_t fixed_point) {
 	int16_t long_integer = fixed_point / 65536;
 	uint16_t long_decimal = fixed_point - (long_integer * 65536) ;
 	return_val = long_integer + ( (double)long_decimal / 65536);
-	
+
 	if (return_val < 0.0) {
 		return_val-=1.0;
 	}
-	
+
 	return return_val;
 }
 
@@ -759,12 +759,12 @@ bool APar_assert(bool expression, int error_msg, const char* supplemental_info) 
 				fprintf(stdout, "AP warning:\n\tSetting the %s tag is for ordinary MPEG-4 files.\n\tIt is not supported on 3gp/amc files.\nSkipping\n", supplemental_info);
 				break;
 			}
-			
+
 			case 2 : { //trying to set a 3gp asset on an mpeg-4 file with the improper brand
 				fprintf(stdout, "AP warning:\n\tSetting the %s asset is only available on 3GPP files branded 3gp6 or later.\nSkipping\n", supplemental_info);
 				break;
 			}
-			
+
 			case 3 : { //trying to set 'meta' on a file without a iso2 or mp42 compatible brand.
 				fprintf(stdout, "AtomicParsley warning: ID3 tags requires a v2 compatible file, which was not found.\nSkipping.\n");
 				break;
@@ -814,15 +814,15 @@ bool APar_assert(bool expression, int error_msg, const char* supplemental_info) 
 typedef unsigned long xorgenUINT;
 
 unsigned long xor4096i() {
-  /* 32-bit or 64-bit integer random number generator 
+  /* 32-bit or 64-bit integer random number generator
      with period at least 2**4096-1.
-     
-     It is assumed that "xorgenUINT" is a 32-bit or 64-bit integer 
+
+     It is assumed that "xorgenUINT" is a 32-bit or 64-bit integer
      (see typedef statements in xorgens.h).
-     
+
      xor4096i should be called exactly once with nonzero seed, and
-     thereafter with zero seed.  
-     
+     thereafter with zero seed.
+
      One random number uniformly distributed in [0..2**wlen) is returned,
      where wlen = 8*sizeof(xorgenUINT) = 32 or 64.
 
@@ -831,9 +831,9 @@ unsigned long xor4096i() {
 
   /* UINT64 is TRUE if 64-bit xorgenUINT,
      UINT32 is TRUE otherwise (assumed to be 32-bit xorgenUINT). */
-     
+
 #define UINT64 (sizeof(xorgenUINT)>>3)
-#define UINT32 (1 - UINT64) 
+#define UINT32 (1 - UINT64)
 
 #define wlen (64*UINT64 +  32*UINT32)
 #define r    (64*UINT64 + 128*UINT32)
@@ -842,15 +842,15 @@ unsigned long xor4096i() {
 #define b    (26*UINT64 +  12*UINT32)
 #define c    (27*UINT64 +  13*UINT32)
 #define d    (29*UINT64 +  15*UINT32)
-#define ws   (27*UINT64 +  16*UINT32) 
+#define ws   (27*UINT64 +  16*UINT32)
 
 	xorgenUINT seed = 0;
-	
+
   static xorgenUINT w, weyl, zero = 0, x[r];
   xorgenUINT t, v;
   static int i = -1 ;              /* i < 0 indicates first call */
   int k;
-	
+
 	if (i < 0) {
 #if defined HAVE_SRANDDEV
 		sranddev();
@@ -860,34 +860,34 @@ unsigned long xor4096i() {
 		double doubleseed = ( (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
 		seed = (xorgenUINT)(doubleseed*rand());
 	}
-  
+
   if ((i < 0) || (seed != zero)) { /* Initialisation necessary */
-  
+
   /* weyl = odd approximation to 2**wlen*(sqrt(5)-1)/2. */
 
-    if (UINT32) 
+    if (UINT32)
       weyl = 0x61c88647;
-    else 
+    else
       weyl = ((((xorgenUINT)0x61c88646)<<16)<<16) + (xorgenUINT)0x80b583eb;
-                 
+
     v = (seed!=zero)? seed:~seed;  /* v must be nonzero */
 
     for (k = wlen; k > 0; k--) {   /* Avoid correlations for close seeds */
-      v ^= v<<10; v ^= v>>15;      /* Recurrence has period 2**wlen-1 */ 
+      v ^= v<<10; v ^= v>>15;      /* Recurrence has period 2**wlen-1 */
       v ^= v<<4;  v ^= v>>13;      /* for wlen = 32 or 64 */
       }
     for (w = v, k = 0; (xorgenUINT)k < r; k++) { /* Initialise circular array */
-      v ^= v<<10; v ^= v>>15; 
+      v ^= v<<10; v ^= v>>15;
       v ^= v<<4;  v ^= v>>13;
-      x[k] = v + (w+=weyl);                
+      x[k] = v + (w+=weyl);
       }
-    for (i = r-1, k = 4*r; k > 0; k--) { /* Discard first 4*r results */ 
-      t = x[i = (i+1)&(r-1)];   t ^= t<<a;  t ^= t>>b; 
-      v = x[(i+(r-s))&(r-1)];   v ^= v<<c;  v ^= v>>d;          
-      x[i] = t^v;       
+    for (i = r-1, k = 4*r; k > 0; k--) { /* Discard first 4*r results */
+      t = x[i = (i+1)&(r-1)];   t ^= t<<a;  t ^= t>>b;
+      v = x[(i+(r-s))&(r-1)];   v ^= v<<c;  v ^= v>>d;
+      x[i] = t^v;
       }
     }
-    
+
   /* Apart from initialisation (above), this is the generator */
 
   t = x[i = (i+1)&(r-1)];            /* Assumes that r is a power of two */
@@ -907,5 +907,5 @@ unsigned long xor4096i() {
 #undef b
 #undef c
 #undef d
-#undef ws 
+#undef ws
 }
