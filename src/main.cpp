@@ -184,7 +184,10 @@ static const char *shortHelp_text =
     "  --bpm          (number)     Set the tempo/bpm\n"
     "  --albumArtist  (string)     Set the album artist tag\n"
     "  --compilation  (boolean)    Set the compilation flag (true or false)\n"
-    "  --hdvideo      (boolean)    Set the hdvideo flag (true or false)\n"
+    "  --hdvideo      (number)     Set the hdvideo flag to one of:\n"
+    "                              false or 0 for standard definition\n"
+    "                              true or 1 for 720p\n"
+    "                              2 for 1080p\n"
     "  --advisory     (string*)    Content advisory (*values: 'clean', "
     "'explicit')\n"
     "  --stik         (string*)    Sets the iTunes \"stik\" atom (see "
@@ -2137,18 +2140,27 @@ int real_main(int argc, char *argv[]) {
         break;
       }
 
-      if (strcmp(optarg, "false") == 0 || strlen(optarg) == 0) {
+      if (strcmp(optarg, "false") == 0 || strlen(optarg) == 0 ||
+          strcmp(optarg, "0") == 0) {
         APar_RemoveAtom("moov.udta.meta.ilst.hdvd.data", VERSIONED_ATOM, 0);
       } else {
         // compilation: [0, 0, 0, 0,   boolean_value]; BUT that first uint32_t
         // is already accounted for in APar_MetaData_atom_Init
         AtomicInfo *hdvideoData_atom = APar_MetaData_atom_Init(
             "moov.udta.meta.ilst.hdvd.data", optarg, AtomFlags_Data_UInt);
+
+        uint8_t hdvideo_value = 0;
+        if (strcmp(optarg, "true") == 0) {
+            hdvideo_value = 1;
+        } else {
+            sscanf(optarg, "%" SCNu8, &hdvideo_value);
+        }
+
         APar_Unified_atom_Put(hdvideoData_atom,
                               NULL,
                               UTF8_iTunesStyle_256glyphLimited,
-                              1,
-                              8); // a hard coded uint8_t of: 1 is compilation
+                              hdvideo_value,
+                              8);
       }
       break;
     }
