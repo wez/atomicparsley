@@ -19,12 +19,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
     - uses: actions/checkout@v2
-    - name: install macOS deps
-      if: runner.os == 'macOS'
-      run: brew install autoconf automake
-    - name: autogen
-      run: ./autogen.sh
-    - name: configure
-      run: ./configure
+    - name: cmake
+      run: cmake .
     - name: make
       run: make

@@ -2,7 +2,7 @@
 /*
     AtomicParsley - CDtoc.cpp
 
-    AtomicParsley is GPL software; you can freely distribute, 
+    AtomicParsley is GPL software; you can freely distribute,
     redistribute, modify & use under the terms of the GNU General
     Public License; either version 2 or its successor.
 
@@ -10,7 +10,7 @@
     any warranty; without the implied warranty of merchantability
     or fitness for either an expressed or implied particular purpose.
 
-    Please see the included GNU General Public License (GPL) for 
+    Please see the included GNU General Public License (GPL) for
     your rights and further details; see the file COPYING. If you
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
@@ -27,7 +27,7 @@
 #include "AtomicParsley.h"
 #include "CDtoc.h"
 
-#if defined (DARWIN_PLATFORM)
+#if defined (__APPLE__)
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/IOKitLib.h>
 #include <IOKit/storage/IOCDTypes.h>
@@ -67,9 +67,9 @@ typedef struct CD_TOC_ CD_TOC_;
 
 CD_TOC_* cdTOC = NULL;
 
-#if defined (DARWIN_PLATFORM)
+#if defined (__APPLE__)
 	uint8_t LEADOUT_TRACK_NUMBER = MACOSX_LEADOUT_TRACK;
-#elif defined (HAVE_LINUX_CDROM_H)
+#elif defined (__linux__)
 	uint8_t LEADOUT_TRACK_NUMBER = CDROM_LEADOUT;
 #elif defined (_WIN32)
 	uint8_t LEADOUT_TRACK_NUMBER = 0xAA; //NOTE: for WinXP IOCTL_CDROM_READ_TOC_EX code, its 0xA2
@@ -170,7 +170,7 @@ uint8_t FillSingleMCDIentry(CD_TDesc* atrack, char* mcdi_data_entry) {
 	mcdi_data_entry[2] = 0;
 	mcdi_data_entry[3] = atrack->tracknumber;
 	//LBA=(M*60+S)*75+F - 150 (table 374)
-	uint32_t frameduration = ((((atrack->abs_minutes*60) + atrack->abs_seconds) * 75) + atrack->abs_frames)-150; 
+	uint32_t frameduration = ((((atrack->abs_minutes*60) + atrack->abs_seconds) * 75) + atrack->abs_frames)-150;
 	UInt32_TO_String4(frameduration, mcdi_data_entry + 4);
 	return 8;
 }
@@ -179,12 +179,12 @@ uint16_t FormMCDIdata(char* mcdi_data) {
 	uint16_t mcdi_len = 0;
 	uint8_t first_track = 0;
 	uint8_t last_track = 0;
-	
+
 	CD_TDesc* track_TOC_desc = cdTOC->track_description;
-	
+
 	if (cdTOC->track_description != NULL) {
 		mcdi_len +=4;
-	
+
 		while (track_TOC_desc != NULL) {
 			if (track_TOC_desc->tracknumber >= 1 && track_TOC_desc->tracknumber <= 99 && !DataControlField(track_TOC_desc->controladdress)) {
 				mcdi_len += FillSingleMCDIentry(track_TOC_desc, mcdi_data+mcdi_len);
@@ -213,13 +213,13 @@ uint16_t FormMCDIdata(char* mcdi_data) {
 //                      Platform Specifics                                 //
 /////////////////////////////////////////////////////////////////////////////
 
-#if defined (HAVE_LINUX_CDROM_H)
+#if defined (__linux__)
 void Linux_ReadCDTOC(int cd_fd) {
 	cdrom_tochdr toc_header;
 	cdrom_tocentry toc_entry;
 	CD_TDesc* a_TOC_desc = NULL;
 	CD_TDesc* prev_desc = NULL;
-	
+
 	if (ioctl(cd_fd, CDROMREADTOCHDR, &toc_header) == -1) {
 		fprintf(stderr, "AtomicParsley error: there was an error reading the CD Table of Contents header.\n");
 		return;
@@ -235,14 +235,14 @@ void Linux_ReadCDTOC(int cd_fd) {
 			toc_entry.cdte_track = i;
 		}
 		toc_entry.cdte_format = CDROM_MSF; //although it could just be easier to use CDROM_LBA
-		
+
 		if (ioctl(cd_fd, CDROMREADTOCENTRY, &toc_entry) == -1) {
 			fprintf(stderr,
 				"AtomicParsley error: there was an error reading a "
 				"CD Table of Contents entry (linux cdrom).\n");
 			return;
 		}
-		
+
 		if (cdTOC->track_description == NULL) {
 			cdTOC->track_description = (CD_TDesc*)calloc(1, (sizeof(CD_TDesc)));
 			a_TOC_desc = cdTOC->track_description;
@@ -275,42 +275,42 @@ void Linux_ReadCDTOC(int cd_fd) {
 uint16_t Linux_ioctlProbeTargetDrive(const char* id3args_drive, char* mcdi_data) {
 	uint16_t mcdi_data_len = 0;
 	int cd_fd = 0;
-	
+
 	cd_fd = open(id3args_drive, O_RDONLY | O_NONBLOCK);
-	
+
 	if (cd_fd != -1) {
 		int cd_mode = ioctl(cd_fd, CDROM_DISC_STATUS);
 		if (cd_mode != CDS_AUDIO || cd_mode != CDS_MIXED) {
 			Linux_ReadCDTOC(cd_fd);
-			mcdi_data_len = FormMCDIdata(mcdi_data);			
+			mcdi_data_len = FormMCDIdata(mcdi_data);
 		} else {
 			//scan for available devices
 		}
 	} else {
 		//scan for available devices
 	}
-	
+
 	return mcdi_data_len;
 }
 #endif
 
-#if defined (DARWIN_PLATFORM)
+#if defined (__APPLE__)
 uint16_t Extract_cdTOCrawdata(CFDataRef cdTOCdata, char* cdTOCrawdata) {
 	CFRange	cdrange;
 	CFIndex cdTOClen = CFDataGetLength (cdTOCdata);
-	cdTOCrawdata = (char*)calloc(1, sizeof(char)*cdTOClen+1);	
+	cdTOCrawdata = (char*)calloc(1, sizeof(char)*cdTOClen+1);
 	cdrange = CFRangeMake(0, cdTOClen+1);
 	CFDataGetBytes(cdTOCdata, cdrange, (unsigned char*)cdTOCrawdata);
-	
+
 	cdTOC = (CD_TOC_*)calloc(1, sizeof(CD_TOC_));
 	cdTOC->toc_length = UInt16FromBigEndian(cdTOCrawdata);
 	cdTOC->first_session = cdTOCrawdata[2];
 	cdTOC->first_session = cdTOCrawdata[3];
 	cdTOC->track_description = NULL;
-	
+
 	CD_TDesc* a_TOC_desc = NULL;
 	CD_TDesc* prev_desc = NULL;
-	
+
 	uint16_t toc_offset = 0;
 	for (toc_offset = 4; toc_offset <= cdTOClen; toc_offset +=11) {
 		if (cdTOC->track_description == NULL) {
@@ -334,7 +334,7 @@ uint16_t Extract_cdTOCrawdata(CFDataRef cdTOCdata, char* cdTOCrawdata) {
 		a_TOC_desc->abs_seconds = cdTOCrawdata[toc_offset+9];
 		a_TOC_desc->abs_frames = cdTOCrawdata[toc_offset+10];
 	}
-	
+
 	return (uint16_t)cdTOClen;
 }
 
@@ -342,9 +342,9 @@ void OSX_ReadCDTOC(io_object_t cdobject) {
 	CFMutableDictionaryRef cd_props = 0;
 	CFDataRef cdTOCdata = NULL;
 	char* cdTOCrawdata = NULL;
-	
+
 	if (IORegistryEntryCreateCFProperties(cdobject, &cd_props, kCFAllocatorDefault, kNilOptions) != kIOReturnSuccess) return;
-												
+
 	cdTOCdata = (CFDataRef)CFDictionaryGetValue(cd_props, CFSTR (kIOCDMediaTOCKey));
 	if (cdTOCdata != NULL) {
 	   	Extract_cdTOCrawdata(cdTOCdata, cdTOCrawdata);
@@ -362,7 +362,7 @@ void OSX_ScanForCDDrive() {
 	if (IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching(kIOCDMediaClass), &drive_iter) != kIOReturnSuccess) { //create the iterator
 		fprintf(stdout, "No device capable of reading cd media present\n");
 	}
-	
+
 	driveobject = IOIteratorNext(drive_iter);
 	while ( driveobject != MACH_PORT_NULL ) {
 		drive_path = IORegistryEntryCreateCFProperty(driveobject, CFSTR(kIOBSDNameKey), kCFAllocatorDefault, 0);
@@ -383,7 +383,7 @@ void OSX_ScanForCDDrive() {
 		IOObjectRelease(driveobject);
 		driveobject = IOIteratorNext(drive_iter);
 	}
-	
+
 	if (drive_path_str[0] == (uint8_t)0x00) {
 		fprintf(stdout, "No CD media was found in any device\n");
 	}
@@ -395,7 +395,7 @@ void OSX_ScanForCDDrive() {
 uint16_t OSX_ProbeTargetDrive(const char* id3args_drive, char* mcdi_data) {
 	uint16_t mcdi_data_len = 0;
 	io_object_t	cdobject = MACH_PORT_NULL;
-	
+
 	if (strncmp(id3args_drive, "disk", 4) != 0) {
 		OSX_ScanForCDDrive();
 		exit(0);
@@ -405,7 +405,7 @@ uint16_t OSX_ProbeTargetDrive(const char* id3args_drive, char* mcdi_data) {
 	if (cdobject == MACH_PORT_NULL) {
 		fprintf(stdout, "No device found at %s; searching for possible drives...\n", id3args_drive);
 		OSX_ScanForCDDrive();
-		
+
 	} else if (IOObjectConformsTo(cdobject, kIOCDMediaClass) == false) {
 		fprintf (stdout, "No cd present in drive at %s\n", id3args_drive );
 		IOObjectRelease(cdobject);
@@ -433,14 +433,14 @@ uint16_t OSX_ProbeTargetDrive(const char* id3args_drive, char* mcdi_data) {
 void Windows_ioctlReadCDTOC(HANDLE cdrom_device) {
 	DWORD bytes_returned;
 	CDROM_TOC win_cdrom_toc;
-	
+
 	//WARNING: "This IOCTL is obsolete beginning with the Microsoft Windows Vista. Do not use this IOCTL to develop drivers in Microsoft Windows Vista."
 	if (DeviceIoControl(cdrom_device, IOCTL_CDROM_READ_TOC, NULL, 0, &win_cdrom_toc, sizeof(CDROM_TOC), &bytes_returned, NULL) == 0) {
 		fprintf(stderr, "AtomicParsley error: there was an error reading the CD Table of Contents header (win32).\n");
 		return;
 	}
-	
-	
+
+
 	cdTOC = (CD_TOC_*)calloc(1, sizeof(CD_TOC_));
 	cdTOC->toc_length = ((win_cdrom_toc.Length[0] & 0xFF) << 8) | (win_cdrom_toc.Length[1] & 0xFF);
 	//cdTOC->first_session = 0; //seems windows doesn't store session info with IOCTL_CDROM_READ_TOC, all tracks from all sessions are available
@@ -453,7 +453,7 @@ void Windows_ioctlReadCDTOC(HANDLE cdrom_device) {
 
 	for (uint8_t i = win_cdrom_toc.FirstTrack; i <= win_cdrom_toc.LastTrack+1; i++) {
 		TRACK_DATA* thisTrackData = &(win_cdrom_toc.TrackData[i-1]);
-		
+
 		if (cdTOC->track_description == NULL) {
 			cdTOC->track_description = (CD_TDesc*)calloc(1, (sizeof(CD_TDesc)));
 			a_TOC_desc = cdTOC->track_description;
@@ -463,7 +463,7 @@ void Windows_ioctlReadCDTOC(HANDLE cdrom_device) {
 			a_TOC_desc = (CD_TDesc*)prev_desc->next_description;
 			prev_desc = a_TOC_desc;
 		}
-		
+
 		a_TOC_desc->session = 1; //and for vanilla audio CDs it is session 1, but for multi-session...
 #if defined (__ppc__) || defined (__ppc64__)
 		a_TOC_desc->controladdress = (thisTrackData->Control << 4) | thisTrackData->Adr;
@@ -480,17 +480,17 @@ void Windows_ioctlReadCDTOC(HANDLE cdrom_device) {
 		a_TOC_desc->abs_seconds = thisTrackData->Address[2];
 		a_TOC_desc->abs_frames = thisTrackData->Address[3];
 	}
-	
+
 	return;
 }
 
 uint16_t Windows_ioctlProbeTargetDrive(const char* id3args_drive, char* mcdi_data) {
 	uint16_t mcdi_data_len = 0;
 	char cd_device_path[16];
-				
+
 	memset(cd_device_path, 0, 16);
 	sprintf(cd_device_path, "\\\\.\\%s:", id3args_drive);
-	
+
 	HANDLE cdrom_device = APar_OpenFileWin32(cd_device_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (cdrom_device != INVALID_HANDLE_VALUE) {
 		Windows_ioctlReadCDTOC(cdrom_device);
@@ -502,7 +502,7 @@ uint16_t Windows_ioctlProbeTargetDrive(const char* id3args_drive, char* mcdi_dat
 		}
 		CloseHandle(cdrom_device);
 	}
-	
+
 	return mcdi_data_len;
 }
 #endif
@@ -513,11 +513,11 @@ uint16_t Windows_ioctlProbeTargetDrive(const char* id3args_drive, char* mcdi_dat
 
 uint16_t GenerateMCDIfromCD(const char* drive, char* dest_buffer) {
 	uint16_t mcdi_bytes = 0;
-#if defined (DARWIN_PLATFORM)
+#if defined(__APPLE__)
 	mcdi_bytes = OSX_ProbeTargetDrive(drive, dest_buffer);
-#elif defined (HAVE_LINUX_CDROM_H)
+#elif defined(__linux__)
 	mcdi_bytes = Linux_ioctlProbeTargetDrive(drive, dest_buffer);
-#elif defined (_WIN32)
+#elif defined(_WIN32)
 	mcdi_bytes = Windows_ioctlProbeTargetDrive(drive, dest_buffer);
 #endif
 	return mcdi_bytes;

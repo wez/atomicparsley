@@ -342,7 +342,7 @@ static const char* longHelp_text =
 "        moov.trak[2].uuid=55534d54-21d2-4fce-bb88-695cfac9c740\n"
 "------------------------------------------------------------------------------------------------\n"
 
-#if defined (DARWIN_PLATFORM)
+#if defined (__APPLE__)
 "                   Environmental Variables (affecting picture placement)\n"
 "\n"
 "  set PIC_OPTIONS in your shell to set these flags; preferences are separated by colons (:)\n"
@@ -773,7 +773,7 @@ static const char* ID3Help_text =
 " --ID3Tag APIC extract\n"
 "       images are extracted into the same directory as the source mpeg-4 file\n"
 "\n"
-#if defined (DARWIN_PLATFORM)
+#if defined (__APPLE__)
 " Setting MCDI (Music CD Identifier):\n"
 " --ID3Tag MCDI disk4\n"
 "       Information to create this frame is taken directly off an Audio CD's TOC. If the target\n"
@@ -783,7 +783,7 @@ static const char* ID3Help_text =
 "          % No cd present in drive at disk3\n"
 "          % Device 'disk4' contains cd media\n"
 "          % Good news, device 'disk4' is an Audio CD and can be used for 'MCDI' setting\n"
-#elif defined (HAVE_LINUX_CDROM_H)
+#elif defined (__linux__)
 " Setting MCDI (Music CD Identifier):\n"
 " --ID3Tag MCDI /dev/hdc\n"
 "       Information to create this frame is taken directly off an Audio CD's TOC. An Audio CD\n"
@@ -948,7 +948,7 @@ static void show_short_help(void)
 {
     printf("%s\n", shortHelp_text);
     ShowVersionInfo();
-    printf("\nReport issues at %s\n", PACKAGE_BUGREPORT);
+    printf("\nSubmit bug fixes to https://github.com/wez/atomicparsley\n");
 }
 
 int real_main(int argc, char *argv[])
