@@ -339,12 +339,6 @@ uint16_t PackLanguage(const char* language_code, uint8_t lang_offset) { //?? is 
 //                                platform specifics                                 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef _WIN32
-int lroundf(float a) {
-	return (int)(a/1);
-}
-#endif
-
 #ifndef HAVE_STRSEP
 // use glibc's strsep only on windows when cygwin & libc are undefined; otherwise the internal strsep will be used
 // This marks the point where a ./configure & makefile combo would make this easier
