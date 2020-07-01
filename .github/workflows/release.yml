@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "20*"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    steps:
+    - uses: actions/checkout@v2
+    - name: configure
+      run: cmake .
+    - name: build
+      run: cmake --build .
+    - name: "Upload to Tagged Release"
+      uses: softprops/action-gh-release@v1
+      with:
+         files: "AtomicParsley*"
+      env:
+         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
