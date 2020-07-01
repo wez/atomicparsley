@@ -70,8 +70,8 @@ target_link_libraries(
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   target_link_libraries(
     AtomicParsley
-    Cocoa
-    Foundation
-    IOKit
+    "-framework Cocoa"
+    "-framework Foundation"
+    "-framework IOKit"
   )
 endif()
