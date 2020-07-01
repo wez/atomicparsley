@@ -68,6 +68,8 @@
 # include <sys/param.h>
 #endif
 #ifdef _WIN32
+// Don't break std::min!
+#define NOMINMAX
 # include <windows.h>
 #endif
 #include <wchar.h>
@@ -112,12 +114,6 @@
 #ifndef SCNu16
 # define SCNu16 "hu"
 #endif
-
-#ifndef MIN
-//#define MIN(X,Y) ((X) < (Y) ? : (X) : (Y))
-#define MIN min
-#endif
-
 
 #ifndef MAXPATHLEN
 # define MAXPATHLEN 255
