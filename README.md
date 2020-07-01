@@ -1,7 +1,6 @@
 # AtomicParsley
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/wez/atomicparsley/CI)
-![Maintenance](https://img.shields.io/maintenance/no/2012)
 
 ## Installation
 
