@@ -85,7 +85,7 @@ struct padding_preferences pad_prefs;
 short max_display_width = 55;
 char* file_progress_buffer=(char*)calloc(1, sizeof(char)* (max_display_width+50) ); //+50 for any overflow in "%100", or "|"
 
-#if defined (DARWIN_PLATFORM)
+#if defined (__APPLE__)
 struct PicPrefs myPicturePrefs;
 #endif
 bool parsed_prefs = false;
@@ -211,7 +211,7 @@ void APar_FreeMemory() {
 //                        Picture Preferences Functions                              //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-#if defined (DARWIN_PLATFORM)
+#if defined (__APPLE__)
 PicPrefs APar_ExtractPicPrefs(char* env_PicOptions) {
 	if (!parsed_prefs) {
 
@@ -2306,7 +2306,7 @@ void APar_MetaData_atomArtwork_Set(const char* artworkPath, char* env_PicOptions
 			AtomicInfo* desiredAtom = APar_FindAtom(artwork_atom, true, SIMPLE_ATOM, 0);
 			AtomicInfo sample_data_atom = { 0 };
 
-#if defined (DARWIN_PLATFORM)
+#if defined (__APPLE__)
 			// used on Darwin adding a 2nd image (the original)
 			short parent_atom = desiredAtom->AtomicNumber;
 #endif
@@ -2314,7 +2314,7 @@ void APar_MetaData_atomArtwork_Set(const char* artworkPath, char* env_PicOptions
 			APar_CreateSurrogateAtom(&sample_data_atom, "data", 6, VERSIONED_ATOM, 0, NULL, 0);
 			desiredAtom = APar_CreateSparseAtom(&sample_data_atom, desiredAtom, APar_FindLastChild_of_ParentAtom(desiredAtom->AtomicNumber) );
 
-#if defined (DARWIN_PLATFORM)
+#if defined (__APPLE__)
 			//determine if any picture preferences will impact the picture file in any way
 			myPicturePrefs = APar_ExtractPicPrefs(env_PicOptions);
 
@@ -4818,7 +4818,7 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 		APar_DeriveNewPath(ISObasemediafile, temp_file_name, 0, "-temp-", NULL);
 		temp_file = APar_OpenFile(temp_file_name, "wb");
 
-#if defined (DARWIN_PLATFORM)
+#if defined (__APPLE__)
 		APar_SupplySelectiveTypeCreatorCodes(ISObasemediafile, temp_file_name, forced_suffix_type); //provide type/creator codes for ".mp4" for randomly named temp files
 #endif
 
@@ -4830,14 +4830,14 @@ void APar_WriteFile(const char* ISObasemediafile, const char* outfile, bool rewr
 			APar_DeriveNewPath(ISObasemediafile, temp_file_name, 0, "-temp-", NULL);
 			temp_file = APar_OpenFile(temp_file_name, "wb");
 
-#if defined (DARWIN_PLATFORM)
+#if defined (__APPLE__)
 			APar_SupplySelectiveTypeCreatorCodes(ISObasemediafile, temp_file_name, forced_suffix_type); //provide type/creator codes for ".mp4" for a fall-through randomly named temp files
 #endif
 
 		} else {
 			temp_file = APar_OpenFile(outfile, "wb");
 
-#if defined (DARWIN_PLATFORM)
+#if defined (__APPLE__)
 			APar_SupplySelectiveTypeCreatorCodes(ISObasemediafile, outfile, forced_suffix_type); //provide type/creator codes for ".mp4" for a user-defined output file
 #endif
 

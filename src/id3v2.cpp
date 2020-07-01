@@ -2,7 +2,7 @@
 /*
     AtomicParsley - id3v2.cpp
 
-    AtomicParsley is GPL software; you can freely distribute, 
+    AtomicParsley is GPL software; you can freely distribute,
     redistribute, modify & use under the terms of the GNU General
     Public License; either version 2 or its successor.
 
@@ -10,7 +10,7 @@
     any warranty; without the implied warranty of merchantability
     or fitness for either an expressed or implied particular purpose.
 
-    Please see the included GNU General Public License (GPL) for 
+    Please see the included GNU General Public License (GPL) for
     your rights and further details; see the file COPYING. If you
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
@@ -51,7 +51,7 @@ uint64_t syncsafeXX_to_UInt64(char* syncsafe_int, uint8_t syncsafe_len) {
 	} else if (syncsafe_len == 7) {
 		if (syncsafe_int[0] & 0x80 || syncsafe_int[1] & 0x80 || syncsafe_int[2] & 0x80 || syncsafe_int[3] & 0x80 ||
 		    syncsafe_int[4] & 0x80 || syncsafe_int[5] & 0x80 || syncsafe_int[6] & 0x80) return 0;
-		return ((uint64_t)syncsafe_int[0] << 42) | ((uint64_t)syncsafe_int[1] << 35) | ((uint64_t)syncsafe_int[2] << 28) | (syncsafe_int[3] << 21) | 
+		return ((uint64_t)syncsafe_int[0] << 42) | ((uint64_t)syncsafe_int[1] << 35) | ((uint64_t)syncsafe_int[2] << 28) | (syncsafe_int[3] << 21) |
 		       (syncsafe_int[3] << 14) | (syncsafe_int[5] << 7) | syncsafe_int[6];
 	} else if (syncsafe_len == 8) {
 		if (syncsafe_int[0] & 0x80 || syncsafe_int[1] & 0x80 || syncsafe_int[2] & 0x80 || syncsafe_int[3] & 0x80 ||
@@ -59,7 +59,7 @@ uint64_t syncsafeXX_to_UInt64(char* syncsafe_int, uint8_t syncsafe_len) {
 		return ((uint64_t)syncsafe_int[0] << 49) | ((uint64_t)syncsafe_int[1] << 42) | ((uint64_t)syncsafe_int[2] << 35) | ((uint64_t)syncsafe_int[3] << 28) |
 					(syncsafe_int[4] << 21) | (syncsafe_int[5] << 14) | (syncsafe_int[6] << 7) | syncsafe_int[7];
 	} else if (syncsafe_len == 9) {
-		if (syncsafe_int[0] & 0x80 || syncsafe_int[1] & 0x80 || syncsafe_int[2] & 0x80 || syncsafe_int[3] & 0x80 || syncsafe_int[4] & 0x80 || 
+		if (syncsafe_int[0] & 0x80 || syncsafe_int[1] & 0x80 || syncsafe_int[2] & 0x80 || syncsafe_int[3] & 0x80 || syncsafe_int[4] & 0x80 ||
 		    syncsafe_int[5] & 0x80 || syncsafe_int[6] & 0x80 || syncsafe_int[7] & 0x80 || syncsafe_int[8] & 0x80) return 0;
 		return ((uint64_t)syncsafe_int[0] << 56) | ((uint64_t)syncsafe_int[1] << 49) | ((uint64_t)syncsafe_int[2] << 42) | ((uint64_t)syncsafe_int[3] << 35) |
 					  ((uint64_t)syncsafe_int[4] << 28) | (syncsafe_int[5] << 21) | (syncsafe_int[6] << 14) | (syncsafe_int[7] << 7) | syncsafe_int[8];
@@ -86,7 +86,7 @@ void convert_to_syncsafe32(uint32_t in_uint, char* buffer) {
 }
 
 uint8_t convert_to_syncsafeXX(uint64_t in_uint, char* buffer) {
-	if 
+	if
 #if defined (_MSC_VER)
 	(in_uint <= (uint64_t)34359738367)
 #else
@@ -164,7 +164,7 @@ uint32_t UInt24FromBigEndian(const char *string) { //v2.2 frame lengths
 uint32_t ID3v2_desynchronize(char* buffer, uint32_t bufferlen) {
 	char* buf_ptr = buffer;
 	uint32_t desync_count = 0;
-	
+
 	for (uint32_t i = 0; i < bufferlen; i++) {
 		if ((unsigned char)buffer[i] == 0xFF && (unsigned char)buffer[i+1] == 0x00) {
 			buf_ptr[desync_count] = buffer[i];
@@ -232,7 +232,7 @@ void APar_ValidateNULLTermination16bit(ID3v2Fields* this_field, uint8_t encoding
 	if (this_field->field_string[0] == 0 && this_field->field_string[1] == 0) {
 		this_field->field_length = 2;
 		if (encoding == TE_UTF16LE_WITH_BOM) {
-			if ( ((uint8_t)(this_field->field_string[0]) != 0xFF && (uint8_t)(this_field->field_string[1]) != 0xFE) || 
+			if ( ((uint8_t)(this_field->field_string[0]) != 0xFF && (uint8_t)(this_field->field_string[1]) != 0xFE) ||
 			     ((uint8_t)(this_field->field_string[0]) != 0xFE && (uint8_t)(this_field->field_string[1]) != 0xFF) ) {
 				memcpy(this_field->field_string, "\xFF\xFE", 2);
 				this_field->field_length = 4;
@@ -246,7 +246,7 @@ void APar_ValidateNULLTermination16bit(ID3v2Fields* this_field, uint8_t encoding
 
 bool APar_EvalFrame_for_Field(int frametype, int fieldtype) {
 	uint8_t frametype_idx = GetFrameCompositionDescription(frametype);
-	
+
 	for (uint8_t fld_i = 0; fld_i < FrameTypeConstructionList[frametype_idx].ID3_FieldCount; fld_i++) {
 		if (FrameTypeConstructionList[frametype_idx].ID3_FieldComponents[fld_i] == fieldtype) {
 			return true;
@@ -278,7 +278,7 @@ void WriteZlibData(char* buffer, uint32_t buff_len) {
 
 	FILE* test_file = fopen(indy_atom_path, "wb");
 	if (test_file != NULL) {
-		
+
 		fwrite(buffer, (size_t)buff_len, 1, test_file);
 		fclose(test_file);
 	}
@@ -308,7 +308,7 @@ static const char* ReturnFrameTypeStr(int frametype) {
 	} else if (frametype == ID3_ATTACHED_PICTURE_FRAME) {
 		return "picture frame          ";
 	} else if (frametype == ID3_ATTACHED_OBJECT_FRAME) {
-		return "encapuslated object frm";			
+		return "encapuslated object frm";
 	} else if (frametype == ID3_GROUP_ID_FRAME) {
 		return "group ID frame         ";
 	} else if (frametype == ID3_SIGNATURE_FRAME) {
@@ -321,7 +321,7 @@ static const char* ReturnFrameTypeStr(int frametype) {
 		return "popularimeter          ";
 	}
 	return "";
-} 
+}
 
 void ListID3FrameIDstrings() {
 	const char* frametypestr = NULL;
@@ -371,9 +371,9 @@ void ListID3FrameIDstrings() {
 "  url frame :                  (url)\n"
 "  user defined url frame :     (url) [desc=(str)] [encoding]\n"
 "  file ID frame :              (owner) [uniqueID={\"randomUUIDstamp\",(str)}]\n"
-#if defined (DARWIN_PLATFORM)
+#if defined (__APPLE__)
 "  AudioCD ID frame :           disk(num)\n"
-#elif defined (HAVE_LINUX_CDROM_H)
+#elif defined (__linux__)
 "  AudioCD ID frame :           (/path)\n"
 #elif defined (_WIN32)
 "  AudioCD ID frame :           (letter)\n"
@@ -403,8 +403,8 @@ void ListID3FrameIDstrings() {
 "     [lang=(3char)] (default='eng') sets the language/ID32 atom to which the frame belongs\n"
 "                    use AP --languages-list to see a list of available languages\n"
 );
-	
-	
+
+
 	return;
 }
 
@@ -420,13 +420,13 @@ void List_imagtype_strings() {
 const char* ConvertCLIFrameStr_TO_frameID(const char* frame_str) {
 	const char* discovered_frameID = NULL;
 	uint16_t total_known_frames = (uint16_t)(sizeof(KnownFrames)/sizeof(*KnownFrames));
-	
+
 	for (uint16_t i = 0; i < total_known_frames; i++) {
 		if (strcmp(KnownFrames[i].CLI_frameIDpreset, frame_str) == 0) {
 			if (AtomicParsley_ID3v2Tag_MajorVersion == 2) discovered_frameID = KnownFrames[i].ID3V2p2_FrameID;
 			if (AtomicParsley_ID3v2Tag_MajorVersion == 3) discovered_frameID = KnownFrames[i].ID3V2p3_FrameID;
 			if (AtomicParsley_ID3v2Tag_MajorVersion == 4) discovered_frameID = KnownFrames[i].ID3V2p4_FrameID;
-			
+
 			if (strlen(discovered_frameID) == 0) discovered_frameID = NULL;
 			break;
 		}
@@ -439,7 +439,7 @@ const char* ConvertCLIFrameStr_TO_frameID(const char* frame_str) {
 //2 = type
 bool TestCLI_for_FrameParams(int frametype, uint8_t testparam) {
 	if (frametype == ID3_URL_FRAME_USERDEF && testparam == 0) return true;
-	
+
 	if (frametype == ID3_UNIQUE_FILE_ID_FRAME && testparam == 3) {
 		return true;
 	} else if (frametype == ID3_ATTACHED_OBJECT_FRAME && testparam == 4) {
@@ -454,7 +454,7 @@ bool TestCLI_for_FrameParams(int frametype, uint8_t testparam) {
 		return true;
 	} else {
 		uint8_t frametype_idx = GetFrameCompositionDescription(frametype);
-	
+
 		for (uint8_t fld_i = 0; fld_i < FrameTypeConstructionList[frametype_idx].ID3_FieldCount; fld_i++) {
 			if (FrameTypeConstructionList[frametype_idx].ID3_FieldComponents[fld_i] == ID3_DESCRIPTION_FIELD && testparam == 0) {
 				return true;
@@ -480,13 +480,13 @@ bool TestCLI_for_FrameParams(int frametype, uint8_t testparam) {
 int MatchID3FrameIDstr(const char* foundFrameID, uint8_t tagVersion) {
 	uint16_t total_known_frames = (uint16_t)(sizeof(KnownFrames)/sizeof(*KnownFrames));
 	uint8_t frameLen = (tagVersion >= 3 ? 4 : 3) +1;
-	
+
 	for (int i = 0; i < total_known_frames; i++) {
 		const char* testFrameID = NULL;
 		if (tagVersion == 2) testFrameID = KnownFrames[i].ID3V2p2_FrameID;
 		if (tagVersion == 3) testFrameID = KnownFrames[i].ID3V2p3_FrameID;
 		if (tagVersion == 4) testFrameID = KnownFrames[i].ID3V2p4_FrameID;
-		
+
 		if (memcmp(foundFrameID, testFrameID, frameLen) == 0) {
 			return KnownFrames[i].ID3v2_InternalFrameID;
 		}
@@ -497,8 +497,8 @@ int MatchID3FrameIDstr(const char* foundFrameID, uint8_t tagVersion) {
 uint8_t GetFrameCompositionDescription(int ID3v2_FrameTypeID) {
 	uint8_t matchingFrameDescription = 0; //return the UnknownFrame/UnknownField if it can't be found
 	uint8_t total_frame_descrips = (uint8_t)(sizeof(FrameTypeConstructionList)/sizeof(*FrameTypeConstructionList));
-	
-	for (uint8_t i = 0; i < total_frame_descrips; i++) {		
+
+	for (uint8_t i = 0; i < total_frame_descrips; i++) {
 		if (FrameTypeConstructionList[i].ID3_FrameType == ID3v2_FrameTypeID) {
 			matchingFrameDescription = i;
 			break;
@@ -511,12 +511,12 @@ int FrameStr_TO_FrameType(const char* frame_str) {
 	const char* eval_framestr = NULL;
 	int frame_type = 0;
 	uint16_t total_known_frames = (uint16_t)(sizeof(KnownFrames)/sizeof(*KnownFrames));
-	
+
 	for (uint16_t i = 0; i < total_known_frames; i++) {
 		if (AtomicParsley_ID3v2Tag_MajorVersion == 2) eval_framestr = KnownFrames[i].ID3V2p2_FrameID;
 		if (AtomicParsley_ID3v2Tag_MajorVersion == 3) eval_framestr = KnownFrames[i].ID3V2p3_FrameID;
 		if (AtomicParsley_ID3v2Tag_MajorVersion == 4) eval_framestr = KnownFrames[i].ID3V2p4_FrameID;
-			
+
 		if (strcmp(frame_str, eval_framestr) == 0) {
 			frame_type = KnownFrames[i].ID3v2_FrameType;
 			break;
@@ -535,7 +535,7 @@ ID3v2Fields* APar_FindLastTextField(ID3v2Frame* aFrame) {
 			}
 			lastusedtextfield = lastusedtextfield->next_field;
 		}
-	}	
+	}
 	return lastusedtextfield;
 }
 
@@ -549,7 +549,7 @@ bool APar_ExtraTextFieldInit(ID3v2Fields* lastField, uint32_t utf8len, uint8_t t
 	extraField = lastField->next_field;
 	extraField->ID3v2_Field_Type = ID3_TEXT_FIELD;
 	extraField->field_length = 0;
-	
+
 	if (textencoding == TE_UTF16LE_WITH_BOM || textencoding == TE_UTF16BE_NO_BOM) {
 		extraField->alloc_length = 2 + (utf8len * 2);
 	} else {
@@ -559,7 +559,7 @@ bool APar_ExtraTextFieldInit(ID3v2Fields* lastField, uint32_t utf8len, uint8_t t
 		extraField->field_string = (char*)calloc(1, sizeof(char*) * extraField->alloc_length);
 		if (!APar_assert((extraField->field_string != NULL), 11, "while setting an extra text field") ) exit(11);
 		return true;
-	}		
+	}
 	return false;
 }
 
@@ -577,7 +577,7 @@ uint32_t APar_ExtractField(char* buffer, uint32_t maxFieldLen, ID3v2Frame* thisF
 			thisField->field_string = (char*)calloc(1, sizeof(char)*(maxFieldLen+1 > 16 ? maxFieldLen+1 : 16));
 			thisField->alloc_length = sizeof(char)*(maxFieldLen+1 > 16 ? maxFieldLen+1 : 16);
 			memcpy(thisField->field_string, buffer, maxFieldLen);
-			
+
 			bytes_used = maxFieldLen;
 			break;
 		}
@@ -589,7 +589,7 @@ uint32_t APar_ExtractField(char* buffer, uint32_t maxFieldLen, ID3v2Frame* thisF
 			thisField->field_string = (char*)calloc(1, sizeof(char)*16);
 			thisField->field_string[0] = buffer[0]; //memcpy(thisField->field_string, buffer, 1);
 			thisField->alloc_length = sizeof(char)*16;
-			
+
 			bytes_used = 1;
 			break;
 		}
@@ -599,7 +599,7 @@ uint32_t APar_ExtractField(char* buffer, uint32_t maxFieldLen, ID3v2Frame* thisF
 			thisField->field_string = (char*)calloc(1, sizeof(char)*16);
 			memcpy(thisField->field_string, buffer, 3);
 			thisField->alloc_length = sizeof(char)*16;
-			
+
 			bytes_used = 3;
 			break;
 		}
@@ -612,9 +612,9 @@ uint32_t APar_ExtractField(char* buffer, uint32_t maxFieldLen, ID3v2Frame* thisF
 			thisField->field_string = (char*)calloc(1, sizeof(char)*maxFieldLen+1 > 16 ? maxFieldLen+1 : 16);
 			memcpy(thisField->field_string, buffer, maxFieldLen);
 			thisField->alloc_length = (sizeof(char)*maxFieldLen+1 > 16 ? maxFieldLen+1 : 16);
-			
+
 			if (fieldType == ID3_TEXT_FIELD) {
-				bytes_used = findstringNULLterm(buffer, textEncoding, maxFieldLen);			
+				bytes_used = findstringNULLterm(buffer, textEncoding, maxFieldLen);
 			} else {
 				bytes_used = maxFieldLen;
 			}
@@ -627,10 +627,10 @@ uint32_t APar_ExtractField(char* buffer, uint32_t maxFieldLen, ID3v2Frame* thisF
 			thisField->field_string = (char*)calloc(1, sizeof(char) * thisField->field_length +1 > 16 ? thisField->field_length +1 : 16);
 			memcpy(thisField->field_string, buffer, thisField->field_length);
 			thisField->alloc_length = (sizeof(char)*maxFieldLen+1 > 16 ? maxFieldLen+1 : 16);
-						
+
 			bytes_used = thisField->field_length;
 			break;
-		
+
 		}
 		case ID3_FILENAME_FIELD :
 		case ID3_DESCRIPTION_FIELD : {
@@ -639,7 +639,7 @@ uint32_t APar_ExtractField(char* buffer, uint32_t maxFieldLen, ID3v2Frame* thisF
 			thisField->field_string = (char*)calloc(1, sizeof(char) * thisField->field_length +1 > 16 ? thisField->field_length +1 : 16);
 			memcpy(thisField->field_string, buffer, thisField->field_length);
 			thisField->alloc_length = (sizeof(char) * thisField->field_length +1 > 16 ? thisField->field_length +1 : 16);
-						
+
 			bytes_used = thisField->field_length;
 			break;
 		}
@@ -650,7 +650,7 @@ uint32_t APar_ExtractField(char* buffer, uint32_t maxFieldLen, ID3v2Frame* thisF
 
 void APar_ScanID3Frame(ID3v2Frame* targetframe, char* frame_ptr, uint32_t frameLen) {
 	uint64_t offset_into_frame = 0;
-	
+
 	switch(targetframe->ID3v2_FrameType) {
 		case ID3_UNKNOWN_FRAME : {
 			APar_ExtractField(frame_ptr, frameLen, targetframe, targetframe->ID3v2_Frame_Fields, ID3_UNKNOWN_FIELD, 0);
@@ -659,39 +659,39 @@ void APar_ScanID3Frame(ID3v2Frame* targetframe, char* frame_ptr, uint32_t frameL
 		case ID3_TEXT_FRAME : {
 			uint8_t textencoding = 0xFF;
 			offset_into_frame += APar_ExtractField(frame_ptr, 1, targetframe, targetframe->ID3v2_Frame_Fields, ID3_TEXT_ENCODING_FIELD, 0);
-			
+
 			offset_into_frame += APar_ExtractField(frame_ptr + 1, frameLen - 1, targetframe, targetframe->ID3v2_Frame_Fields+1,
 			                                        ID3_TEXT_FIELD, targetframe->ID3v2_Frame_Fields->field_string[0]);
 			targetframe->textfield_tally++;
-			
+
 			if (offset_into_frame >= frameLen) break;
 			textencoding = targetframe->ID3v2_Frame_Fields->field_string[0];
-			
+
 			if (offset_into_frame < frameLen) {
 				while (true) {
 					if (offset_into_frame >= frameLen) break;
-					
+
 					//skip the required separator for multiple strings
 					if (textencoding == TE_LATIN1 || textencoding == TE_UTF8) {
 						offset_into_frame += 1;
 					} else if (textencoding == TE_UTF16LE_WITH_BOM) {
 						offset_into_frame += 2;
 					}
-					
+
 					//multiple id3v2.4 strings should be separated with a single NULL byte; some implementations might terminate the string AND use a NULL separator
 					if (textencoding == TE_LATIN1 || textencoding == TE_UTF8) {
 						if ((frame_ptr + offset_into_frame)[0] == 0) offset_into_frame+=1;
 					} else if (textencoding == TE_UTF16LE_WITH_BOM) {
 						if ((frame_ptr + offset_into_frame)[0] == 0 && (frame_ptr + offset_into_frame)[1] == 0) offset_into_frame+=2;
 					}
-					
+
 					//a 3rd NULL would not be good
 					if (textencoding == TE_LATIN1 || textencoding == TE_UTF8) {
 						if ((frame_ptr + offset_into_frame)[0] == 0) break;
 					} else if (textencoding == TE_UTF16LE_WITH_BOM) {
 						if ((frame_ptr + offset_into_frame)[0] == 0 && (frame_ptr + offset_into_frame)[1] == 0) break;
 					}
-					
+
 					ID3v2Fields* last_textfield = APar_FindLastTextField(targetframe);
 					if (APar_ExtraTextFieldInit(last_textfield, frameLen - offset_into_frame, textencoding)) {
 						offset_into_frame += APar_ExtractField(frame_ptr + offset_into_frame, frameLen - offset_into_frame, targetframe, last_textfield->next_field,
@@ -711,12 +711,12 @@ void APar_ScanID3Frame(ID3v2Frame* targetframe, char* frame_ptr, uint32_t frameL
 		case ID3_TEXT_FRAME_USERDEF :
 		case ID3_URL_FRAME_USERDEF : {
 			offset_into_frame += APar_ExtractField(frame_ptr, 1, targetframe, targetframe->ID3v2_Frame_Fields, ID3_TEXT_ENCODING_FIELD, 0);
-			
-			offset_into_frame += APar_ExtractField(frame_ptr + offset_into_frame, frameLen - offset_into_frame, targetframe, 
+
+			offset_into_frame += APar_ExtractField(frame_ptr + offset_into_frame, frameLen - offset_into_frame, targetframe,
 			                                       targetframe->ID3v2_Frame_Fields+1, ID3_DESCRIPTION_FIELD, targetframe->ID3v2_Frame_Fields->field_string[0]);
-			
+
 			offset_into_frame += skipNULLterm(frame_ptr + offset_into_frame, targetframe->ID3v2_Frame_Fields->field_string[0], frameLen - offset_into_frame);
-			
+
 			if (targetframe->ID3v2_FrameType == ID3_TEXT_FRAME_USERDEF) {
 				APar_ExtractField(frame_ptr + offset_into_frame, frameLen - offset_into_frame, targetframe,
 				                  targetframe->ID3v2_Frame_Fields+2, ID3_TEXT_FIELD, targetframe->ID3v2_Frame_Fields->field_string[0]);
@@ -729,7 +729,7 @@ void APar_ScanID3Frame(ID3v2Frame* targetframe, char* frame_ptr, uint32_t frameL
 		case ID3_UNIQUE_FILE_ID_FRAME : {
 			offset_into_frame += APar_ExtractField(frame_ptr, frameLen, targetframe, targetframe->ID3v2_Frame_Fields, ID3_OWNER_FIELD, 0);
 			offset_into_frame++; //iso-8859-1 owner field is NULL terminated
-			
+
 			APar_ExtractField(frame_ptr + offset_into_frame, frameLen - offset_into_frame, targetframe, targetframe->ID3v2_Frame_Fields+1, ID3_BINARY_DATA_FIELD, 0);
 			break;
 		}
@@ -739,14 +739,14 @@ void APar_ScanID3Frame(ID3v2Frame* targetframe, char* frame_ptr, uint32_t frameL
 		}
 		case ID3_DESCRIBED_TEXT_FRAME : {
 			offset_into_frame += APar_ExtractField(frame_ptr, 1, targetframe, targetframe->ID3v2_Frame_Fields, ID3_TEXT_ENCODING_FIELD, 0);
-			
+
 			offset_into_frame += APar_ExtractField(frame_ptr + offset_into_frame, 3, targetframe, targetframe->ID3v2_Frame_Fields+1, ID3_LANGUAGE_FIELD, 0);
-			
+
 			offset_into_frame += APar_ExtractField(frame_ptr + offset_into_frame, frameLen - offset_into_frame, targetframe,
 			                                       targetframe->ID3v2_Frame_Fields+2, ID3_DESCRIPTION_FIELD, targetframe->ID3v2_Frame_Fields->field_string[0]);
-			
+
 			offset_into_frame += skipNULLterm(frame_ptr + offset_into_frame, targetframe->ID3v2_Frame_Fields->field_string[0], frameLen - offset_into_frame);
-			
+
 			if (frameLen > offset_into_frame) {
 				APar_ExtractField(frame_ptr + offset_into_frame, frameLen - offset_into_frame, targetframe, targetframe->ID3v2_Frame_Fields+3,
 				                  ID3_TEXT_FIELD, targetframe->ID3v2_Frame_Fields->field_string[0]);
@@ -756,25 +756,25 @@ void APar_ScanID3Frame(ID3v2Frame* targetframe, char* frame_ptr, uint32_t frameL
 		case ID3_ATTACHED_OBJECT_FRAME :
 		case ID3_ATTACHED_PICTURE_FRAME : {
 			offset_into_frame += APar_ExtractField(frame_ptr, 1, targetframe, targetframe->ID3v2_Frame_Fields, ID3_TEXT_ENCODING_FIELD, 0);
-			
+
 			offset_into_frame += APar_ExtractField(frame_ptr + offset_into_frame, frameLen - 1, targetframe, targetframe->ID3v2_Frame_Fields+1, ID3_MIME_TYPE_FIELD, 0);
-			
+
 			offset_into_frame += 1; //should only be 1 NULL
-			
+
 			if (targetframe->ID3v2_FrameType == ID3_ATTACHED_PICTURE_FRAME) {
 				offset_into_frame += APar_ExtractField(frame_ptr + offset_into_frame, 1, targetframe, targetframe->ID3v2_Frame_Fields+2, ID3_PIC_TYPE_FIELD, 0);
 			} else {
 				offset_into_frame += APar_ExtractField(frame_ptr + offset_into_frame, frameLen - offset_into_frame, targetframe,
 				                                       targetframe->ID3v2_Frame_Fields+2, ID3_FILENAME_FIELD, 0);
-			
+
 				offset_into_frame+=skipNULLterm(frame_ptr + offset_into_frame, targetframe->ID3v2_Frame_Fields->field_string[0], frameLen - offset_into_frame);
 			}
-			
-			offset_into_frame += APar_ExtractField(frame_ptr + offset_into_frame, frameLen - offset_into_frame, targetframe, targetframe->ID3v2_Frame_Fields+3, 
+
+			offset_into_frame += APar_ExtractField(frame_ptr + offset_into_frame, frameLen - offset_into_frame, targetframe, targetframe->ID3v2_Frame_Fields+3,
 			                                       ID3_DESCRIPTION_FIELD, targetframe->ID3v2_Frame_Fields->field_string[0]);
-			
+
 			offset_into_frame += skipNULLterm(frame_ptr + offset_into_frame, targetframe->ID3v2_Frame_Fields->field_string[0], frameLen - offset_into_frame);
-			
+
 			if (frameLen > offset_into_frame) {
 				offset_into_frame += APar_ExtractField(frame_ptr + offset_into_frame, frameLen - offset_into_frame, targetframe, targetframe->ID3v2_Frame_Fields+4,
 				                                       ID3_BINARY_DATA_FIELD, 0);
@@ -784,16 +784,16 @@ void APar_ScanID3Frame(ID3v2Frame* targetframe, char* frame_ptr, uint32_t frameL
 		case ID3_PRIVATE_FRAME : { //the only difference between the 'priv' frame & the 'ufid' frame is ufid is limited to 64 bytes
 			offset_into_frame += APar_ExtractField(frame_ptr, frameLen, targetframe, targetframe->ID3v2_Frame_Fields, ID3_OWNER_FIELD, 0);
 			offset_into_frame++; //iso-8859-1 owner field is NULL terminated
-			
+
 			APar_ExtractField(frame_ptr + offset_into_frame, frameLen - 1, targetframe, targetframe->ID3v2_Frame_Fields+1, ID3_BINARY_DATA_FIELD, 0);
 			break;
 		}
 		case ID3_GROUP_ID_FRAME : {
 			offset_into_frame += APar_ExtractField(frame_ptr, frameLen, targetframe, targetframe->ID3v2_Frame_Fields, ID3_OWNER_FIELD, 0);
 			offset_into_frame++; //iso-8859-1 owner field is NULL terminated
-			
+
 			offset_into_frame += APar_ExtractField(frame_ptr + offset_into_frame, 1, targetframe, targetframe->ID3v2_Frame_Fields+1, ID3_GROUPSYMBOL_FIELD, 0);
-			
+
 			if (frameLen > offset_into_frame) {
 				APar_ExtractField(frame_ptr + offset_into_frame, frameLen - offset_into_frame, targetframe, targetframe->ID3v2_Frame_Fields+2, ID3_BINARY_DATA_FIELD, 0);
 			}
@@ -801,7 +801,7 @@ void APar_ScanID3Frame(ID3v2Frame* targetframe, char* frame_ptr, uint32_t frameL
 		}
 		case ID3_SIGNATURE_FRAME : {
 			APar_ExtractField(frame_ptr, 1, targetframe, targetframe->ID3v2_Frame_Fields, ID3_GROUPSYMBOL_FIELD, 0);
-			
+
 			APar_ExtractField(frame_ptr + 1, frameLen - 1, targetframe, targetframe->ID3v2_Frame_Fields+1, ID3_BINARY_DATA_FIELD, 0);
 			break;
 		}
@@ -812,9 +812,9 @@ void APar_ScanID3Frame(ID3v2Frame* targetframe, char* frame_ptr, uint32_t frameL
 		case ID3_POPULAR_FRAME : {
 			offset_into_frame += APar_ExtractField(frame_ptr, frameLen, targetframe, targetframe->ID3v2_Frame_Fields, ID3_OWNER_FIELD, 0); //surrogate for 'emai to user' field
 			offset_into_frame++; //iso-8859-1 email address field is NULL terminated
-			
+
 			offset_into_frame += APar_ExtractField(frame_ptr + offset_into_frame, 1, targetframe, targetframe->ID3v2_Frame_Fields+1, ID3_BINARY_DATA_FIELD, 0);
-			
+
 			if (frameLen > offset_into_frame) {
 				APar_ExtractField(frame_ptr, frameLen - offset_into_frame, targetframe, targetframe->ID3v2_Frame_Fields+2, ID3_COUNTER_FIELD, 0);
 			}
@@ -830,13 +830,13 @@ void APar_ScanID3Frame(ID3v2Frame* targetframe, char* frame_ptr, uint32_t frameL
 void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom) {
 	char* id32_fulltag = (char*)calloc(1, sizeof(char)*id32_atom->AtomicLength);
 	char* fulltag_ptr = id32_fulltag;
-	
+
 	if (id32_atom->AtomicLength < 20) return;
 	APar_readX(id32_fulltag, source_file, id32_atom->AtomicStart+14, id32_atom->AtomicLength-14); //+10 = 4bytes ID32 atom length + 4bytes ID32 atom name + 2 bytes packed lang
-	
+
 	if (memcmp(id32_fulltag, "ID3", 3) != 0) return;
 	fulltag_ptr+=3;
-	
+
 	id32_atom->ID32_TagInfo = (ID3v2Tag*)calloc(1, sizeof(ID3v2Tag));
 	id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion = *fulltag_ptr;
 	fulltag_ptr++;
@@ -844,7 +844,7 @@ void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom) {
 	fulltag_ptr++;
 	id32_atom->ID32_TagInfo->ID3v2Tag_Flags = *fulltag_ptr;
 	fulltag_ptr++;
-	
+
 	if (id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion != 4) {
 		fprintf(stdout, "AtomicParsley warning: an ID32 atom was encountered using an unsupported ID3v2 tag version: %u. Skipping\n", id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion);
 		return;
@@ -853,22 +853,22 @@ void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom) {
 		fprintf(stdout, "AtomicParsley warning: an ID32 atom was encountered using an unsupported ID3v2.4 tag revision: %u. Skipping\n", id32_atom->ID32_TagInfo->ID3v2Tag_RevisionVersion);
 		return;
 	}
-	
+
 	if (ID3v2_TestTagFlag(id32_atom->ID32_TagInfo->ID3v2Tag_Flags, ID32_TAGFLAG_BIT0+ID32_TAGFLAG_BIT1+ID32_TAGFLAG_BIT2+ID32_TAGFLAG_BIT3)) return;
-	
+
 	if (ID3v2_TestTagFlag(id32_atom->ID32_TagInfo->ID3v2Tag_Flags, ID32_TAGFLAG_FOOTER)) {
 		fprintf(stdout, "AtomicParsley error: an ID32 atom was encountered with a forbidden footer flag. Exiting.\n");
 		free(id32_fulltag);
 		id32_fulltag = NULL;
 		return;
 	}
-		
+
 	if (ID3v2_TestTagFlag(id32_atom->ID32_TagInfo->ID3v2Tag_Flags, ID32_TAGFLAG_EXPERIMENTAL)) {
 #if defined(DEBUG_V)
 		fprintf(stdout, "AtomicParsley warning: an ID32 atom was encountered with an experimental flag set.\n");
 #endif
 	}
-	
+
 	if (id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion == 4) {
 		id32_atom->ID32_TagInfo->ID3v2Tag_Length = syncsafe32_to_UInt32(fulltag_ptr);
 		fulltag_ptr+=4;
@@ -879,7 +879,7 @@ void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom) {
 		id32_atom->ID32_TagInfo->ID3v2Tag_Length = UInt24FromBigEndian(fulltag_ptr);
 		fulltag_ptr+=3;
 	}
-	
+
 	if (ID3v2_TestTagFlag(id32_atom->ID32_TagInfo->ID3v2Tag_Flags, ID32_TAGFLAG_UNSYNCRONIZATION)) {
 		//uint32_t newtagsize = ID3v2_desynchronize(id32_fulltag, id32_atom->ID32_TagInfo->ID3v2Tag_Length);
 		//fprintf(stdout, "New tag size is %" PRIu32 "\n", newtagsize);
@@ -899,22 +899,22 @@ void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom) {
 		}
 		fulltag_ptr+= id32_atom->ID32_TagInfo->ID3v2_Tag_ExtendedHeader_Length;
 	}
-	
+
 	id32_atom->ID32_TagInfo->ID3v2_FirstFrame = NULL;
 	id32_atom->ID32_TagInfo->ID3v2_FrameList = NULL;
-	
+
 	//loop through parsing frames
 	while (fulltag_ptr < id32_fulltag + (id32_atom->AtomicLength-14) ) {
 		uint32_t fullframesize = 0;
 
 		if (ID3v2_PaddingTest(fulltag_ptr)) break;
 		if (ID3v2_TestFrameID_NonConformance(fulltag_ptr)) break;
-		
+
 		ID3v2Frame* target_list_frameinfo = (ID3v2Frame*)calloc(1, sizeof(ID3v2Frame));
 		target_list_frameinfo->ID3v2_NextFrame = NULL;
 		target_list_frameinfo->ID3v2_Frame_ID = MatchID3FrameIDstr(fulltag_ptr, id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion);
 		target_list_frameinfo->ID3v2_FrameType = KnownFrames[target_list_frameinfo->ID3v2_Frame_ID+1].ID3v2_FrameType;
-		
+
 		uint8_t FrameCompositionList = GetFrameCompositionDescription(target_list_frameinfo->ID3v2_FrameType);
 		target_list_frameinfo->ID3v2_FieldCount = FrameTypeConstructionList[FrameCompositionList].ID3_FieldCount;
 		target_list_frameinfo->ID3v2_Frame_ExpandedLength = 0;
@@ -928,7 +928,7 @@ void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom) {
 		//ID3v2_FrameType describes the general form this frame takes (text, text with description, attached object, attached picture)
 		//the general form is composed of several fields; that number of fields needs to be malloced to target_list_frameinfo->ID3v2_Frame_Fields
 		//and each target_list_frameinfo->ID3v2_Frame_Fields+num->field_string needs to be malloced and copied from id32_fulltag
-		
+
 		memset(target_list_frameinfo->ID3v2_Frame_Namestr, 0, 5);
 		if (id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion == 2) {
 			memcpy(target_list_frameinfo->ID3v2_Frame_Namestr, fulltag_ptr, 3);
@@ -937,7 +937,7 @@ void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom) {
 			memcpy(target_list_frameinfo->ID3v2_Frame_Namestr, fulltag_ptr, 4);
 			fulltag_ptr+= 4;
 		}
-		
+
 		if (id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion == 4) {
 			target_list_frameinfo->ID3v2_Frame_Length = syncsafe32_to_UInt32(fulltag_ptr);
 			fulltag_ptr+=4;
@@ -948,18 +948,18 @@ void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom) {
 			target_list_frameinfo->ID3v2_Frame_Length = UInt24FromBigEndian(fulltag_ptr);
 			fulltag_ptr+=3;
 		}
-		
+
 		if (id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion >= 3) {
 			target_list_frameinfo->ID3v2_Frame_Flags = UInt16FromBigEndian(fulltag_ptr); //v2.2 doesn't have frame level flags (but it does have field level flags)
 			fulltag_ptr+=2;
-			
+
 			if (ID3v2_TestFrameFlag(target_list_frameinfo->ID3v2_Frame_Flags, ID32_FRAMEFLAG_UNSYNCED)) {
 				//DE-UNSYNC frame
 				fullframesize = target_list_frameinfo->ID3v2_Frame_Length;
 				target_list_frameinfo->ID3v2_Frame_Length = ID3v2_desynchronize(fulltag_ptr+frame_offset, target_list_frameinfo->ID3v2_Frame_Length);
 				target_list_frameinfo->ID3v2_Frame_Flags -= ID32_FRAMEFLAG_UNSYNCED;
 			}
-			
+
 			//info based on frame flags (order based on the order of flags defined by the frame flags
 			if (ID3v2_TestFrameFlag(target_list_frameinfo->ID3v2_Frame_Flags, ID32_FRAMEFLAG_GROUPING)) {
 #if defined(DEBUG_V)
@@ -968,7 +968,7 @@ void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom) {
 				target_list_frameinfo->ID3v2_Frame_GroupingSymbol = *fulltag_ptr; //er, uh... wouldn't this also require ID32_FRAMEFLAG_LENINDICATED to be set???
 				frame_offset++;
 			}
-			
+
 			if (ID3v2_TestFrameFlag(target_list_frameinfo->ID3v2_Frame_Flags, ID32_FRAMEFLAG_COMPRESSED)) { // technically ID32_FRAMEFLAG_LENINDICATED should also be tested
 #if defined(DEBUG_V)
 				fprintf(stdout, "Frame %s has a compressed flag set\n", target_list_frameinfo->ID3v2_Frame_Namestr);
@@ -982,20 +982,20 @@ void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom) {
 				}
 			}
 		}
-		
-		
+
+
 		target_list_frameinfo->ID3v2_Frame_Fields = (ID3v2Fields*)calloc(1, sizeof(ID3v2Fields)*target_list_frameinfo->ID3v2_FieldCount);
 		char* expanded_frame = NULL;
 		char* frame_ptr = NULL;
 		uint32_t frameLen = 0;
-		
+
 		if (target_list_frameinfo->ID3v2_Frame_ExpandedLength != 0) {
 #ifdef HAVE_ZLIB_H
 			expanded_frame = (char*)calloc(1, sizeof(char)*target_list_frameinfo->ID3v2_Frame_ExpandedLength + 1);
 			APar_zlib_inflate(fulltag_ptr+frame_offset, target_list_frameinfo->ID3v2_Frame_Length, expanded_frame, target_list_frameinfo->ID3v2_Frame_ExpandedLength);
-			
+
 			WriteZlibData(expanded_frame, target_list_frameinfo->ID3v2_Frame_ExpandedLength);
-			
+
 			frame_ptr = expanded_frame;
 			frameLen = target_list_frameinfo->ID3v2_Frame_ExpandedLength;
 #else
@@ -1006,11 +1006,11 @@ void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom) {
 		} else {
 
 			frame_ptr = fulltag_ptr+frame_offset;
-			frameLen = target_list_frameinfo->ID3v2_Frame_Length; 
+			frameLen = target_list_frameinfo->ID3v2_Frame_Length;
 		}
-		
+
 		APar_ScanID3Frame(target_list_frameinfo, frame_ptr, frameLen);
-		
+
 		if (expanded_frame != NULL) {
 			free(expanded_frame);
 			expanded_frame = NULL;
@@ -1022,7 +1022,7 @@ void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom) {
 			}
 			id32_atom->ID32_TagInfo->ID3v2_FrameList = target_list_frameinfo; //this always points to the last frame that had the scan completed
 		}
-		
+
 		if (fullframesize != 0) {
 			fulltag_ptr+= fullframesize;
 		} else {
@@ -1033,7 +1033,7 @@ void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom) {
 		}
 		id32_atom->ID32_TagInfo->ID3v2_FrameCount++;
 	}
-	
+
 	id32_atom->ID32_TagInfo->modified_tag = false; //if a frame is altered/added/removed, change this to true and render the tag & fill id32_atom-AtomicData with the tag
 	return;
 }
@@ -1076,22 +1076,22 @@ void APar_FrameFilter(AtomicInfo* id32_atom) {
 				if (!thisFrame->eliminate_frame) {
 					thisFrame->ID3v2_Frame_Flags |= ID32_FRAMEFLAG_GROUPING;
 				}
-				
+
 			} else if (thisFrame->ID3v2_Frame_ID == ID3v2_FRAME_SIGNATURE) { //find a GRID frame that contains this symbol (@ field_string, not ID3v2_Frame_GroupingSymbol)
 				thisFrame->eliminate_frame = !APar_LocateFrameSymbol(id32_atom, thisFrame, (uint8_t)thisFrame->ID3v2_Frame_Fields->field_string[0]);
 				//since the group symbol is carried as a field for SIGN, no need to set the frame's grouping bit in the frame flags
-			
+
 			} else if (thisFrame->ID3v2_Frame_GroupingSymbol > 0) { //find a GRID frame that contains this symbol, otherwise discard it
 				thisFrame->eliminate_frame = !APar_LocateFrameSymbol(id32_atom, thisFrame, thisFrame->ID3v2_Frame_GroupingSymbol);
 				if (!thisFrame->eliminate_frame) {
 					thisFrame->ID3v2_Frame_Flags |= ID32_FRAMEFLAG_GROUPING;
 				}
-				
+
 			}
 		}
 		thisFrame = thisFrame->ID3v2_NextFrame;
 	}
-	
+
 	if (MCDI_frame != NULL && TRCK_frame == NULL) {
 		fprintf(stderr, "AP warning: the MCDI frame was skipped due to a missing TRCK frame\n");
 		MCDI_frame->eliminate_frame = true;
@@ -1106,7 +1106,7 @@ uint32_t APar_GetTagSize(AtomicInfo* id32_atom) { // a rough approximation of ho
 	if (id32_atom->ID32_TagInfo->ID3v2_FrameCount == 0) return tag_len; //but a frame isn't removed by AP; its just marked for elimination
 	if (id32_atom->ID32_TagInfo->ID3v2_FrameList == NULL) return tag_len; //something went wrong somewhere if this wasn't an entry to a linked list of frames
 	if (id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion != 4) return tag_len; //only id3 version 2.4 tags are written
-	
+
 	ID3v2Frame* eval_frame = id32_atom->ID32_TagInfo->ID3v2_FirstFrame;
 	while (eval_frame != NULL) {
 		if (eval_frame->eliminate_frame == true)  {
@@ -1136,14 +1136,14 @@ void APar_RenderFields(char* dest_buffer, uint32_t max_alloc, ID3v2Tag* id3_tag,
 		*frame_length = 0;
 		return;
 	}
-	
+
 	for (uint8_t fld_idx = 0; fld_idx < id3v2_frame->ID3v2_FieldCount; fld_idx++) {
 		ID3v2Fields* this_field = id3v2_frame->ID3v2_Frame_Fields+fld_idx;
 		//fprintf(stdout, "Total Fields for %s: %u (this is %u, %u)\n", id3v2_frame->ID3v2_Frame_Namestr, id3v2_frame->ID3v2_FieldCount, fld_idx, this_field->ID3v2_Field_Type);
 		switch(this_field->ID3v2_Field_Type) {
-			
+
 			//these are raw data fields of variable/fixed length and are not NULL terminated
-			case ID3_UNKNOWN_FIELD : 
+			case ID3_UNKNOWN_FIELD :
 			case ID3_PIC_TYPE_FIELD :
 			case ID3_GROUPSYMBOL_FIELD :
 			case ID3_TEXT_ENCODING_FIELD :
@@ -1160,7 +1160,7 @@ void APar_RenderFields(char* dest_buffer, uint32_t max_alloc, ID3v2Tag* id3_tag,
 				}
 				break;
 			}
-			
+
 			//these fields are subject to NULL byte termination - based on what the text encoding field says the encoding of this string is
 			case ID3_TEXT_FIELD :
 			case ID3_FILENAME_FIELD :
@@ -1174,16 +1174,16 @@ void APar_RenderFields(char* dest_buffer, uint32_t max_alloc, ID3v2Tag* id3_tag,
 					encoding_val = id3v2_frame->ID3v2_Frame_Fields->field_string[0]; //ID3_TEXT_ENCODING_FIELD is always the first field, and should have an encoding
 					if ( (id3_tag->ID3v2Tag_MajorVersion == 4 && encoding_val == TE_UTF8) || encoding_val == TE_LATIN1 ) {
 						if (this_field->ID3v2_Field_Type != ID3_TEXT_FIELD) APar_ValidateNULLTermination8bit(this_field);
-						
+
 						memcpy(dest_buffer + *frame_length, this_field->field_string, this_field->field_length);
 						*frame_length += this_field->field_length;
 
 					} else if ((id3_tag->ID3v2Tag_MajorVersion == 4 && encoding_val == TE_UTF16LE_WITH_BOM) || encoding_val == TE_UTF16BE_NO_BOM) {
 						APar_ValidateNULLTermination16bit(this_field, encoding_val); //TODO: shouldn't this also exclude ID3_TEXT_FIELDs?
-						
+
 						memcpy(dest_buffer + *frame_length, this_field->field_string, this_field->field_length);
 						*frame_length += this_field->field_length;
-					
+
 					} else { //well, AP didn't set this frame, so just duplicate it.
 						memcpy(dest_buffer + *frame_length, this_field->field_string, this_field->field_length);
 						*frame_length += this_field->field_length;
@@ -1192,7 +1192,7 @@ void APar_RenderFields(char* dest_buffer, uint32_t max_alloc, ID3v2Tag* id3_tag,
 				//fprintf(stdout, "Field idx %u(%d) is now %" PRIu32 " bytes long\n", fld_idx, this_field->ID3v2_Field_Type, *frame_length);
 				break;
 			}
-			
+
 			//these are iso 8859-1 encoded with a single NULL terminator
 			//a 'LINK' url would also come here and be seperately enumerated (because it has a terminating NULL); but in 3gp assets, external references aren't allowed
 			//an 'OWNE'/'COMR' price field would also be here because of single byte NULL termination
@@ -1217,23 +1217,23 @@ void APar_RenderFields(char* dest_buffer, uint32_t max_alloc, ID3v2Tag* id3_tag,
 				//fprintf(stdout, "I was unable to determine the field class. I was provided with %u (i.e. text field: %u, text encoding: %u\n", this_field->ID3v2_Field_Type, ID3_TEXT_FIELD, ID3_TEXT_ENCODING_FIELD);
 				break;
 			}
-		
+
 		} //end switch
 	}
 	if (id3v2_frame->ID3v2_FrameType == ID3_TEXT_FRAME && id3v2_frame->textfield_tally > 1 && id3_tag->ID3v2Tag_MajorVersion == 4) {
 		ID3v2Fields* extra_textfield = (id3v2_frame->ID3v2_Frame_Fields+1)->next_field;
 		while (true) {
 			if (extra_textfield == NULL) break;
-			
+
 			if (encoding_val == TE_UTF8 || encoding_val == TE_LATIN1 ) {
 				*frame_length+=1;
 			} else if (encoding_val == TE_UTF16LE_WITH_BOM || encoding_val == TE_UTF16BE_NO_BOM) {
 				*frame_length+=2;
 			}
-			
+
 			memcpy(dest_buffer + *frame_length, extra_textfield->field_string, extra_textfield->field_length);
 			*frame_length += extra_textfield->field_length;
-			
+
 			extra_textfield = extra_textfield->next_field;
 		}
 	}
@@ -1243,20 +1243,20 @@ void APar_RenderFields(char* dest_buffer, uint32_t max_alloc, ID3v2Tag* id3_tag,
 uint32_t APar_Render_ID32_Tag(AtomicInfo* id32_atom, uint32_t max_alloc) {
 	bool contains_rendered_frames = false;
 	APar_FrameFilter(id32_atom);
-	
+
 	UInt16_TO_String2(id32_atom->AtomicLanguage, id32_atom->AtomicData); //parsedAtoms[atom_idx].AtomicLanguage
 	uint64_t tag_offset = 2; //those first 2 bytes will hold the language
 	uint32_t frame_length, frame_header_len; //the length in bytes this frame consumes in AtomicData as rendered
 	uint64_t frame_length_pos, frame_compressed_length_pos;
-	
+
 	memcpy(id32_atom->AtomicData + tag_offset, "ID3", 3);
 	tag_offset+=3;
-	
+
 	id32_atom->AtomicData[tag_offset] = id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion; //should be 4
 	id32_atom->AtomicData[tag_offset+1] = id32_atom->ID32_TagInfo->ID3v2Tag_RevisionVersion; //should be 0
 	id32_atom->AtomicData[tag_offset+2] = id32_atom->ID32_TagInfo->ID3v2Tag_Flags;
 	tag_offset+=3;
-	
+
 	//unknown full length; fill in later
 	if (id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion == 3 || id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion == 4) {
 		tag_offset+= 4;
@@ -1266,70 +1266,70 @@ uint32_t APar_Render_ID32_Tag(AtomicInfo* id32_atom, uint32_t max_alloc) {
 	} else if (id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion == 2) {
 		tag_offset+= 3;
 	}
-	
+
 	id32_atom->ID32_TagInfo->ID3v2Tag_Length = tag_offset-2;
-	
+
 	ID3v2Frame* thisframe = id32_atom->ID32_TagInfo->ID3v2_FirstFrame;
 	while (thisframe != NULL) {
 		frame_header_len = 0;
 		frame_length_pos = 0;
 		frame_compressed_length_pos = 0;
-		
+
 		if (thisframe->eliminate_frame == true) {
 			thisframe = thisframe->ID3v2_NextFrame;
 			continue;
 		}
-		
+
 		contains_rendered_frames = true;
 		//this won't be able to convert from 1 tag version to another because it doesn't look up the frame id strings for the change
 		if (id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion == 3 || id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion == 4) {
 			memcpy(id32_atom->AtomicData + tag_offset, thisframe->ID3v2_Frame_Namestr, 4);
 			frame_header_len += 4;
-			
+
 			//the frame length won't be determined until the end of rendering this frame fully; for now just remember where its supposed to be:
 			frame_length_pos = tag_offset + frame_header_len;
 			frame_header_len+=4;
-			
+
 		} else if (id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion == 2) {
 			memcpy(id32_atom->AtomicData + tag_offset, thisframe->ID3v2_Frame_Namestr, 3);
 			frame_header_len += 3;
-			
+
 			//the frame length won't be determined until the end of rendering this frame fully; for now just remember where its supposed to be:
 			frame_length_pos = tag_offset + frame_header_len;
 			frame_header_len+=3;
 		}
-		
+
 		//render frame flags //TODO: compression & group symbol are the only ones that can possibly be set here
 		if (id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion == 3 || id32_atom->ID32_TagInfo->ID3v2Tag_MajorVersion == 4) {
 			UInt16_TO_String2(thisframe->ID3v2_Frame_Flags, id32_atom->AtomicData + tag_offset + frame_header_len);
 			frame_header_len+=2;
 		}
-		
+
 		//grouping flag? 1 byte; technically, its outside the header and before the fields begin
 		if (ID3v2_TestFrameFlag(thisframe->ID3v2_Frame_Flags, ID32_FRAMEFLAG_GROUPING)) {
 			id32_atom->AtomicData[tag_offset + frame_header_len] = thisframe->ID3v2_Frame_GroupingSymbol;
 			frame_header_len++;
 		}
-		
+
 		//compression flag? 4bytes; technically, its outside the header and before the fields begin
 		if (ID3v2_TestFrameFlag(thisframe->ID3v2_Frame_Flags, ID32_FRAMEFLAG_COMPRESSED)) {
 			frame_compressed_length_pos = tag_offset + frame_header_len; //fill in later; remember where it is supposed to go
 			frame_header_len+=4;
 		}
-		
+
 		frame_length = 0;
 		APar_RenderFields(id32_atom->AtomicData + tag_offset+frame_header_len,
 			max_alloc-tag_offset, id32_atom->ID32_TagInfo, thisframe,
 			&frame_header_len, &frame_length);
-		
+
 #if defined HAVE_ZLIB_H
 		//and now that we have rendered the frame, its time to turn to compression, if set
 		if (ID3v2_TestFrameFlag(thisframe->ID3v2_Frame_Flags, ID32_FRAMEFLAG_COMPRESSED) ) {
 			uint32_t compressed_len = 0;
 			char* compress_buffer = (char*)calloc(1, sizeof(char)*frame_length + 20);
-			
+
 			compressed_len = APar_zlib_deflate(id32_atom->AtomicData + tag_offset+frame_header_len, frame_length, compress_buffer, frame_length + 20);
-			
+
 			if (compressed_len > 0) {
 				memcpy(id32_atom->AtomicData + tag_offset+frame_header_len, compress_buffer, compressed_len + 1);
 				convert_to_syncsafe32(frame_length, id32_atom->AtomicData + frame_compressed_length_pos);
@@ -1339,15 +1339,15 @@ uint32_t APar_Render_ID32_Tag(AtomicInfo* id32_atom, uint32_t max_alloc) {
 			}
 		}
 #endif
-		
+
 		convert_to_syncsafe32(frame_length, id32_atom->AtomicData + frame_length_pos);
 		tag_offset += frame_header_len + frame_length; //advance
 		id32_atom->ID32_TagInfo->ID3v2Tag_Length += frame_header_len + frame_length;
 		thisframe = thisframe->ID3v2_NextFrame;
-		
+
 	}
 	convert_to_syncsafe32(id32_atom->ID32_TagInfo->ID3v2Tag_Length - 10, id32_atom->AtomicData + 8); //-10 for a v2.4 tag with no extended header
-	
+
 	if (!contains_rendered_frames) id32_atom->ID32_TagInfo->ID3v2Tag_Length = 0;
 
 	return id32_atom->ID32_TagInfo->ID3v2Tag_Length;
@@ -1361,10 +1361,10 @@ void APar_FieldInit(ID3v2Frame* aFrame, uint8_t a_field, uint8_t frame_comp_list
 	uint32_t byte_allocation = 0;
 	ID3v2Fields* this_field = NULL;
 	int field_type = FrameTypeConstructionList[frame_comp_list].ID3_FieldComponents[a_field];
-	
+
 	switch(field_type) {
 		//case ID3_UNKNOWN_FIELD will not be handled
-		
+
 		//these are all 1 to less than 16 bytes.
 		case ID3_GROUPSYMBOL_FIELD :
 		case ID3_COUNTER_FIELD :
@@ -1375,13 +1375,13 @@ void APar_FieldInit(ID3v2Frame* aFrame, uint8_t a_field, uint8_t frame_comp_list
 			byte_allocation = 16;
 			break;
 		}
-		
+
 		//between 16 & 100 bytes.
 		case ID3_MIME_TYPE_FIELD : {
 			byte_allocation = 100;
 			break;
 		}
-		
+
 		//these are allocated with 2000 bytes
 		case ID3_FILENAME_FIELD :
 		case ID3_OWNER_FIELD :
@@ -1396,7 +1396,7 @@ void APar_FieldInit(ID3v2Frame* aFrame, uint8_t a_field, uint8_t frame_comp_list
 			}
 			break;
 		}
-		
+
 		case ID3_BINARY_DATA_FIELD : {
 			if (aFrame->ID3v2_Frame_ID == ID3v2_EMBEDDED_PICTURE || aFrame->ID3v2_Frame_ID == ID3v2_EMBEDDED_OBJECT ) {
 				//this will be left NULL because it would would probably have to be realloced, so just do it later to the right size //byte_allocation = findFileSize(frame_payload) + 1; //this should be limited to max_sync_safe_uint28_t
@@ -1405,7 +1405,7 @@ void APar_FieldInit(ID3v2Frame* aFrame, uint8_t a_field, uint8_t frame_comp_list
 			}
 			break;
 		}
-	
+
 		//default : {
 		//	fprintf(stdout, "I am %d\n", FrameTypeConstructionList[frame_comp_list].ID3_FieldComponents[a_field]);
 		//	break;
@@ -1439,11 +1439,11 @@ void APar_FrameInit(ID3v2Frame* aFrame, const char* frame_str, int frameID, uint
 		aFrame->textfield_tally = 0;
 		aFrame->eliminate_frame = false;
 		memcpy(aFrame->ID3v2_Frame_Namestr, frame_str, 5);
-		
+
 		for (uint8_t fld = 0; fld < aFrame->ID3v2_FieldCount; fld++) {
 			APar_FieldInit(aFrame, fld, frame_comp_list, frame_payload);
 		}
-		
+
 		//fprintf(stdout, "(%u = %d) Type %d\n", frameID, KnownFrames[frameID+1].ID3v2_InternalFrameID, aFrame->ID3v2_FrameType);
 	}
 	//fprintf(stdout, "Retrieved frame for '%s': %s (%u fields)\n", frame_str, KnownFrames[frameID].ID3V2p4_FrameID, aFrame->ID3v2_FieldCount);
@@ -1459,7 +1459,7 @@ void APar_ID3Tag_Init(AtomicInfo* id32_atom) {
 	id32_atom->ID32_TagInfo->ID3v2_Tag_ExtendedHeader_Length = 0;
 	id32_atom->ID32_TagInfo->ID3v2_FrameCount = 0;
 	id32_atom->ID32_TagInfo->modified_tag = false; //this will have to change when a frame is added/modified/removed because this id3 header won't be written with 0 frames
-	
+
 	id32_atom->ID32_TagInfo->ID3v2_FirstFrame = NULL;
 	id32_atom->ID32_TagInfo->ID3v2_FrameList = NULL;
 	return;
@@ -1487,7 +1487,7 @@ uint32_t APar_TextFieldDataPut(ID3v2Fields* thisField, const char* this_payload,
 	if (multistringtext == false) {
 		thisField->field_length = 0;
 	}
-	
+
 	if (str_encoding == TE_UTF8) {
 		bytes_used = strlen(this_payload); //no NULL termination is provided until render time
 		if (bytes_used + thisField->field_length > thisField->alloc_length) {
@@ -1495,7 +1495,7 @@ uint32_t APar_TextFieldDataPut(ID3v2Fields* thisField, const char* this_payload,
 		}
 		memcpy(thisField->field_string + thisField->field_length, this_payload, bytes_used);
 		thisField->field_length += bytes_used;
-		
+
 	} else if (str_encoding == TE_LATIN1) {
 		int string_length = strlen(this_payload);
 		if (string_length + thisField->field_length > thisField->alloc_length) {
@@ -1508,7 +1508,7 @@ uint32_t APar_TextFieldDataPut(ID3v2Fields* thisField, const char* this_payload,
 			bytes_used = converted_bytes;
 			//fprintf(stdout, "string %s, %" PRIu32 "=%" PRIu32 "\n", thisField->field_string, thisField->field_length, bytes_used);
 		}
-		
+
 	} else if (str_encoding == TE_UTF16BE_NO_BOM) {
 		int string_length = (int)utf8_length(this_payload, strlen(this_payload)) + 1;
 		if (2 * string_length + thisField->field_length > thisField->alloc_length) {
@@ -1520,18 +1520,18 @@ uint32_t APar_TextFieldDataPut(ID3v2Fields* thisField, const char* this_payload,
 			thisField->field_length += converted_bytes;
 			bytes_used = converted_bytes;
 		}
-	
+
 	} else if (str_encoding == TE_UTF16LE_WITH_BOM) {
 		int string_length = (int)utf8_length(this_payload, strlen(this_payload)) + 1;
 		uint64_t bom_offset = 0;
-		
+
 		if (2 * string_length + thisField->field_length > thisField->alloc_length) { //important: realloc before BOM testing!!!
 			APar_realloc_memcpy(thisField, (2 * string_length + thisField->field_length > 2000 ? 2 * string_length + thisField->field_length : 2000) );
 		}
 		if (thisField->field_length == 0 && multistringtext == false) {
 			memcpy(thisField->field_string, "\xFF\xFE", 2);
 		}
-		
+
 		uint8_t field_encoding = TextField_TestBOM(thisField->field_string);
 		if (field_encoding > 0) {
 			bom_offset = 2;
@@ -1543,7 +1543,7 @@ uint32_t APar_TextFieldDataPut(ID3v2Fields* thisField, const char* this_payload,
 			bytes_used = converted_bytes;
 		}
 	}
-	
+
 	if (multistringtext != false) {
 		if (str_encoding == TE_UTF16LE_WITH_BOM || str_encoding == TE_UTF16BE_NO_BOM) {
 			bytes_used += 2;
@@ -1560,24 +1560,24 @@ uint32_t APar_BinaryFieldPut(ID3v2Fields* thisField, uint32_t a_number, const ch
 		thisField->field_length = 1;
 		//fprintf(stdout, "My (TE/PT) content is 0x%02X\n", thisField->field_string[0]);
 		return 1;
-		
+
 	} else if (thisField->ID3v2_Field_Type == ID3_BINARY_DATA_FIELD && payload_len == 0) { //contents of a file
 		uint64_t file_length = findFileSize(this_payload);
 		thisField->field_string = (char*)calloc(1, sizeof(char*)*file_length+16);
-		
+
 		FILE* binfile = APar_OpenFile(this_payload, "rb");
 		APar_ReadFile(thisField->field_string, binfile, file_length);
 		fclose(binfile);
-		
+
 		thisField->field_length = file_length;
 		thisField->alloc_length = file_length+16;
 		thisField->ID3v2_Field_Type = ID3_BINARY_DATA_FIELD;
 		return file_length;
-	
+
 	} else if (thisField->ID3v2_Field_Type == ID3_BINARY_DATA_FIELD || thisField->ID3v2_Field_Type == ID3_COUNTER_FIELD) {
 		thisField->field_string = (char*)calloc(1, sizeof(char*)*payload_len+16);
 		memcpy(thisField->field_string, this_payload, payload_len);
-		
+
 		thisField->field_length = payload_len;
 		thisField->alloc_length = payload_len+16;
 		thisField->ID3v2_Field_Type = ID3_BINARY_DATA_FIELD;
@@ -1644,13 +1644,13 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 		}
 		case ID3_UNIQUE_FILE_ID_FRAME : {
 			thisFrame->ID3v2_Frame_Length += APar_TextFieldDataPut(thisFrame->ID3v2_Frame_Fields, frame_payload, TE_LATIN1); //owner field
-			
+
 			if (memcmp(adjunct_payload->dataArg, "randomUUIDstamp", 16) == 0) {
 				char uuid_binary_str[25]; memset(uuid_binary_str, 0, 25);
 				APar_generate_random_uuid(uuid_binary_str);
 				(thisFrame->ID3v2_Frame_Fields+1)->field_string = (char*)calloc(1, sizeof(char*)*40);
 				APar_sprintf_uuid((ap_uuid_t*)uuid_binary_str, (thisFrame->ID3v2_Frame_Fields+1)->field_string);
-		
+
 				(thisFrame->ID3v2_Frame_Fields+1)->field_length = 36;
 				(thisFrame->ID3v2_Frame_Fields+1)->alloc_length = 40;
 				(thisFrame->ID3v2_Frame_Fields+1)->ID3v2_Field_Type = ID3_BINARY_DATA_FIELD;
@@ -1668,7 +1668,7 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 		case ID3_CD_ID_FRAME : {
 			thisFrame->ID3v2_Frame_Fields->field_length = GenerateMCDIfromCD(frame_payload, thisFrame->ID3v2_Frame_Fields->field_string);
 			thisFrame->ID3v2_Frame_Length = thisFrame->ID3v2_Frame_Fields->field_length;
-			
+
 			if (thisFrame->ID3v2_Frame_Length < 12) {
 				free(thisFrame->ID3v2_Frame_Fields->field_string);
 				thisFrame->ID3v2_Frame_Fields->field_string = NULL;
@@ -1777,7 +1777,7 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 			} else {
 				sscanf(frame_payload, "%" SCNu64, &playcount);
 			}
-			
+
 			if (playcount < 268435455) {
 				convert_to_syncsafe32(playcount, play_count_syncsafe);
 				thisFrame->ID3v2_Frame_Length = APar_BinaryFieldPut(thisFrame->ID3v2_Frame_Fields, 0, play_count_syncsafe, 4);
@@ -1797,13 +1797,13 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 
 			memset(popm_play_count_syncsafe, 0,
 				sizeof(popm_play_count_syncsafe));
-			
+
 			if (adjunct_payload->ratingArg != NULL) {
 				popm_rating = strtoul(adjunct_payload->ratingArg, NULL, 10);
 			}
 			thisFrame->ID3v2_Frame_Length += APar_TextFieldDataPut(thisFrame->ID3v2_Frame_Fields, frame_payload, TE_LATIN1); //owner field
 			thisFrame->ID3v2_Frame_Length += APar_BinaryFieldPut(thisFrame->ID3v2_Frame_Fields+1, 0, (char*)&popm_rating, 1); //rating
-			
+
 			if (adjunct_payload->dataArg != NULL) {
 				if (strlen(adjunct_payload->dataArg) > 0) {
 					if (memcmp(adjunct_payload->dataArg, "+1", 3) == 0) {
@@ -1839,12 +1839,12 @@ void APar_FrameDataPut(ID3v2Frame* thisFrame, const char* frame_payload, Adjunct
 
 void APar_EmbeddedFileTests(const char* filepath, int frameType, AdjunctArgs* adjunct_payloads) {
 	if (frameType == ID3_ATTACHED_PICTURE_FRAME) {
-		
+
 		//get cli imagetype
 		uint8_t total_image_types = (uint8_t)(sizeof(ImageTypeList)/sizeof(*ImageTypeList));
 		uint8_t img_typlen = strlen(adjunct_payloads->pictypeArg) + 1;
 		const char* img_comparison_str = NULL;
-		
+
 		for (uint8_t itest = 0; itest < total_image_types; itest++) {
 			if (img_typlen == 5) {
 				img_comparison_str = ImageTypeList[itest].hexstring;
@@ -1859,7 +1859,7 @@ void APar_EmbeddedFileTests(const char* filepath, int frameType, AdjunctArgs* ad
 		if (strlen(filepath) > 0) {
 			//see if file even exists
 			TestFileExistence(filepath, true);
-			
+
 			char* image_headerbytes = (char*)calloc(1, (sizeof(char)*25));
 			FILE* imagefile =  APar_OpenFile(filepath, "rb");
 			APar_ReadFile(image_headerbytes, imagefile, 24);
@@ -1885,10 +1885,10 @@ void APar_EmbeddedFileTests(const char* filepath, int frameType, AdjunctArgs* ad
 			free(image_headerbytes);
 			image_headerbytes = NULL;
 		}
-		
+
 	} else if (frameType == ID3_ATTACHED_OBJECT_FRAME) {
 		if (strlen(filepath) > 0) {
-			TestFileExistence(filepath, true);			
+			TestFileExistence(filepath, true);
 			FILE* embedfile =  APar_OpenFile(filepath, "rb");
 			fclose(embedfile);
 		}
@@ -1900,19 +1900,19 @@ char* APar_ConvertField_to_UTF8(ID3v2Frame* targetframe, int fieldtype) {
 	char* utf8str = NULL;
 	uint8_t targetfield = 0xFF;
 	uint8_t textencoding = 0;
-	
+
 	for (uint8_t frm_field = 0; frm_field < targetframe->ID3v2_FieldCount; frm_field++) {
 		if ( (targetframe->ID3v2_Frame_Fields+frm_field)->ID3v2_Field_Type == fieldtype) {
 			targetfield = frm_field;
 			break;
 		}
 	}
-	
+
 	if (targetfield != 0xFF) {
 		if (targetframe->ID3v2_Frame_Fields->ID3v2_Field_Type == ID3_TEXT_ENCODING_FIELD) {
 			textencoding = targetframe->ID3v2_Frame_Fields->field_string[0];
 		}
-		
+
 		if (textencoding == TE_LATIN1) {
 			utf8str = (char*)calloc(1, sizeof(char*)*( (targetframe->ID3v2_Frame_Fields+targetfield)->field_length *2) +16);
 			isolat1ToUTF8((unsigned char*)utf8str, sizeof(char*)*( (targetframe->ID3v2_Frame_Fields+targetfield)->field_length *2) +16,
@@ -1921,12 +1921,12 @@ char* APar_ConvertField_to_UTF8(ID3v2Frame* targetframe, int fieldtype) {
 		} else if (textencoding == TE_UTF8) { //just so things can be free()'d with testing; a small price to pay
 			utf8str = (char*)calloc(1, sizeof(char*)*( (targetframe->ID3v2_Frame_Fields+targetfield)->field_length) +16);
 			memcpy(utf8str, (targetframe->ID3v2_Frame_Fields+targetfield)->field_string, (targetframe->ID3v2_Frame_Fields+targetfield)->field_length);
-			
+
 		} else if (textencoding == TE_UTF16BE_NO_BOM) {
 			utf8str = (char*)calloc(1, sizeof(char*)*( (targetframe->ID3v2_Frame_Fields+targetfield)->field_length *4) +16);
 			UTF16BEToUTF8((unsigned char*)utf8str, sizeof(char*)*( (targetframe->ID3v2_Frame_Fields+targetfield)->field_length *4) +16,
 			              (unsigned char*)((targetframe->ID3v2_Frame_Fields+targetfield)->field_string), (targetframe->ID3v2_Frame_Fields+targetfield)->field_length);
-			
+
 		} else if (textencoding == TE_UTF16LE_WITH_BOM) {
 			utf8str = (char*)calloc(1, sizeof(char*)*( (targetframe->ID3v2_Frame_Fields+targetfield)->field_length *4) +16);
 			if (memcmp( (targetframe->ID3v2_Frame_Fields+targetfield)->field_string, "\xFF\xFE", 2) == 0) {
@@ -1938,7 +1938,7 @@ char* APar_ConvertField_to_UTF8(ID3v2Frame* targetframe, int fieldtype) {
 			}
 		}
 	}
-	
+
 	return utf8str;
 }
 
@@ -1957,7 +1957,7 @@ ID3v2Frame* APar_FindFrame(ID3v2Tag* id3v2tag, const char* frame_str, int frameI
 	ID3v2Frame* returnframe = NULL;
 	ID3v2Frame* evalframe = id3v2tag->ID3v2_FirstFrame;
 	uint8_t supplemental_matching = 0;
-	
+
 	if (createframe) {
 		ID3v2Frame* newframe = (ID3v2Frame*)calloc(1, sizeof(ID3v2Frame));
 		newframe->ID3v2_NextFrame = NULL;
@@ -1966,7 +1966,7 @@ ID3v2Frame* APar_FindFrame(ID3v2Tag* id3v2tag, const char* frame_str, int frameI
 		id3v2tag->ID3v2_FrameList = newframe;
 		return newframe;
 	}
-	
+
 	if (APar_EvalFrame_for_Field(frametype, ID3_DESCRIPTION_FIELD)) {
 		supplemental_matching = 0x01;
 	}
@@ -1974,7 +1974,7 @@ ID3v2Frame* APar_FindFrame(ID3v2Tag* id3v2tag, const char* frame_str, int frameI
 	while (evalframe != NULL) {
 		//if (trametype is a type containing a modifer like description or image type or symbol or such things
 		if (supplemental_matching != 0) {
-		
+
 			//match on description + frame name
 			if (supplemental_matching && 0x01 && evalframe->ID3v2_Frame_ID == frameID) {
 				char* utf8_descrip = APar_ConvertField_to_UTF8(evalframe, ID3_DESCRIPTION_FIELD);
@@ -1987,13 +1987,13 @@ ID3v2Frame* APar_FindFrame(ID3v2Tag* id3v2tag, const char* frame_str, int frameI
 					free(utf8_descrip);
 				}
 			}
-		
+
 		} else if (evalframe->ID3v2_Frame_ID == ID3_UNKNOWN_FRAME) {
 			if (memcmp(frame_str, evalframe->ID3v2_Frame_Namestr, 4) == 0) {
 				returnframe = evalframe;
 				break;
 			}
-		
+
 		} else {
 			//fprintf(stdout, "frame is %s; eval frameID is %d ?= %d\n", frame_str, evalframe->ID3v2_Frame_ID, frameID);
 			if (evalframe->ID3v2_Frame_ID == frameID) {
@@ -2012,7 +2012,7 @@ APar_ID3FrameAmmend
 	frame_str - the string for the frame (like TCON) that is desired. This string must be a known frame string in AP_ID3v2_FrameDefinitions.h
 	frame_payload - the major piece of metadata to be set (for APIC its the path, for MCDI its a device...), that can optionally be NULL (for removal of the frame)
 	adjunct_payloads - a structure holding a number of optional/required parameters for the frame (compression...)
-	str_encoding - the encoding to be used in the fields of the target frame when different encodings are allowed	
+	str_encoding - the encoding to be used in the fields of the target frame when different encodings are allowed
 
     lookup what frame_str is supposed to look like in the KnownFrames[] array in AP_ID3v2_FrameDefinitions.h. First see if this frame exists at all - if it does &
 		the frame_str is NULL or blank (""), then mark this frame for elimination. if the frame is of a particular type (like TCON), run some tests on the frame_payload.
@@ -2021,21 +2021,21 @@ APar_ID3FrameAmmend
 ----------------------*/
 void APar_ID3FrameAmmend(AtomicInfo* id32_atom, const char* frame_str, const char* frame_payload, AdjunctArgs* adjunct_payloads, uint8_t str_encoding) {
 	ID3v2Frame* targetFrame = NULL;
-	
+
 	if (id32_atom == NULL) return;
 	GlobalID3Tag = id32_atom->ID32_TagInfo;
 	//fprintf(stdout, "frame is %s; payload is %s; %s %s\n", frame_str, frame_payload, adjunct_payloads->descripArg, adjunct_payloads->targetLang);
-	
+
 	int frameID = MatchID3FrameIDstr(frame_str, GlobalID3Tag->ID3v2Tag_MajorVersion);
 	int frameType = KnownFrames[frameID+1].ID3v2_FrameType;
 	uint8_t frameCompositionList = GetFrameCompositionDescription(frameType);
-	
+
 	if (frameType == ID3_ATTACHED_PICTURE_FRAME || frameType == ID3_ATTACHED_OBJECT_FRAME) {
 		APar_EmbeddedFileTests(frame_payload, frameType, adjunct_payloads);
 	}
-	
+
 	targetFrame = APar_FindFrame(id32_atom->ID32_TagInfo, frame_str, frameID, frameType, adjunct_payloads, false);
-	
+
 	if (frame_payload == NULL) {
 		if (targetFrame != NULL) {
 			targetFrame->eliminate_frame = true;
@@ -2043,7 +2043,7 @@ void APar_ID3FrameAmmend(AtomicInfo* id32_atom, const char* frame_str, const cha
 			id32_atom->ID32_TagInfo->modified_tag = true;
 		}
 		return;
-		
+
 	} else if (strlen(frame_payload) == 0) {
 		if (targetFrame != NULL) {
 			targetFrame->eliminate_frame = true; //thats right, frames of empty text are removed - so be a doll and try to convey some info, eh?
@@ -2051,26 +2051,26 @@ void APar_ID3FrameAmmend(AtomicInfo* id32_atom, const char* frame_str, const cha
 			id32_atom->ID32_TagInfo->modified_tag = true;
 		}
 		return;
-	
+
 	} else {
 		if (frameType == ID3_UNKNOWN_FRAME) {
 			APar_assert(false, 10, frame_str);
 			return;
 		}
-		
+
 		//check tags to be set so they conform to the id3v2 informal specification
 		if (frameType == ID3_TEXT_FRAME) {
 			if (targetFrame != NULL) {
 				if (!targetFrame->eliminate_frame) adjunct_payloads->multistringtext = true; //if a frame already exists and isn't marked for elimination, append a new string
 			}
-			
+
 			if (frameID == ID3v2_FRAME_COPYRIGHT || frameID == ID3v2_FRAME_PRODNOTICE) {
 				if ((TestCharInRange(frame_payload[0], '0', '9') + TestCharInRange(frame_payload[1], '0', '9') + TestCharInRange(frame_payload[2], '0', '9') +
 						 TestCharInRange(frame_payload[3], '0', '9') != 4) || frame_payload[4] != ' ') {
 					fprintf(stderr, "AtomicParsley warning: frame %s was skipped because it did not start with a year followed by a space\n", KnownFrames[frameID].ID3V2p4_FrameID);
 					return;
 				}
-			
+
 			} else if (frameID == ID3v2_FRAME_PART_O_SET || frameID == ID3v2_FRAME_TRACKNUM) {
 				uint8_t pos_len = strlen(frame_payload);
 				for (uint8_t letter_idx = 0; letter_idx < pos_len; letter_idx++) {
@@ -2086,7 +2086,7 @@ void APar_ID3FrameAmmend(AtomicInfo* id32_atom, const char* frame_str, const cha
 							}
 						}
 					}
-				}			
+				}
 			} else if (frameID == ID3v2_FRAME_ISRC) {
 				uint8_t isrc_len = strlen(frame_payload);
 				if (isrc_len != 12) {
@@ -2102,26 +2102,26 @@ void APar_ID3FrameAmmend(AtomicInfo* id32_atom, const char* frame_str, const cha
 			}
 		}
 
-		
+
 		if (targetFrame == NULL) {
 			targetFrame = APar_FindFrame(id32_atom->ID32_TagInfo, frame_str, frameID, frameType, adjunct_payloads, true);
 			if (targetFrame == NULL) {
 				fprintf(stdout, "NULL frame\n");
 				exit(0);
 			} else {
-				APar_FrameInit(targetFrame, frame_str, frameID, frameCompositionList, frame_payload);			
+				APar_FrameInit(targetFrame, frame_str, frameID, frameCompositionList, frame_payload);
 			}
 		}
 	}
-	
+
 	if (targetFrame != NULL) {
 		if (adjunct_payloads->zlibCompressed) {
 			targetFrame->ID3v2_Frame_Flags |= (ID32_FRAMEFLAG_COMPRESSED + ID32_FRAMEFLAG_LENINDICATED);
 		}
-		
+
 		if (targetFrame->ID3v2_Frame_ID == ID3v2_FRAME_LANGUAGE) {
 			APar_FrameDataPut(targetFrame, adjunct_payloads->targetLang, adjunct_payloads, str_encoding);
-			
+
 		} else if (targetFrame->ID3v2_Frame_ID == ID3v2_FRAME_CONTENTTYPE) {
 			uint8_t genre_idx = ID3StringGenreToInt(frame_payload);
 			if (genre_idx != 0xFF) {
@@ -2132,11 +2132,11 @@ void APar_ID3FrameAmmend(AtomicInfo* id32_atom, const char* frame_str, const cha
 			} else {
 				APar_FrameDataPut(targetFrame, frame_payload, adjunct_payloads, str_encoding);
 			}
-		
+
 		} else {
 			APar_FrameDataPut(targetFrame, frame_payload, adjunct_payloads, str_encoding);
 		}
-		
+
 		if (adjunct_payloads->zlibCompressed) {
 			targetFrame->ID3v2_Frame_ExpandedLength = targetFrame->ID3v2_Frame_Length;
 		}
@@ -2158,7 +2158,7 @@ APar_FreeID32Memory
 void APar_FreeID32Memory(ID3v2Tag* id32tag) {
 	ID3v2Frame* aframe = id32tag->ID3v2_FirstFrame;
 	while (aframe != NULL) {
-		
+
 #if defined(DEBUG_V)
 		fprintf(stdout, "freeing frame %s of %u fields\n", aframe->ID3v2_Frame_Namestr, aframe->ID3v2_FieldCount);
 #endif
@@ -2181,7 +2181,7 @@ void APar_FreeID32Memory(ID3v2Tag* id32tag) {
 		}
 		free( aframe->ID3v2_Frame_Fields );
 		aframe->ID3v2_Frame_Fields = NULL;
-		free(aframe);	
+		free(aframe);
 		aframe = aframe->ID3v2_NextFrame;
 	}
 	return;
