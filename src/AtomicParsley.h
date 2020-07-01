@@ -70,6 +70,8 @@
 # include <sys/param.h>
 #endif
 #ifdef _WIN32
+// Don't break std::min!
+#define NOMINMAX
 # include <windows.h>
 #endif
 #include <wchar.h>
