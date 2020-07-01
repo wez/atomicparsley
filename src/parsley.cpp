@@ -1224,6 +1224,7 @@ void APar_IdentifyBrand(char *file_brand) {
   case 0x4D345620: //'M4V '
   case 0x4D345648: //'MV4H'
   case 0x4D345650: //'M4VP'
+  case 0x66347620: //'f4v'
   case 0x6D703432: //'mp42'
   case 0x6D703431: //'mp41'
   case 0x69736F6D: //'isom'
