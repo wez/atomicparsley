@@ -20,6 +20,7 @@ endif()
 add_definitions(
   -DPACKAGE_VERSION="${PACKAGE_VERSION}"
   -DBUILD_INFO="${BUILD_INFO}"
+  -D_FILE_OFFSET_BITS=64
 )
 
 find_package(ZLIB)
