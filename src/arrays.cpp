@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright ©2005-2007 puck_lock
+    Copyright (C) 2005-2007 puck_lock
     with contributions from others; see the CREDITS file
 
                 ----------------------
@@ -397,7 +397,7 @@ iso639_lang known_languages[] = {
     {"grn", "gn", "Guarani"},
     {"gsw", NULL, "Alemanic; Swiss German"},
     {"guj", "gu", "Gujarati"},
-    {"gwi", NULL, "Gwich´in"},
+    {"gwi", NULL, "Gwich\xabin"},
     {"hai", NULL, "Haida"},
     {"hat", "ht", "Haitian; Haitian Creole"},
     {"hau", "ha", "Hausa"},
@@ -545,7 +545,7 @@ iso639_lang known_languages[] = {
     {"nic", NULL, "Niger-Kordofanian (Other)"},
     {"niu", NULL, "Niuean"},
     {"nno", "nn", "Norwegian Nynorsk; Nynorsk, Norwegian"},
-    {"nob", "nb", "Norwegian Bokmål; Bokmål, Norwegian"},
+    {"nob", "nb", "Norwegian Bokm\x8cl; Bokm\x8cl, Norwegian"},
     {"nog", NULL, "Nogai"},
     {"non", NULL, "Norse, Old"},
     {"nor", "no", "Norwegian"},
@@ -558,7 +558,7 @@ iso639_lang known_languages[] = {
     {"nyn", NULL, "Nyankole"},
     {"nyo", NULL, "Nyoro"},
     {"nzi", NULL, "Nzima"},
-    {"oci", "oc", "Occitan (post 1500); Provençal"},
+    {"oci", "oc", "Occitan (post 1500); Proven\x8dal"},
     {"oji", "oj", "Ojibwa"},
     {"ori", "or", "Oriya"},
     {"orm", "om", "Oromo"},
@@ -582,7 +582,7 @@ iso639_lang known_languages[] = {
     {"pon", NULL, "Pohnpeian"},
     {"por", "pt", "Portuguese"},
     {"pra", NULL, "Prakrit languages"},
-    {"pro", NULL, "Provençal, Old (to 1500)"},
+    {"pro", NULL, "Proven\x8dal, Old (to 1500)"},
     {"pus", "ps", "Pushto"},
     //{ "qaa-qtz",	NULL,			"Reserved for local use" },
     {"que", "qu", "Quechua"},
@@ -692,7 +692,7 @@ iso639_lang known_languages[] = {
     {"vai", NULL, "Vai"},
     {"ven", "ve", "Venda"},
     {"vie", "vi", "Vietnamese"},
-    {"vol", "vo", "Volapük"},
+    {"vol", "vo", "Volap\x9fk"},
     {"vot", NULL, "Votic"},
     {"wak", NULL, "Wakashan languages"},
     {"wal", NULL, "Walamo"},
