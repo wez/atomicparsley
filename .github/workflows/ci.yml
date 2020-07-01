@@ -20,7 +20,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: install macOS deps
-      if: runner.os == "macOS"
+      if: runner.os == 'macOS'
       run: brew install autoconf automake
     - name: autogen
       run: ./autogen.sh
