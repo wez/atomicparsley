@@ -20,6 +20,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: configure
-      run: cmake -GNinja .
+      run: cmake .
     - name: build
-      run: ninja
+      run: cmake --build .
