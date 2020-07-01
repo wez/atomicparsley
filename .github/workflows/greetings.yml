@@ -1,0 +1,13 @@
+name: Greetings
+
+on: [pull_request, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: 'Thanks for filing an issue!  Please note that this project is only passively maintained, so your best bet for getting an issue resolved is through a pull request that is easy to verify!'
+        pr-message: 'Thanks for your contribution!  As this project is only passively maintained, it is preferable for PRs to be as simple as possible to verify and review.  If feasible and appropriate, consider including a tiny test file to exercise your proposed changes!'
