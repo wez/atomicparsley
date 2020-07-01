@@ -66,10 +66,6 @@ uint32_t APar_FindValueInAtom(char* uint32_buffer, FILE* ISObasemediafile, short
 void APar_UnpackLanguage(unsigned char lang_code[], uint16_t packed_language);
 uint16_t PackLanguage(const char* language_code, uint8_t lang_offset);
 
-#ifdef _WIN32
-int lroundf(float a);
-#endif
-
 #ifndef HAVE_STRSEP
 char *strsep (char **stringp, const char *delim);
 #endif
