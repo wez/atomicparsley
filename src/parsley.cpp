@@ -163,8 +163,7 @@ int APar_TestArtworkBinaryData(const char *artworkPath) {
     if (strncmp(twenty_byte_buffer, "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A", 8) ==
         0) {
       artwork_dataType = AtomFlags_Data_PNGBinary;
-    } else if (strncmp(twenty_byte_buffer, "\xFF\xD8\xFF\xE0", 4) == 0 ||
-               memcmp(twenty_byte_buffer, "\xFF\xD8\xFF\xE1", 4) == 0) {
+    } else if (memcmp(twenty_byte_buffer, "\xFF\xD8\xFF", 3) == 0) {
       artwork_dataType = AtomFlags_Data_JPEGBinary;
     } else {
       fprintf(stdout,

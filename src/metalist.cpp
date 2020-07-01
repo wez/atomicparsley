@@ -305,8 +305,7 @@ void APar_ExtractAAC_Artwork(short this_atom_num,
 
   if (memcmp(art_payload, "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A", 8) == 0) {
     strcpy(suffix, ".png");
-  } else if (memcmp(art_payload, "\xFF\xD8\xFF\xE0", 4) == 0 ||
-             memcmp(art_payload, "\xFF\xD8\xFF\xE1", 4) == 0) {
+  } else if (memcmp(art_payload, "\xFF\xD8\xFF", 3) == 0) {
     strcpy(suffix, ".jpg");
   }
 

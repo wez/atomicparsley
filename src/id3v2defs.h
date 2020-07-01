@@ -557,8 +557,7 @@ ID3v2FieldDefinition FrameTypeConstructionList[] = {
 
 // used to determine mimetype for APIC image writing
 ImageFileFormatDefinition ImageList[] = {
-    {"image/jpeg", ".jpg", 4, "\xFF\xD8\xFF\xE0"},
-    {"image/jpeg", ".jpg", 4, "\xFF\xD8\xFF\xE1"},
+    {"image/jpeg", ".jpg", 3, "\xFF\xD8\xFF"},
     {"image/png", ".png", 8, "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A"},
     {"image/pdf", ".pdf", 7, "%PDF-1."},
     {"image/jp2",
