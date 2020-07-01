@@ -29,6 +29,7 @@
 
 #include "AtomicParsley.h"
 #include "AtomDefs.h"
+#include <algorithm>
 
 //#define DEBUG_V
 
@@ -60,7 +61,7 @@ bool force_existing_hierarchy = false;
 int metadata_style = UNDEFINED_STYLE;
 bool deep_atom_scan = false;
 
-uint32_t max_buffer =
+uint64_t max_buffer =
 #ifdef __linux__
 	0.5 /* splice() allows us to use less buffer space */
 #else
@@ -4447,7 +4448,7 @@ uint64_t splice_copy(int sfd, int ofd, uint64_t block_size,
 	}
 
 	while (block_size) {
-		long toread = MIN(block_size, lim);
+		long toread = std::min(block_size, lim);
 
 		/* splice source data into pipe.
 		 * This will typically be 64k at a time */
@@ -4522,7 +4523,7 @@ uint64_t block_copy(FILE *source_file, FILE *out_file,
 	while (toread) {
 		char *bpos;
 
-		didread = fread(buffer, 1, MIN(max_buffer, toread), source_file);
+		didread = fread(buffer, 1, std::min(max_buffer, toread), source_file);
 		if (didread == 0) {
 			fprintf(stderr, "read: eof=%d err=%d %s\n",
 					feof(source_file),

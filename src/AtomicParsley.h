@@ -113,12 +113,6 @@
 # define SCNu16 "hu"
 #endif
 
-#ifndef MIN
-//#define MIN(X,Y) ((X) < (Y) ? : (X) : (Y))
-#define MIN min
-#endif
-
-
 #ifndef MAXPATHLEN
 # define MAXPATHLEN 255
 #endif
