@@ -21,7 +21,7 @@ On Windows systems you'll need Visual Studio or MingW.
 
 ```
 cmake .
-cmake --build .
+cmake --build . --config Release
 ```
 
 will generate an `AtomicParsley` executable.
