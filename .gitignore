@@ -1,4 +1,4 @@
-syntax: glob
+.*.sw*
 .DS_Store
 obj_dir
 AtomicParsley*
