@@ -138,8 +138,8 @@ void ShowVersionInfo() {
 #define unicode_enabled	"(utf8)"
 #endif
 
-	fprintf(stdout, "AtomicParsley version: %s %s\n",
-		PACKAGE_VERSION, unicode_enabled);
+	fprintf(stdout, "AtomicParsley version: %s %s %s\n",
+		PACKAGE_VERSION, BUILD_INFO, unicode_enabled);
 
 }
 

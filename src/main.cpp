@@ -948,7 +948,7 @@ static void show_short_help(void)
 {
     printf("%s\n", shortHelp_text);
     ShowVersionInfo();
-    printf("\nReport issues at %s\n", PACKAGE_BUGREPORT);
+    printf("\nSubmit bug fixes to https://github.com/wez/atomicparsley\n");
 }
 
 int real_main(int argc, char *argv[])

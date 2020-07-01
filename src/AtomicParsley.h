@@ -5,7 +5,7 @@
 /*
     AtomicParsley - AtomicParsley.h
 
-    AtomicParsley is GPL software; you can freely distribute, 
+    AtomicParsley is GPL software; you can freely distribute,
     redistribute, modify & use under the terms of the GNU General
     Public License; either version 2 or its successor.
 
@@ -13,7 +13,7 @@
     any warranty; without the implied warranty of merchantability
     or fitness for either an expressed or implied particular purpose.
 
-    Please see the included GNU General Public License (GPL) for 
+    Please see the included GNU General Public License (GPL) for
     your rights and further details; see the file COPYING. If you
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
@@ -38,8 +38,6 @@
 #endif
 #endif
 
-#include "config.h"
-
 #define __STDC_LIMIT_MACROS
 #define __STDC_FORMAT_MACROS
 #define __STDC_CONSTANT_MACROS
@@ -52,56 +50,37 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#if HAVE_SYS_TIME_H
-# include <sys/time.h>
-#endif
+#include <sys/time.h>
 #include <time.h>
 #include <math.h>
 #include <errno.h>
 
-#if HAVE_STDDEF_H
-# include <stddef.h>
-#endif
-#if HAVE_STDINT_H
+#include <stddef.h>
 # include <stdint.h>
-#endif
-#if HAVE_INTTYPES_H
 # include <inttypes.h>
-#endif
-#if HAVE_FCNTL_H
+#ifndef _WIN32
 # include <fcntl.h>
-#endif
-#if HAVE_SYS_IOCTL_H
 # include <sys/ioctl.h>
 #endif
-#if HAVE_LINUX_CDROM_H
+#ifdef __linux__
 # include <linux/cdrom.h>
-#endif
-#if HAVE_SYS_MOUNT_H
 # include <sys/mount.h>
-#endif
-#if HAVE_SYS_PARAM_H
 # include <sys/param.h>
 #endif
-#if HAVE_WINDOWS_H
+#ifdef _WIN32
 # include <windows.h>
 #endif
-#if HAVE_WCHAR_H
-# include <wchar.h>
-#endif
-#if HAVE_SYS_STAT_H
+#include <wchar.h>
+#ifndef _WIN32
 # include <sys/stat.h>
-#endif
-#if HAVE_UNISTD_H
 # include <unistd.h>
 #endif
-#if HAVE_IO_H
+#ifdef _WIN32
 # include <io.h>
 #endif
-#if HAVE_SIGNAL_H
+
+#ifndef _WIN32
 # include <signal.h>
-#endif
-#if HAVE_GETOPT_H
 # include <getopt.h>
 #else
 # include "extras/getopt.h"
