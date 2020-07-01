@@ -1,5 +1,6 @@
 # AtomicParsley
 
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/wez/atomicparsley/CI)
 ![Maintenance](https://img.shields.io/maintenance/no/2012)
 
 **Maintenance Note:** This repo is not actively maintained by @wez.
@@ -18,8 +19,12 @@ A note from @wez:
 > I don't use this tool myself I have no way to verify complex changes.
 > If you'd like to make such a change, please consider contributing some
 > kind of basic automated test with a corresponding small test file.
-> This repo does have GitHub Actions enabled so bootstrapping some test
-> coverage is now feasible.
+>
+> This repo has GitHub Actions enabled for the three major platforms
+> so bootstrapping some test coverage is feasible.
+>
+> You are welcome to report issues using the issue tracker, but I am
+> unlikely to act upon them.
 
 ## Basic Instructions
 
