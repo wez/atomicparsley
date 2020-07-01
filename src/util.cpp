@@ -122,12 +122,13 @@ ISO Base Media File; store the resulting FILE* in a global source_file
 FILE *APar_OpenISOBaseMediaFile(const char *utf8file, bool open) {
   if (open && !file_opened) {
     source_file = APar_OpenFile(utf8file, "rb");
-    if (source_file != NULL) {
+    if (source_file != nullptr) {
       file_opened = true;
     }
-  } else {
+  } else if (file_opened) {
     fclose(source_file);
     file_opened = false;
+    source_file = nullptr;
   }
   return source_file;
 }
