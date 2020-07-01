@@ -6273,12 +6273,6 @@ void APar_WriteFile(const char *ISObasemediafile,
     }
   }
 
-  // turn off buffering on the output, since we have a big buffer ourselves
-  if (temp_file) {
-    setbuf(temp_file, NULL);
-  }
-  setbuf(source_file, NULL);
-
   if (temp_file != NULL) { // body of atom writing here
 
     if (dynUpd.updage_by_padding) {
