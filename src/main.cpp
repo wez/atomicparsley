@@ -2151,9 +2151,9 @@ int real_main(int argc, char *argv[]) {
 
         uint8_t hdvideo_value = 0;
         if (strcmp(optarg, "true") == 0) {
-            hdvideo_value = 1;
+          hdvideo_value = 1;
         } else {
-            sscanf(optarg, "%" SCNu8, &hdvideo_value);
+          sscanf(optarg, "%" SCNu8, &hdvideo_value);
         }
 
         APar_Unified_atom_Put(hdvideoData_atom,
