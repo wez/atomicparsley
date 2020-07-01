@@ -19,7 +19,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
     - uses: actions/checkout@v2
-    - name: cmake
+    - name: configure
       run: cmake .
-    - name: make
-      run: make
+    - name: build
+      run: cmake --build .
