@@ -820,12 +820,12 @@ void APar_Print_iTunesData(const char *path,
         true); // just to know if 'free' atoms can be considered padding, or (in
                // the case of say a faac file) it's *just* 'free'
 
-    if (supplemental_info && 0x02) { // PRINT_FREE_SPACE
+    if (supplemental_info & 0x02) { // PRINT_FREE_SPACE
       fprintf(stdout,
               "free atom space: %" PRIu32 "\n",
               APar_ProvideTallyForAtom("free"));
     }
-    if (supplemental_info && 0x04) { // PRINT_PADDING_SPACE
+    if (supplemental_info & 0x04) { // PRINT_PADDING_SPACE
       if (!moov_atom_was_mooved) {
         fprintf(stdout,
                 "padding available: %" PRIu64 " bytes\n",
@@ -834,13 +834,13 @@ void APar_Print_iTunesData(const char *path,
         fprintf(stdout, "padding available: 0 (reorg)\n");
       }
     }
-    if (supplemental_info && 0x08 &&
+    if (supplemental_info & 0x08 &&
         dynUpd.moov_udta_atom != NULL) { // PRINT_USER_DATA_SPACE
       fprintf(stdout,
               "user data space: %" PRIu64 "\n",
               dynUpd.moov_udta_atom->AtomicLength);
     }
-    if (supplemental_info && 0x10) { // PRINT_USER_DATA_SPACE
+    if (supplemental_info & 0x10) { // PRINT_USER_DATA_SPACE
       fprintf(stdout,
               "media data space: %" PRIu32 "\n",
               APar_ProvideTallyForAtom("mdat"));

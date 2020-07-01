@@ -2823,7 +2823,7 @@ ID3v2Frame *APar_FindFrame(ID3v2Tag *id3v2tag,
     if (supplemental_matching != 0) {
 
       // match on description + frame name
-      if (supplemental_matching && 0x01 &&
+      if (supplemental_matching & 0x01 &&
           evalframe->ID3v2_Frame_ID == frameID) {
         char *utf8_descrip =
             APar_ConvertField_to_UTF8(evalframe, ID3_DESCRIPTION_FIELD);
