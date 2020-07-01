@@ -83,8 +83,8 @@
 # include <io.h>
 #endif
 
+#include <signal.h>
 #ifndef _WIN32
-# include <signal.h>
 # include <getopt.h>
 #else
 # include "extras/getopt.h"
