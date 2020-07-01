@@ -22,4 +22,4 @@ jobs:
     - name: configure
       run: cmake .
     - name: build
-      run: cmake --build .
+      run: cmake --build . --config Release

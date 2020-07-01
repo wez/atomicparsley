@@ -21,10 +21,16 @@ jobs:
     - name: configure
       run: cmake .
     - name: build
-      run: cmake --build .
+      run: cmake --build . --config Release
+    - name: zip
+      if: runner.os == 'macOS'
+      run: zip AtomicParsleyMacOS.zip AtomicParsley
+    - name: zip
+      if: runner.os == 'Windows'
+      run: 7z a -tzip AtomicParsleyWindows.zip Release/AtomicParsley.exe
     - name: "Upload to Tagged Release"
       uses: softprops/action-gh-release@v1
       with:
-         files: "AtomicParsley*"
+         files: "AtomicParsley*.zip"
       env:
          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
