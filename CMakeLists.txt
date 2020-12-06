@@ -21,6 +21,12 @@ if(GIT)
   endif()
 endif()
 
+include(CheckSymbolExists)
+check_symbol_exists(strsep "string.h" HAVE_STRSEP)
+if(HAVE_STRSEP)
+  add_definitions(-DHAVE_STRSEP)
+endif()
+
 add_definitions(
   -DPACKAGE_VERSION="${PACKAGE_VERSION}"
   -DBUILD_INFO="${BUILD_INFO}"
