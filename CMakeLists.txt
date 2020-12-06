@@ -73,10 +73,12 @@ add_executable(
   ${sources}
 )
 
-target_link_libraries(
-  AtomicParsley
-  ${ZLIB_LIBRARIES}
-)
+if(ZLIB_FOUND)
+  target_link_libraries(
+    AtomicParsley
+    ${ZLIB_LIBRARIES}
+  )
+endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   target_link_libraries(
