@@ -150,12 +150,12 @@ static void kill_signal(int sig) { exit(0); }
 // less than 80 (max 78) char wide, giving a general (concise) overview
 static const char *shortHelp_text =
     "\n"
-    "AtomicParlsey sets metadata into MPEG-4 files & derivatives supporting 3 "
+    "AtomicParsley sets metadata into MPEG-4 files & derivatives supporting 3 "
     "tag\n"
     " schemes: iTunes-style, 3GPP assets & ISO defined copyright "
     "notifications.\n"
     "\n"
-    "AtomicParlsey quick help for setting iTunes-style metadata into MPEG-4 "
+    "AtomicParsley quick help for setting iTunes-style metadata into MPEG-4 "
     "files.\n"
     "\n"
     "General usage examples:\n"
