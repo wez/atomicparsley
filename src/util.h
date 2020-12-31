@@ -47,10 +47,12 @@ FILE *APar_OpenFile(const char *utf8_filepath, const char *file_flags);
 FILE *APar_OpenISOBaseMediaFile(const char *file, bool open); // openSomeFile
 void TestFileExistence(const char *filePath, bool errorOut);
 
-#if defined(_WIN32)
 #ifndef HAVE_FSEEKO
-int fseeko(FILE *stream, uint64_t pos, int whence);
+int fseeko(FILE *stream, off_t pos, int whence);
+off_t ftello(FILE *stream);
 #endif
+
+#if defined(_WIN32)
 HANDLE APar_OpenFileWin32(const char *utf8_filepath,
                           DWORD dwDesiredAccess,
                           DWORD dwShareMode,

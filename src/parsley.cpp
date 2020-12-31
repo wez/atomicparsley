@@ -1598,7 +1598,7 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
           APar_TestCompatibleBrand(file, 0, dataSize);
         }
 
-        fseek(file, jump, SEEK_SET);
+        fseeko(file, jump, SEEK_SET);
 
         while (jump < file_size) {
 
@@ -5718,31 +5718,14 @@ void APar_MergeTempFile(FILE *dest_file,
     if (file_pos + max_buffer <= src_file_size) {
       APar_readX(buffer, src_file, file_pos, max_buffer);
 
-      // fseek(dest_file, dest_position + file_pos, SEEK_SET);
-#if defined(_WIN32)
-      fpos_t file_offset = dest_position + file_pos;
-#elif defined(__GLIBC__)
-      fpos_t file_offset = {0};
-      file_offset.__pos = dest_position + file_pos;
-#else
-      off_t file_offset = dest_position + file_pos;
-#endif
-      fsetpos(dest_file, &file_offset);
+      fseeko(dest_file, dest_position + file_pos, SEEK_SET);
       fwrite(buffer, max_buffer, 1, dest_file);
       file_pos += max_buffer;
 
     } else {
       APar_readX(buffer, src_file, file_pos, src_file_size - file_pos);
       // fprintf(stdout, "buff starts with %s\n", buffer+4);
-#if defined(_WIN32)
-      fpos_t file_offset = dest_position + file_pos;
-#elif defined(__GLIBC__)
-      fpos_t file_offset = {0};
-      file_offset.__pos = dest_position + file_pos;
-#else
-      off_t file_offset = dest_position + file_pos;
-#endif
-      fsetpos(dest_file, &file_offset);
+      fseeko(dest_file, dest_position + file_pos, SEEK_SET);
       fwrite(buffer, src_file_size - file_pos, 1, dest_file);
       file_pos += src_file_size - file_pos;
       break;

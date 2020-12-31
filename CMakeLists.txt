@@ -26,6 +26,10 @@ check_symbol_exists(strsep "string.h" HAVE_STRSEP)
 if(HAVE_STRSEP)
   add_definitions(-DHAVE_STRSEP)
 endif()
+check_symbol_exists(fseeko "stdio.h" HAVE_FSEEKO)
+if(HAVE_FSEEKO)
+  add_definitions(-DHAVE_FSEEKO)
+endif()
 
 add_definitions(
   -DPACKAGE_VERSION="${PACKAGE_VERSION}"

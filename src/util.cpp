@@ -155,25 +155,28 @@ void TestFileExistence(const char *filePath, bool errorOut) {
   }
 }
 
+#ifndef HAVE_FSEEKO
+#ifdef _WIN32
+int fseeko(FILE *stream, off_t pos, int whence) {
+  return _fseeki64(stream, pos, whence);
+}
+
+off_t ftello(FILE *stream) { return _ftelli64(stream); }
+
+#else
+int fseeko(FILE *stream, off_t pos, int whence) {
+  return fseek(stream, pos, whence);
+}
+
+off_t ftello(FILE *stream) { return ftell(stream); }
+#endif
+#endif
+
 #if defined(_WIN32)
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //                                Win32 functions //
 ///////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef HAVE_FSEEKO
-
-int fseeko(FILE *stream, uint64_t pos, int whence) { // only using SEEK_SET here
-  if (whence == SEEK_SET) {
-    fpos_t fpos = pos;
-    return fsetpos(stream, &fpos);
-  } else {
-    return -1;
-  }
-  return -1;
-}
-
-#endif
 
 /*----------------------
 APar_OpenFileWin32
