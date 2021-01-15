@@ -23,16 +23,11 @@
 #include "AtomicParsley.h"
 #import <Cocoa/Cocoa.h>
 
-bool isJPEG = false;
-bool isPNG = false;
+static void DetermineType(const char *picfilePath, bool &isJPEG, bool &isPNG) {
+  char picHeader[20];
 
-void DetermineType(const char *picfilePath) {
-  char *picHeader = (char *)calloc(1, sizeof(char) * 20);
-  u_int64_t r;
-
-  FILE *pic_file = NULL;
-  pic_file = fopen(picfilePath, "rb");
-  r = fread(picHeader, 8, 1, pic_file);
+  FILE *pic_file = fopen(picfilePath, "rb");
+  u_int64_t r = fread(picHeader, 8, 1, pic_file);
   fclose(pic_file);
 
   if (memcmp(picHeader, "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A", 8) == 0) {
@@ -41,13 +36,14 @@ void DetermineType(const char *picfilePath) {
   } else if (memcmp(picHeader, "\xFF\xD8\xFF", 3) == 0) {
     isJPEG = true;
     isPNG = false;
+  } else {
+    isPNG = false;
+    isJPEG = false;
   }
-  free(picHeader);
-  picHeader = NULL;
-  return;
 }
 
-char *DeriveNewPath(const char *filePath, PicPrefs myPicPrefs, char *newpath) {
+static char *
+DeriveNewPath(const char *filePath, PicPrefs myPicPrefs, char *newpath) {
   const char *suffix = strrchr(filePath, '.');
 
   size_t filepath_len = strlen(filePath);
@@ -71,14 +67,6 @@ char *DeriveNewPath(const char *filePath, PicPrefs myPicPrefs, char *newpath) {
     strcat(newpath, ".png");
   } else {
     strcat(newpath, suffix);
-  }
-
-  if ((strncmp(suffix, ".jpg", 4) == 0) || (strncmp(suffix, ".jpeg", 5) == 0) ||
-      (strncmp(suffix, ".JPG", 4) == 0) || (strncmp(suffix, ".JPEG", 5) == 0)) {
-    isJPEG = true;
-  } else if ((strncmp(suffix, ".png", 4) == 0) ||
-             (strncmp(suffix, ".PNG", 4) == 0)) {
-    isPNG = true;
   }
 
   free(randstring);
@@ -181,7 +169,8 @@ bool ResizeGivenImage(const char *filePath,
     resize = true;
   }
 
-  DetermineType(filePath);
+  bool isJPEG, isPNG;
+  DetermineType(filePath, isJPEG, isPNG);
   if ((isJPEG && myPicPrefs.allPNG) ||
       (isPNG && myPicPrefs.allJPEG)) { // handle jpeg->png & png->jpg conversion
     resize = true;
@@ -248,8 +237,6 @@ bool ResizeGivenImage(const char *filePath,
 
     [image unlockFocus];
     [image release];
-    isJPEG = false;
-    isPNG = false;
     memcpy(resized_path,
            [outFile cStringUsingEncoding:NSUTF8StringEncoding],
            [outFile lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
