@@ -430,7 +430,8 @@ void APar_SupplySelectiveTypeCreatorCodes(const char *inputPath,
 
 bool ResizeGivenImage(const char *filePath,
                       PicPrefs myPicPrefs,
-                      char *resized_path);
+                      char *resized_path,
+                      size_t resized_path_len);
 
 char *GenreIntToString(int genre);
 uint8_t StringGenreToInt(const char *genre_string);

@@ -42,12 +42,14 @@ static void DetermineType(const char *picfilePath, bool &isJPEG, bool &isPNG) {
   }
 }
 
-static char *
-DeriveNewPath(const char *filePath, PicPrefs myPicPrefs, char *newpath) {
+static char *DeriveNewPath(const char *filePath,
+                           PicPrefs myPicPrefs,
+                           char *newpath,
+                           size_t newpath_len) {
   const char *suffix = strrchr(filePath, '.');
 
   size_t filepath_len = strlen(filePath);
-  memset(newpath, 0, MAXPATHLEN + 1);
+  memset(newpath, 0, newpath_len);
   size_t base_len = filepath_len - strlen(suffix);
   memcpy(newpath, filePath, base_len);
   memcpy(newpath + base_len, "-resized-", 9);
@@ -74,11 +76,44 @@ DeriveNewPath(const char *filePath, PicPrefs myPicPrefs, char *newpath) {
   return newpath;
 }
 
+static NSImage *DoResize(NSImage *sourceImage, NSSize newSize) {
+  if (!sourceImage.isValid) {
+    return nil;
+  }
+
+  NSBitmapImageRep *rep = [[NSBitmapImageRep alloc]
+      initWithBitmapDataPlanes:NULL
+                    pixelsWide:newSize.width
+                    pixelsHigh:newSize.height
+                 bitsPerSample:8
+               samplesPerPixel:4
+                      hasAlpha:YES
+                      isPlanar:NO
+                colorSpaceName:NSCalibratedRGBColorSpace
+                   bytesPerRow:0
+                  bitsPerPixel:0];
+  rep.size = newSize;
+
+  [NSGraphicsContext saveGraphicsState];
+  [NSGraphicsContext
+      setCurrentContext:[NSGraphicsContext
+                            graphicsContextWithBitmapImageRep:rep]];
+  [sourceImage drawInRect:NSMakeRect(0, 0, newSize.width, newSize.height)
+                 fromRect:NSZeroRect
+                operation:NSCompositingOperationCopy
+                 fraction:1.0];
+  [NSGraphicsContext restoreGraphicsState];
+
+  NSImage *newImage = [[NSImage alloc] initWithSize:newSize];
+  [newImage addRepresentation:rep];
+  return newImage;
+}
+
 bool ResizeGivenImage(const char *filePath,
                       PicPrefs myPicPrefs,
-                      char *resized_path) {
+                      char *resized_path,
+                      size_t resized_path_len) {
   bool resize = false;
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
   NSImage *source = [[NSImage alloc]
       initWithContentsOfFile:[NSString stringWithUTF8String:filePath]];
@@ -179,37 +214,23 @@ bool ResizeGivenImage(const char *filePath,
   NSSize size = NSMakeSize(hmax, vmax);
 
   if (resize) {
-    [NSApplication sharedApplication];
-    [[NSGraphicsContext currentContext]
-        setImageInterpolation:NSImageInterpolationHigh];
+    NSImage *image = DoResize(source, size);
 
-    [source setSize:size];
+    NSData *imageData = [image TIFFRepresentation];
+    NSBitmapImageRep *bitmap = [NSBitmapImageRep imageRepWithData:imageData];
 
-    NSImage *image = [[NSImage alloc] initWithSize:size];
-    [image lockFocus];
-
-    NSEraseRect(destinationRect);
-    [source drawInRect:destinationRect
-              fromRect:destinationRect
-             operation:NSCompositingOperationCopy
-              fraction:1.0];
-
-    NSBitmapImageRep *bitmap =
-        [[NSBitmapImageRep alloc] initWithFocusedViewRect:destinationRect];
     NSBitmapImageFileType filetype;
     NSDictionary *props;
 
     if ((isPNG && !myPicPrefs.allJPEG) || myPicPrefs.allPNG) {
       filetype = NSBitmapImageFileTypePNG;
       props = nil;
-
     } else {
       filetype = NSBitmapImageFileTypeJPEG;
       props = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:0.7]
                                           forKey:NSImageCompressionFactor];
     }
     NSData *data = [bitmap representationUsingType:filetype properties:props];
-
     unsigned dataLength = [data length]; // holds the file length
 
     int iter = 0;
@@ -227,21 +248,21 @@ bool ResizeGivenImage(const char *filePath,
       }
     }
 
-    [bitmap release];
-    NSString *outFile = [NSString
-        stringWithUTF8String:DeriveNewPath(filePath, myPicPrefs, resized_path)];
-    // NSLog(outFile);
+    NSString *outFile =
+        [NSString stringWithUTF8String:DeriveNewPath(filePath,
+                                                     myPicPrefs,
+                                                     resized_path,
+                                                     resized_path_len)];
     [[NSFileManager defaultManager] createFileAtPath:outFile
                                             contents:data
                                           attributes:nil];
 
-    [image unlockFocus];
     [image release];
+    [bitmap release];
     memcpy(resized_path,
            [outFile cStringUsingEncoding:NSUTF8StringEncoding],
            [outFile lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
   }
   [source release];
-  [pool release];
   return resize;
 }

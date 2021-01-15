@@ -2938,9 +2938,13 @@ void APar_MetaData_atomArtwork_Set(const char *artworkPath,
       // any way
       myPicturePrefs = APar_ExtractPicPrefs(env_PicOptions);
 
-      char *resized_filepath = (char *)calloc(1, sizeof(char) * MAXPATHLEN + 1);
+      size_t resized_filepath_len = MAXPATHLEN + 1;
+      char *resized_filepath = (char *)calloc(1, resized_filepath_len);
 
-      if (ResizeGivenImage(artworkPath, myPicturePrefs, resized_filepath)) {
+      if (ResizeGivenImage(artworkPath,
+                           myPicturePrefs,
+                           resized_filepath,
+                           resized_filepath_len)) {
         APar_MetaData_atomArtwork_Init(desiredAtom->AtomicNumber,
                                        resized_filepath);
 

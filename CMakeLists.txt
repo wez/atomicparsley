@@ -5,6 +5,8 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
+option(ASAN "whether to enable ASAN" OFF)
+
 find_program(GIT git)
 if(GIT)
   execute_process(
@@ -91,4 +93,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     "-framework Foundation"
     "-framework IOKit"
   )
+endif()
+
+if (ASAN)
+  set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+  set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 endif()
