@@ -82,7 +82,6 @@ bool ResizeGivenImage(const char *filePath,
 
   NSImage *source = [[NSImage alloc]
       initWithContentsOfFile:[NSString stringWithUTF8String:filePath]];
-  [source setScalesWhenResized:YES];
   if (source == nil) {
     fprintf(stderr, "Image '%s' could not be loaded.\n", filePath);
     exit(1);
@@ -192,7 +191,7 @@ bool ResizeGivenImage(const char *filePath,
     NSEraseRect(destinationRect);
     [source drawInRect:destinationRect
               fromRect:destinationRect
-             operation:NSCompositeCopy
+             operation:NSCompositingOperationCopy
               fraction:1.0];
 
     NSBitmapImageRep *bitmap =
@@ -201,11 +200,11 @@ bool ResizeGivenImage(const char *filePath,
     NSDictionary *props;
 
     if ((isPNG && !myPicPrefs.allJPEG) || myPicPrefs.allPNG) {
-      filetype = NSPNGFileType;
+      filetype = NSBitmapImageFileTypePNG;
       props = nil;
 
     } else {
-      filetype = NSJPEGFileType;
+      filetype = NSBitmapImageFileTypeJPEG;
       props = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:0.7]
                                           forKey:NSImageCompressionFactor];
     }
@@ -215,7 +214,8 @@ bool ResizeGivenImage(const char *filePath,
 
     int iter = 0;
     float compression = 0.65;
-    if ((myPicPrefs.max_Kbytes != 0) && (filetype == NSJPEGFileType)) {
+    if ((myPicPrefs.max_Kbytes != 0) &&
+        (filetype == NSBitmapImageFileTypeJPEG)) {
       while ((dataLength > (unsigned)myPicPrefs.max_Kbytes) && (iter < 10)) {
         props = [NSDictionary
             dictionaryWithObject:[NSNumber numberWithFloat:compression]
