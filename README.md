@@ -2,6 +2,9 @@
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/wez/atomicparsley/CI)
 
+AtomicParsley is a lightweight command line program for reading, parsing and
+setting metadata into MPEG-4 files, in particular, iTunes-style metadata.
+
 ## Installation
 
 ### macOS
