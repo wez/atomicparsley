@@ -34,10 +34,10 @@ zlib  - used to compress ID3 frames & expand already compressed frames
 
 ## A note on maintenance!
 
-> I made some fixes to the original project on sourceforge back in
-> in 2009 and became the de-facto fork of AtomicParsley as a
-> result.  However, I haven't used this tool myself in many years and have
-> acted in a very loose guiding role since then.
+> I made some fixes to the original project on sourceforge back in in 2009 and
+> became the de-facto fork of AtomicParsley as a result.  However, I haven't
+> used this tool myself in many years and have acted in a very loose guiding
+> role since then.
 >
 > In 2020 Bitbucket decided to cease hosting Mercurial based repositories
 > which meant that I had to move it in order to keep it alive, so you'll
@@ -51,6 +51,6 @@ zlib  - used to compress ID3 frames & expand already compressed frames
 > This repo has GitHub Actions enabled for the three major platforms
 > so bootstrapping some test coverage is feasible.
 >
-> You are welcome to report issues using the issue tracker, but I am
-> unlikely to act upon them.
+> You are welcome to report issues using the issue tracker, but I (@wez)
+> am unlikely to act upon them.
 
