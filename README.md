@@ -37,7 +37,7 @@ zlib  - used to compress ID3 frames & expand already compressed frames
 
 ## A note on maintenance!
 
-> I made some fixes to the original project on sourceforge back in in 2009 and
+> I made some fixes to the original project on sourceforge back in 2009 and
 > became the de-facto fork of AtomicParsley as a result.  However, I haven't
 > used this tool myself in many years and have acted in a very loose guiding
 > role since then.
