@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - "20*"
-  workflow_dispatch:
 
 defaults:
   run:
