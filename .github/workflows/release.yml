@@ -27,7 +27,7 @@ jobs:
       run: |
         rm CMakeCache.txt
         mv AtomicParsley AtomicParsleyLinux
-        docker run --rm -it -v "$(pwd):/mnt" -w '/mnt' alpine sh -c "\
+        docker run --rm -v "$(pwd):/mnt" -w '/mnt' alpine sh -c "\
           apk add cmake build-base linux-headers zlib-dev && \
           cmake . \
           cmake --build . --config Release \
