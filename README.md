@@ -17,6 +17,16 @@ setting metadata into MPEG-4 files, in particular, iTunes-style metadata.
 * Navigate to the [latest release](https://github.com/wez/atomicparsley/releases/latest)
 * Download the `AtomicParsleyWindows.zip` file and extract `AtomicParsley.exe`
 
+### Linux (x86-64)
+
+* Navigate to the [latest release](https://github.com/wez/atomicparsley/releases/latest)
+* Download the `AtomicParsleyLinux.zip` file and extract `AtomicParsley`
+
+### Alpine Linux (x86-64 musl libc)
+
+* Navigate to the [latest release](https://github.com/wez/atomicparsley/releases/latest)
+* Download the `AtomicParsleyAlpine.zip` file and extract `AtomicParsley`
+
 ### Building from Source
 
 If you are building from source you will need `cmake` and `make`.
