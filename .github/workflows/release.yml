@@ -22,12 +22,25 @@ jobs:
       run: cmake .
     - name: build
       run: cmake --build . --config Release
+    - name: build-musl
+      if: runner.os == 'Linux'
+      run: |
+        rm CMakeCache.txt
+        mv AtomicParsley AtomicParsleyLinux
+        docker run --rm -it -v "$(pwd):/mnt" -w '/mnt' alpine sh -c "\
+          apk add cmake build-base linux-headers zlib-dev && \
+          cmake . \
+          cmake --build . --config Release \
+        "
     - name: zip
       if: runner.os == 'macOS'
       run: zip AtomicParsleyMacOS.zip AtomicParsley
     - name: zip
       if: runner.os == 'Linux'
-      run: zip AtomicParsleyLinux.zip AtomicParsley
+      run: |
+        zip AtomicParsleyAlpine.zip AtomicParsley
+        mv AtomicParsleyLinux AtomicParsley
+        zip AtomicParsleyLinux.zip AtomicParsley
     - name: zip
       if: runner.os == 'Windows'
       run: 7z a -tzip AtomicParsleyWindows.zip Release/AtomicParsley.exe
