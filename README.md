@@ -26,8 +26,7 @@ setting metadata into MPEG-4 files, in particular, iTunes-style metadata.
 
 * Navigate to the [latest release](https://github.com/wez/atomicparsley/releases/latest)
 * Download the `AtomicParsleyAlpine.zip` file and extract `AtomicParsley`
-* If while trying to run it you get an `Error loading shared library libstdc++.so` (as per [#19](https://github.com/wez/atomicparsley/issues/19))
-  * Fix this with `apk add libstdc++`
+* And finally `apk add libstdc++`
 
 ### Building from Source
 
