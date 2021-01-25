@@ -29,7 +29,7 @@ jobs:
         mv AtomicParsley AtomicParsleyLinux
         docker run --rm -v "$(pwd):/mnt" -w '/mnt' alpine sh -c "\
           apk add cmake build-base linux-headers zlib-dev && \
-          cmake . \
+          cmake . && \
           cmake --build . --config Release \
         "
     - name: zip
