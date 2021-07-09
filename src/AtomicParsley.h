@@ -122,6 +122,7 @@
 #endif
 
 #include "util.h"
+#include <algorithm>
 
 #define MAX_ATOMS 2048
 #define MAXDATA_PAYLOAD 1256

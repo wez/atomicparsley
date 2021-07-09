@@ -1282,11 +1282,12 @@ void APar_ExtractTrackDetails(char *uint32_buffer,
     track_info->type_of_track = VIDEO_TRACK;
   }
   if (parsedAtoms[track->track_atom].AtomicLength > 34) {
-    memset(track_info->track_hdlr_name, 0, 100);
+    memset(track_info->track_hdlr_name, 0, sizeof(track_info->track_hdlr_name));
     APar_readX(track_info->track_hdlr_name,
                isofile,
                parsedAtoms[track->track_atom].AtomicStart + 32,
-               parsedAtoms[track->track_atom].AtomicLength - 32);
+               std::min(sizeof(track_info->track_hdlr_name),
+                        parsedAtoms[track->track_atom].AtomicLength - 32));
   }
 
   // codec section
