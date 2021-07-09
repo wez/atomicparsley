@@ -1286,7 +1286,7 @@ void APar_ExtractTrackDetails(char *uint32_buffer,
     APar_readX(track_info->track_hdlr_name,
                isofile,
                parsedAtoms[track->track_atom].AtomicStart + 32,
-               std::min(sizeof(track_info->track_hdlr_name),
+               std::min((uint64_t)sizeof(track_info->track_hdlr_name),
                         parsedAtoms[track->track_atom].AtomicLength - 32));
   }
 
