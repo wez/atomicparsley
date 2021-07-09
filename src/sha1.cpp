@@ -215,7 +215,13 @@ void sha1_process_bytes(const void *buffer, size_t len, struct sha1_ctx *ctx) {
   /* Process available complete blocks.  */
   if (len >= 64) {
 #if !_STRING_ARCH_unaligned
-#define alignof(type) offsetof(struct { char c; type x; }, x)
+#define alignof(type)                                                          \
+  offsetof(                                                                    \
+      struct {                                                                 \
+        char c;                                                                \
+        type x;                                                                \
+      },                                                                       \
+      x)
 #define UNALIGNED_P(p)                                                         \
   (((size_t)p) % 4 !=                                                          \
    0) //# define UNALIGNED_P(p) (((size_t) p) % alignof (md5_uint32) != 0)
