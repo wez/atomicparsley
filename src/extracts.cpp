@@ -724,7 +724,7 @@ void APar_ShowObjectProfileInfo(uint8_t track_type, TrackInfo *track_info) {
       } // end switch
     }   // end level if
   } else if (track_type == S_AMR_TRACK) {
-    char *amr_modes = (char *)calloc(1, sizeof(char) * 500);
+    char amr_modes[500] = {};
     if (track_info->track_codec == 0x73616D72 ||
         track_info->track_codec == 0x73617762) {
       if (track_info->amr_modes & 0x0001)
@@ -786,9 +786,6 @@ void APar_ShowObjectProfileInfo(uint8_t track_type, TrackInfo *track_info) {
               "  AMR VBR Wide-Band. Encoder vendor code: %s\n",
               track_info->encoder_name);
     }
-    free(amr_modes);
-    amr_modes = NULL;
-
   } else if (track_type == EVRC_TRACK) {
     fprintf(stdout,
             "  EVRC (Enhanced Variable Rate Coder). Encoder vendor code: %s\n",
@@ -821,7 +818,6 @@ void APar_ShowObjectProfileInfo(uint8_t track_type, TrackInfo *track_info) {
       fprintf(stdout, "    channels: [%u]\n", track_info->channels);
     }
   }
-  return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -1592,7 +1588,7 @@ void APar_Print_TrackDetails(TrackInfo *track_info) {
 }
 
 void APar_ExtractDetails(FILE *isofile, uint8_t optional_output) {
-  char *uint32_buffer = (char *)malloc(sizeof(char) * 5);
+  char uint32_buffer[5];
   Trackage track = {0};
 
   AtomicInfo *mvhdAtom = APar_FindAtom("moov.mvhd", false, VERSIONED_ATOM, 0);
@@ -1692,14 +1688,13 @@ void APar_ExtractDetails(FILE *isofile, uint8_t optional_output) {
       }
     }
   }
-  return;
 }
 
 // provided as a convenience function so that 3rd party utilities can know
 // beforehand
 void APar_ExtractBrands(char *filepath) {
   FILE *a_file = APar_OpenISOBaseMediaFile(filepath, true);
-  char *buffer = (char *)calloc(1, sizeof(char) * 16);
+  char buffer[16] = {};
   uint32_t atom_length = 0;
   uint8_t file_type_offset = 0;
   uint32_t compatible_brand = 0;
@@ -1779,8 +1774,4 @@ void APar_ExtractBrands(char *filepath) {
   fprintf(stdout,
           "   ISO-copyright notices @ movie and/or track level "
           "allowed.\n   uuid private user extension tags allowed.\n");
-
-  free(buffer);
-  buffer = NULL;
-  return;
 }
