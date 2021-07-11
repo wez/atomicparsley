@@ -1692,6 +1692,7 @@ void APar_ExtractDetails(FILE *isofile, uint8_t optional_output) {
       }
     }
   }
+	free(uint32_buffer);
   return;
 }
 
