@@ -23,3 +23,16 @@ jobs:
       run: cmake .
     - name: build
       run: cmake --build . --config Release
+
+  asan:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@v2
+    - name: configure
+      run: cmake -DASAN=on -DCMAKE_BUILD_TYPE=Debug .
+    - name: build
+      run: cmake --build .
+    - name: test
+      run: tests/test.sh

@@ -1588,7 +1588,7 @@ void APar_Print_TrackDetails(TrackInfo *track_info) {
 }
 
 void APar_ExtractDetails(FILE *isofile, uint8_t optional_output) {
-  char uint32_buffer[5];
+  char uint32_buffer[8];
   Trackage track = {0};
 
   AtomicInfo *mvhdAtom = APar_FindAtom("moov.mvhd", false, VERSIONED_ATOM, 0);
