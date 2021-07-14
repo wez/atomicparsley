@@ -1217,12 +1217,13 @@ void APar_IdentifyBrand(char *file_brand) {
     psp_brand = true;
     break;
   case 0x4D344120: //'M4A '  -- these are all listed at
-                   // http://www.mp4ra.org/filetype.html as registered brands
+                   // https://mp4ra.org/#/brands as registered brands
   case 0x4D344220: //'M4B '
   case 0x4D345020: //'M4P '
   case 0x4D345620: //'M4V '
   case 0x4D345648: //'MV4H'
   case 0x4D345650: //'M4VP'
+  case 0x64617368: //'dash'
   case 0x66347620: //'f4v'
   case 0x6D703432: //'mp42'
   case 0x6D703431: //'mp41'
