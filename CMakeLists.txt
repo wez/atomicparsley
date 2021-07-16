@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.10)
 project(AtomicParsley)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -100,4 +100,4 @@ if (ASAN)
   set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 endif()
 
-install(TARGETS AtomicParsley RUNTIME)
+install(TARGETS AtomicParsley RUNTIME DESTINATION bin)
