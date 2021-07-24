@@ -3561,7 +3561,7 @@ AtomicInfo *APar_reverseDNS_atom_Init(const char *rDNS_atom_name,
 }
 
 AtomicInfo *APar_ID32_atom_Init(const char *frameID_str,
-                                char meta_area,
+                                signed char meta_area,
                                 const char *lang_str,
                                 uint16_t id32_lang) {
   uint8_t total_tracks = 0;

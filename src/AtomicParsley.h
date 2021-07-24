@@ -258,7 +258,7 @@ AtomicInfo *APar_UserData_atom_Init(const char *userdata_atom_name,
 
 /* ID3v2 (2.4) style metadata, non-external form */
 AtomicInfo *APar_ID32_atom_Init(const char *frameID_str,
-                                char meta_area,
+                                signed char meta_area,
                                 const char *lang_str,
                                 uint16_t id32_lang);
 
