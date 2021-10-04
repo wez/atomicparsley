@@ -3499,15 +3499,15 @@ AtomicInfo *APar_reverseDNS_atom_Init(const char *rDNS_atom_name,
     APar_atom_Binary_Put(
         &parsedAtoms[rDNS_mean_atom], rDNS_domain, domain_len, 0);
 
+    uint32_t name_len = strlen(rDNS_atom_name);
     short rDNS_name_atom = APar_InterjectNewAtom("name",
                                                  CHILD_ATOM,
                                                  VERSIONED_ATOM,
-                                                 12,
+                                                 name_len,
                                                  AtomFlags_Data_Binary,
                                                  0,
                                                  ilst_atom->AtomicLevel + 2,
                                                  rDNS_mean_atom);
-    uint32_t name_len = strlen(rDNS_atom_name);
     parsedAtoms[rDNS_name_atom].ReverseDNSname =
         (char *)calloc(1, sizeof(char) * 101);
     memcpy(
