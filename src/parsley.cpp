@@ -5785,7 +5785,7 @@ uint64_t splice_copy(int sfd,
     if (didread <= 0) {
       if (errno == EINVAL || errno == ENOSYS) {
         /* splice is not supported by source */
-        break;
+        goto exit;
       }
       fprintf(stderr,
               "splice(read): %ld of %lu (%s)\n",
@@ -5805,7 +5805,7 @@ uint64_t splice_copy(int sfd,
       if (didwrite <= 0) {
         if (errno == EINVAL || errno == ENOSYS) {
           /* splice is not supported by dest */
-          break;
+          goto exit;
         }
         fprintf(stderr,
                 "splice(write): %ld of %lu (%s)\n",
@@ -5821,6 +5821,7 @@ uint64_t splice_copy(int sfd,
     APar_ShellProgressBar(tally + bytes_written);
   }
 
+exit:
   close(pfd[0]);
   close(pfd[1]);
   return bytes_written;
