@@ -3041,14 +3041,9 @@ void APar_ID3FrameAmmend(AtomicInfo *id32_atom,
     } else if (targetFrame->ID3v2_Frame_ID == ID3v2_FRAME_CONTENTTYPE) {
       uint8_t genre_idx = ID3StringGenreToInt(frame_payload);
       if (genre_idx != 0xFF) {
-        char genre_str_idx[4];
-        genre_str_idx[0] = 0;
-        genre_str_idx[1] = 0;
-        genre_str_idx[2] = 0;
-        genre_str_idx[3] = 0;
-        sprintf(genre_str_idx, "%u", genre_idx);
-        APar_FrameDataPut(
-            targetFrame, genre_str_idx, adjunct_payloads, str_encoding);
+        char buf[4];
+        snprintf(buf, sizeof(buf), "%u", genre_idx);
+        APar_FrameDataPut(targetFrame, buf, adjunct_payloads, str_encoding);
       } else {
         APar_FrameDataPut(
             targetFrame, frame_payload, adjunct_payloads, str_encoding);
