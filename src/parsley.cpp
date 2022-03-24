@@ -4373,6 +4373,7 @@ bool APar_Readjust_TFHD_fragment_atom(uint64_t mdat_position,
 
 		uint32_t track_ID = UInt32FromBigEndian(tfhd_atomFlags_scrap); //unused
 #endif
+    free(tfhd_atomFlags_scrap);
     uint64_t tfhd_offset =
         UInt64FromBigEndian(parsedAtoms[tfhd_number].AtomicData + 4);
 
