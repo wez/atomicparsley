@@ -4359,8 +4359,8 @@ bool APar_Readjust_TFHD_fragment_atom(uint64_t mdat_position,
              parsedAtoms[tfhd_number].AtomicStart + 12,
              parsedAtoms[tfhd_number].AtomicLength - 12);
 
-  char *tfhd_atomFlags_scrap = (char *)malloc(sizeof(char) * 10);
-  memset(tfhd_atomFlags_scrap, 0, 10);
+  char tfhd_atomFlags_scrap[10];
+  memset(tfhd_atomFlags_scrap, 0, sizeof(tfhd_atomFlags_scrap));
   // parsedAtoms[tfhd_number].AtomicVerFlags = APar_read32(tfhd_atomFlags_scrap,
   // source_file, parsedAtoms[tfhd_number].AtomicStart+8);
 
