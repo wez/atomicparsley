@@ -9,8 +9,8 @@ setting metadata into MPEG-4 files, in particular, iTunes-style metadata.
 
 ### macOS
 
-* Navigate to the [latest release](https://github.com/wez/atomicparsley/releases/latest)
-* Download the `AtomicParsleyMacOS.zip` file and extract `AtomicParsley`
+* Open the Terminal
+* Type `brew install atomicparsley`
 
 ### Windows
 
