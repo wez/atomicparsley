@@ -12,6 +12,14 @@ setting metadata into MPEG-4 files, in particular, iTunes-style metadata.
 * Navigate to the [latest release](https://github.com/wez/atomicparsley/releases/latest)
 * Download the `AtomicParsleyMacOS.zip` file and extract `AtomicParsley`
 
+AtomicParsley is also available for brew users and can be installed by executing this command in a terminal:
+
+```
+$ brew install atomicparsley
+````
+
+Note that the version available in brew may lag behind the latest version of the code in this repo.
+
 ### Windows
 
 * Navigate to the [latest release](https://github.com/wez/atomicparsley/releases/latest)
