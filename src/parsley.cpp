@@ -31,7 +31,7 @@
 #include "AtomicParsley.h"
 #include <algorithm>
 
-//#define DEBUG_V
+// #define DEBUG_V
 
 /////////////////////////////////////////////////////////////////////////////
 //                     Global Variables                                    //
@@ -2741,7 +2741,7 @@ APar_MetaData_atomGenre_Set
 
     genre is special in that it gets carried on 2 atoms. A standard genre (as
 listed in ID3v1GenreList) is represented as a number on a 'gnre' atom any value
-other than those, and the genre is placed as a string onto a '©gen' atom. Only
+other than those, and the genre is placed as a string onto a 'ï¿½gen' atom. Only
 one or the other can be present. So if atomPayload is a non-NULL value, first
 try and match the genre into the ID3v1GenreList standard genres. Try to remove
 the other type of genre atom, then find or create the new genre atom and put the
@@ -2751,8 +2751,8 @@ void APar_MetaData_atomGenre_Set(const char *atomPayload) {
   if (metadata_style == ITUNES_STYLE) {
     const char *standard_genre_atom = "moov.udta.meta.ilst.gnre";
     const char *std_genre_data_atom = "moov.udta.meta.ilst.gnre.data";
-    const char *custom_genre_atom = "moov.udta.meta.ilst.©gen";
-    const char *cstm_genre_data_atom = "moov.udta.meta.ilst.©gen.data";
+    const char *custom_genre_atom = "moov.udta.meta.ilst.ï¿½gen";
+    const char *cstm_genre_data_atom = "moov.udta.meta.ilst.ï¿½gen.data";
 
     if (strlen(atomPayload) == 0) {
       APar_RemoveAtom(std_genre_data_atom,
@@ -2770,7 +2770,7 @@ void APar_MetaData_atomGenre_Set(const char *atomPayload) {
       modified_atoms = true;
 
       if (genre_number != 0) {
-        // first find if a custom genre atom ("©gen") exists; erase the
+        // first find if a custom genre atom ("ï¿½gen") exists; erase the
         // custom-string genre atom in favor of the standard genre atom
 
         AtomicInfo *verboten_genre_atom =
@@ -2778,7 +2778,7 @@ void APar_MetaData_atomGenre_Set(const char *atomPayload) {
 
         if (verboten_genre_atom != NULL) {
           if (strlen(verboten_genre_atom->AtomicName) > 0) {
-            if (strncmp(verboten_genre_atom->AtomicName, "©gen", 4) == 0) {
+            if (strncmp(verboten_genre_atom->AtomicName, "ï¿½gen", 4) == 0) {
               APar_RemoveAtom(cstm_genre_data_atom, VERSIONED_ATOM, 0);
             }
           }
@@ -2835,7 +2835,7 @@ void APar_MetaData_atomLyrics_Set(const char *lyricsPath) {
     modified_atoms = true;
 
     AtomicInfo *lyricsData_atom =
-        APar_FindAtom("moov.udta.meta.ilst.©lyr.data", true, VERSIONED_ATOM, 0);
+        APar_FindAtom("moov.udta.meta.ilst.ï¿½lyr.data", true, VERSIONED_ATOM, 0);
     APar_MetaData_atom_QuickInit(
         lyricsData_atom->AtomicNumber, AtomFlags_Data_Text, 0, file_len + 1);
 
@@ -3483,17 +3483,19 @@ AtomicInfo *APar_reverseDNS_atom_Init(const char *rDNS_atom_name,
                               ilst_atom->AtomicLevel + 1,
                               last_iTunes_list_descriptor);
 
+    uint32_t domain_len = strlen(rDNS_domain);
     short rDNS_mean_atom = APar_InterjectNewAtom("mean",
                                                  CHILD_ATOM,
                                                  VERSIONED_ATOM,
-                                                 12,
+                                                 domain_len,
                                                  AtomFlags_Data_Binary,
                                                  0,
                                                  ilst_atom->AtomicLevel + 2,
                                                  rDNS_four_dash_parent);
-    uint32_t domain_len = strlen(rDNS_domain);
+    parsedAtoms[rDNS_mean_atom].AtomicLength = 12;
+
     parsedAtoms[rDNS_mean_atom].ReverseDNSdomain =
-        (char *)calloc(1, sizeof(char) * 101);
+        (char *)calloc(1, sizeof(char) * (domain_len + 1));
     memcpy(
         parsedAtoms[rDNS_mean_atom].ReverseDNSdomain, rDNS_domain, domain_len);
     APar_atom_Binary_Put(
@@ -3508,8 +3510,12 @@ AtomicInfo *APar_reverseDNS_atom_Init(const char *rDNS_atom_name,
                                                  0,
                                                  ilst_atom->AtomicLevel + 2,
                                                  rDNS_mean_atom);
+    // set atom length to 12 as it was from the beginning before applying
+    // https://github.com/wez/atomicparsley/issues/44
+    parsedAtoms[rDNS_name_atom].AtomicLength = 12;
+
     parsedAtoms[rDNS_name_atom].ReverseDNSname =
-        (char *)calloc(1, sizeof(char) * 101);
+        (char *)calloc(1, sizeof(char) * (name_len + 1));
     memcpy(
         parsedAtoms[rDNS_name_atom].ReverseDNSname, rDNS_atom_name, name_len);
     APar_atom_Binary_Put(
