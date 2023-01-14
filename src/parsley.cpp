@@ -3510,9 +3510,9 @@ AtomicInfo *APar_reverseDNS_atom_Init(const char *rDNS_atom_name,
                                                  0,
                                                  ilst_atom->AtomicLevel + 2,
                                                  rDNS_mean_atom);
-    // set atom length to 12 as it was from the beginning before applying
+    // set atom length to 16 as it was from the beginning before applying
     // https://github.com/wez/atomicparsley/issues/44
-    parsedAtoms[rDNS_name_atom].AtomicLength = 12;
+    parsedAtoms[rDNS_name_atom].AtomicLength = 16;
 
     parsedAtoms[rDNS_name_atom].ReverseDNSname =
         (char *)calloc(1, sizeof(char) * (name_len + 1));
