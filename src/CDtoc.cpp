@@ -76,6 +76,8 @@ uint8_t LEADOUT_TRACK_NUMBER = CDROM_LEADOUT;
 #elif defined(_WIN32)
 uint8_t LEADOUT_TRACK_NUMBER =
     0xAA; // NOTE: for WinXP IOCTL_CDROM_READ_TOC_EX code, its 0xA2
+#else
+uint8_t LEADOUT_TRACK_NUMBER = 0xAA;
 #endif
 
 /*
