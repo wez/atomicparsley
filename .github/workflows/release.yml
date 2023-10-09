@@ -34,18 +34,18 @@ jobs:
         "
     - name: zip
       if: runner.os == 'macOS'
-      run: zip AtomicParsleyMacOS.zip AtomicParsley
+      run: zip AtomicParsley-x86_64-apple-darwin.zip AtomicParsley
     - name: zip
       if: runner.os == 'Linux'
       run: |
-        zip AtomicParsleyAlpine.zip AtomicParsley
+        zip AtomicParsley-x86_64-unknown-linux-musl++.zip AtomicParsley
         mv AtomicParsleyLinux AtomicParsley
-        zip AtomicParsleyLinux.zip AtomicParsley
+        zip AtomicParsley-x86_64-unknown-linux.zip AtomicParsley
     - name: zip
       if: runner.os == 'Windows'
       run: |
         pushd Release
-        7z a -tzip ../AtomicParsleyWindows.zip AtomicParsley.exe
+        7z a -tzip ../AtomicParsley-x86_64-pc-windows-msvc.zip AtomicParsley.exe
         popd
     - name: build-windows-x86
       if: runner.os == 'Windows'
@@ -54,7 +54,7 @@ jobs:
         cmake -S . -B build-windows-x86 -A Win32
         cmake --build build-windows-x86 --config Release
         pushd build-windows-x86/Release
-        7z a -tzip ../../AtomicParsleyWindowsX86.zip AtomicParsley.exe
+        7z a -tzip ../../AtomicParsley-x86-pc-windows-msvc.zip AtomicParsley.exe
         popd
     - name: "Upload to Tagged Release"
       uses: softprops/action-gh-release@v1
