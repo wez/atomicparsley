@@ -7,36 +7,49 @@ setting metadata into MPEG-4 files, in particular, iTunes-style metadata.
 
 ## Installation
 
-### macOS
+- [GitHub Releases](#github-releases)
+- [Webi](#webi) (Apple, Linux, Windows)
+- [Brew](#brew) (Apple, Linux)
+
+### GitHub Releases
 
 * Navigate to the [latest release](https://github.com/wez/atomicparsley/releases/latest)
-* Download the `AtomicParsleyMacOS.zip` file and extract `AtomicParsley`
+* Download appropriate file for your OS, and extract `AtomicParsley`
+
+| OS            | Zip File                   | Extracted File      | Notes                                                     |
+| ------------- | -------------------------- | ------------------- | --------------------------------------------------------- |
+| macOS         | `AtomicParsleyMacOS.zip`   | `AtomicParsley`     | After: `xattr -r -d com.apple.quarantine ./AtomicParsley` |
+| Windows       | `AtomicParsleyWindows.zip` | `AtomicParsley.exe` | Before: Install [MSVC Runtime][vcruntime]                 |
+| Linux         | `AtomicParsleyLinux.zip`   | `AtomicParsley`     | -                                                         |
+| Apline (musl) | `AtomicParsleyAlpine.zip`  | `AtomicParsley`     | Before: `apk add libstdc++`                               |
+
+[vcruntime]: https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170
+
+### Webi
+
+Webi also uses GitHub Releases, but automates the process by choosing the download url and setting permissions and PATH correctly.
+
+```sh
+# Mac, Linux
+curl -fsS https://webi.sh/atomicparsley | sh
+```
+
+```pwsh
+# Windows 10+
+curl.exe https://webi.ms/atomicparsley | sh
+```
+
+### Brew
 
 AtomicParsley is also available for brew users and can be installed by executing this command in a terminal:
 
-```
-$ brew install atomicparsley
+```sh
+brew install atomicparsley
 ````
 
 Note that the version available in brew may lag behind the latest version of the code in this repo.
 
-### Windows
-
-* Navigate to the [latest release](https://github.com/wez/atomicparsley/releases/latest)
-* Download the `AtomicParsleyWindows.zip` file and extract `AtomicParsley.exe`
-
-### Linux (x86-64)
-
-* Navigate to the [latest release](https://github.com/wez/atomicparsley/releases/latest)
-* Download the `AtomicParsleyLinux.zip` file and extract `AtomicParsley`
-
-### Alpine Linux (x86-64 musl libc)
-
-* Navigate to the [latest release](https://github.com/wez/atomicparsley/releases/latest)
-* Download the `AtomicParsleyAlpine.zip` file and extract `AtomicParsley`
-* And finally `apk add libstdc++`
-
-### Building from Source
+## Building from Source
 
 If you are building from source you will need `cmake` and `make`.
 On Windows systems you'll need Visual Studio or MingW.
