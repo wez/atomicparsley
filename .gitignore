@@ -31,3 +31,5 @@ CMakeFiles/
 cmake_install.cmake
 .ninja*
 *.ninja
+build/
+.vscode/
