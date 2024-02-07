@@ -2388,10 +2388,8 @@ short APar_InterjectNewAtom(const char *atom_name,
 
   new_atom->AtomicData = (char *)calloc(
       1,
-      sizeof(char) * (atom_length > 16
-                          ? atom_length
-                          : 16)); // puts a hard limit on the length of
-                                  // strings (the spec doesn't)
+      sizeof(char) * MAXDATA_PAYLOAD + 1); // puts a hard limit on the length of
+                                           // strings (the spec doesn't)
 
   new_atom->ID32_TagInfo = NULL;
 
