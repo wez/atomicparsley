@@ -2388,10 +2388,8 @@ short APar_InterjectNewAtom(const char *atom_name,
 
   new_atom->AtomicData = (char *)calloc(
       1,
-      sizeof(char) * (atom_length > 16
-                          ? atom_length
-                          : 16)); // puts a hard limit on the length of
-                                  // strings (the spec doesn't)
+      sizeof(char) * MAXDATA_PAYLOAD + 1); // puts a hard limit on the length of
+                                           // strings (the spec doesn't)
 
   new_atom->ID32_TagInfo = NULL;
 
@@ -3499,15 +3497,15 @@ AtomicInfo *APar_reverseDNS_atom_Init(const char *rDNS_atom_name,
     APar_atom_Binary_Put(
         &parsedAtoms[rDNS_mean_atom], rDNS_domain, domain_len, 0);
 
-    uint32_t name_len = strlen(rDNS_atom_name);
     short rDNS_name_atom = APar_InterjectNewAtom("name",
                                                  CHILD_ATOM,
                                                  VERSIONED_ATOM,
-                                                 name_len,
+                                                 12,
                                                  AtomFlags_Data_Binary,
                                                  0,
                                                  ilst_atom->AtomicLevel + 2,
                                                  rDNS_mean_atom);
+    uint32_t name_len = strlen(rDNS_atom_name);
     parsedAtoms[rDNS_name_atom].ReverseDNSname =
         (char *)calloc(1, sizeof(char) * 101);
     memcpy(
