@@ -225,6 +225,7 @@ sfIDs storefronts[] = {
     {"Portugal", 143453},       {"Spain", 143454},      {"Canada", 143455},
     {"Sweden", 143456},         {"Norway", 143457},     {"Denmark", 143458},
     {"Switzerland", 143459},    {"Australia", 143460},  {"New Zealand", 143461},
+    {"Brazil", 143503},
     {"Japan", 143462}};
 
 iso639_lang known_languages[] = {
