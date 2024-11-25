@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
+
+SET(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "Build all architectures for Mac OS X" FORCE)
+
 project(AtomicParsley)
 
 if(NOT CMAKE_BUILD_TYPE)
